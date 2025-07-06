@@ -1,0 +1,1 @@
+export { InspectionsTable } from "./InspectionsTable";

@@ -1,0 +1,287 @@
+import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
+import { Section } from "@shared/components/Core/Containers/Section";
+import { Icon } from "@shared/components/Core/Icons/Icon";
+import { Subtitle } from "@shared/components/Core/Typography/Subtitle";
+import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
+import { TITLE_ADMIN_EQUIPMENTS } from "@shared/constants/title.browser";
+/* import { URL_PROC_LIST_EQUIP, URL_PROC_SAVE_EQUIP } from "@shared/constants/urls"; */
+import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
+import { useLoaderContext } from "@shared/contexts/Loader";
+import { useToastContext } from "@shared/contexts/Toast";
+import { IEquipment, equipments } from "@shared/hooks/services/Admin/useEquipments";
+import { customers } from "@shared/hooks/services/Admin/useCustomers";
+import { fakeRequest, post, put } from "@shared/services/api/api.service";
+import { useEffect, useState } from "react";
+import { Col, Container, Row } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+
+import { ROUTE_LIST_EQUIPMENTS } from "@/modules/Admin/Equipments/routes/Equipment.paths";
+import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
+
+import { EquipmentRegisterForm } from "./components/RegisterForm";
+import { IEquipmentRegisterForm } from "./components/RegisterForm/RegisterForm.form";
+
+// Dados fictícios para tipos de peça
+const tiposDePeca = [
+  { id: 1, uuidTipoPeca: "tp-a1b2c3d4", nmTipoPeca: "Moenda", dsObse: "Moendas de cana" },
+  { id: 2, uuidTipoPeca: "tp-b2c3d4e5", nmTipoPeca: "Caldeira", dsObse: "Caldeiras de vapor" },
+  { id: 3, uuidTipoPeca: "tp-c3d4e5f6", nmTipoPeca: "Turbina", dsObse: "Turbinas geradoras" },
+  { id: 4, uuidTipoPeca: "tp-d4e5f6a7", nmTipoPeca: "Centrífuga", dsObse: "Centrífugas de separação" },
+  { id: 5, uuidTipoPeca: "tp-e5f6a7b8", nmTipoPeca: "Evaporador", dsObse: "Evaporadores de caldo" },
+];
+
+export function CreateEquipment() {
+  const navigate = useNavigate();
+  const { showLoader, hideLoader } = useLoaderContext();
+  const { addToast, handleApiRejection } = useToastContext();
+  const { setPageBreadcrumb } = useBreadcrumbContext();
+  const { uuid } = useParams();
+
+  // Opções para o select de tipos de peça
+  const tiposPecaOptions: IOption[] = tiposDePeca.map(tipo => ({
+    value: tipo.uuidTipoPeca,
+    label: tipo.nmTipoPeca
+  }));
+
+  const fakeGetEquipment = (uuid: string) => {
+    return fakeRequest(500, { uuid }).then(() => {
+      const equipment = equipments.find((e) => e.uuidEquipamento === uuid);
+
+      if (!equipment) {
+        return { data: null };
+      }
+
+      return { data: equipment };
+    });
+  };
+
+  const fakePostEquipment = async (payload: Partial<IEquipment>) => {
+    const newEquipment = {
+      ...payload,
+      idTipoPeca: tiposDePeca.find(t => t.uuidTipoPeca === payload.uuidTipoPeca)?.id || 0,
+      nmTipoPeca: tiposDePeca.find(t => t.uuidTipoPeca === payload.uuidTipoPeca)?.nmTipoPeca || "",
+      idEquipamento: equipments.length + 1,
+      uuidEquipamento: uuidv4(),
+      dataCadastroEquipamento: new Date().toISOString(),
+      dataUltimaAtualizacao: new Date().toISOString(),
+      inStatusCadastroEquipamento: !!payload.inStatusCadastroEquipamento,
+      dsStatusCadastroEquipamento: payload.inStatusCadastroEquipamento ? "Ativo" : "Inativo",
+      // Buscar nome do cliente
+      nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || "",
+    };
+
+    equipments.push(newEquipment as IEquipment);
+
+    return fakeRequest(1000, {
+      data: newEquipment,
+      message: "Equipamento cadastrado com sucesso!",
+    });
+  };
+
+  const fakePutEquipment = async (uuid: string, payload: Partial<IEquipment>) => {
+    const index = equipments.findIndex((e) => e.uuidEquipamento === uuid);
+
+    if (index === -1) {
+      throw new Error("Equipamento não encontrado");
+    }
+
+    const updatedEquipment: IEquipment = {
+      ...equipments[index],
+      ...payload,
+      idTipoPeca: tiposDePeca.find(t => t.uuidTipoPeca === payload.uuidTipoPeca)?.id || equipments[index].idTipoPeca,
+      nmTipoPeca: tiposDePeca.find(t => t.uuidTipoPeca === payload.uuidTipoPeca)?.nmTipoPeca || equipments[index].nmTipoPeca,
+      dataUltimaAtualizacao: new Date().toISOString(),
+      dsStatusCadastroEquipamento: payload.inStatusCadastroEquipamento ? "Ativo" : "Inativo",
+      nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || equipments[index].nomeCliente,
+    };
+
+    equipments[index] = updatedEquipment;
+
+    return fakeRequest(1000, {
+      data: updatedEquipment,
+      message: "Equipamento atualizado com sucesso!",
+    });
+  };
+
+  const [equipment, setEquipment] = useState<IEquipmentRegisterForm | null>(null);
+
+  // Opções de clientes para o select
+  const customersOptions = customers.map(customer => ({
+    value: customer.uuidCliente,
+    label: customer.nomeRazaoSocialCliente,
+  }));
+
+  useEffect(() => {
+    document.title = TITLE_ADMIN_EQUIPMENTS;
+
+    setPageBreadcrumb([
+      { text: "Home", route: ROUTE_HOME },
+      { text: "Admin" },
+      { text: "Cadastros", route: ROUTE_LIST_EQUIPMENTS },
+      { text: "Equipamentos" },
+    ]);
+
+    if (uuid) {
+      fakeGetEquipment(uuid)
+        .then((data) => {
+          if (data.data) {
+            setEquipment({
+              uuidTipoPeca: data.data.uuidTipoPeca,
+              ttPontoInspecao: data.data.ttPontoInspecao,
+              nomeEquipamento: data.data.nomeEquipamento,
+              dsObservacao: data.data.dsObservacao,
+              inStatusCadastroEquipamento: data.data.inStatusCadastroEquipamento ? "true" : "false",
+              uuidCliente: data.data.uuidCliente || "",
+            });
+          } else {
+            addToast({
+              type: "helper",
+              title: "Ooops.",
+              description: "Equipamento não encontrado.",
+            });
+            navigate(-1);
+          }
+        })
+        .catch(() => {
+          addToast({
+            type: "helper",
+            title: "Ooops.",
+            description: "Erro ao recuperar dados do Equipamento.",
+          });
+          navigate(-1);
+        });
+
+      /* getOne<IEquipment>(`${URL_PROC_LIST_EQUIP}/${uuid}`)
+        .then((data) => {
+          if (data.data) {
+            setEquipment({
+              tipoEquipamento: data.data.tipoEquipamento,
+              numeroSerieEquipamento: data.data.numeroSerieEquipamento,
+              nomeEquipamento: data.data.nomeEquipamento,
+              marcaEquipamento: data.data.marcaEquipamento,
+              modeloEquipamento: data.data.modeloEquipamento,
+              anoFabricacaoEquipamento: data.data.anoFabricacaoEquipamento,
+              numeroPatrimonioEquipamento: data.data.numeroPatrimonioEquipamento,
+              localizacaoEquipamento: data.data.localizacaoEquipamento,
+              descricaoObservacoesEquipamento: data.data.descricaoObservacoesEquipamento,
+              inStatusCadastroEquipamento: data.data.inStatusCadastroEquipamento ? "true" : "false",
+              uuidCliente: data.data.uuidCliente || "",
+            });
+          } else {
+            addToast({
+              type: "helper",
+              title: "Ooops.",
+              description: "Equipamento não encontrado.",
+            });
+
+            navigate(-1);
+          }
+        })
+        .catch(() => {
+          addToast({
+            type: "helper",
+            title: "Ooops.",
+            description: "Erro ao recuperar dados do Equipamento.",
+          });
+
+          navigate(-1);
+        }); */
+    } else {
+      setEquipment({
+        uuidTipoPeca: "",
+        ttPontoInspecao: 0,
+        nomeEquipamento: "",
+        dsObservacao: "",
+        inStatusCadastroEquipamento: "true",
+        uuidCliente: "",
+      });
+    }
+  }, [setPageBreadcrumb, uuid, navigate, addToast]);
+
+  async function handleOnSubmit(formValues: IEquipmentRegisterForm) {
+    const payload = {
+      ...formValues,
+      ttPontoInspecao: Number(formValues.ttPontoInspecao),
+      inStatusCadastroEquipamento: formValues.inStatusCadastroEquipamento === "true",
+    };
+
+    try {
+      showLoader();
+      let response;
+
+      if (uuid) {
+        response = await fakePutEquipment(uuid, payload);
+
+        if (response.data) {
+          addToast({
+            type: "success",
+            title: "Sucesso!",
+            description: response.message,
+          });
+        }
+        /* const { data, message } = await put<IEquipment>(`${URL_PROC_SAVE_EQUIP}/${uuid}`, payload);
+        if (data) {
+          addToast({
+            type: "success",
+            title: "Sucesso!",
+            description: message || "Equipamento atualizado com sucesso!",
+          });
+        }
+      } else {
+        const { data, message } = await post<IEquipment>(URL_PROC_SAVE_EQUIP, payload);
+        if (data) {
+          addToast({
+            type: "success",
+            title: "Sucesso!",
+            description: message || "Equipamento cadastrado com sucesso!",
+          });
+        } */
+      } else {
+        response = await fakePostEquipment(payload);
+
+        if (response.data) {
+          addToast({
+            type: "success",
+            title: "Sucesso!",
+            description: response.message,
+          });
+        }
+      }
+
+      navigate(-1);
+    } catch (error) {
+      handleApiRejection();
+    } finally {
+      hideLoader();
+    }
+  }
+
+  return (
+    <AnimatedPage>
+      <Section>
+        <Container fluid>
+          <Row>
+            <Col lg={9} xxl={12}>
+              <div className="d-flex align-items-center gap-2 mb-4">
+                <Icon icon="post_add" />
+
+                <Subtitle size="sm">Cadastrar Equipamento</Subtitle>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
+              <EquipmentRegisterForm
+                initialValues={equipment && equipment}
+                customersOptions={customersOptions}
+                tiposPecaOptions={tiposPecaOptions}
+                onSubmit={(values) => handleOnSubmit(values)}
+              />
+            </Col>
+          </Row>
+        </Container>
+      </Section>
+    </AnimatedPage>
+  );
+}

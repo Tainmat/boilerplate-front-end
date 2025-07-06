@@ -1,0 +1,8 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true, // required
+  "editor.formatOnType": false, // required
+  "editor.formatOnSave": true, // optional
+  "importSorter.generalConfiguration.sortOnBeforeSave": false,
+  "importSorter.sortConfiguration.removeUnusedImports": false
+}

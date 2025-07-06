@@ -1,0 +1,53 @@
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  src: url("./Material-Icons/MaterialIcons-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Material Icons Outlined";
+  font-style: normal;
+  src: url("./Material-Icons/MaterialIconsOutlined-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Material Icons Round";
+  font-style: normal;
+  src: url("./Material-Icons/MaterialIconsRound-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Material Icons Sharp";
+  font-style: normal;
+  src: url("./Material-Icons/MaterialIconsSharp-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Material Icons Two Tone";
+  font-style: normal;
+  src: url("./Material-Icons/MaterialIconsTwoTone-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./Inter/Inter-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  src: url("./Inter/Inter-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "itenr";
+  font-style: normal;
+  font-weight: 700;
+  src: url("./Inter/Inter-Bold.woff2") format("woff2");
+}

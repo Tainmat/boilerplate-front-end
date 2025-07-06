@@ -1,0 +1,1 @@
+export { CustomerContactRegisterForm } from "./RegisterForm";

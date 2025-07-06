@@ -1,0 +1,1 @@
+export { InspectionRegisterForm } from "./RegisterForm";

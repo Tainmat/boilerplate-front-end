@@ -1,0 +1,1 @@
+export { EquipmentsTable } from "./EquipmentsTable";
