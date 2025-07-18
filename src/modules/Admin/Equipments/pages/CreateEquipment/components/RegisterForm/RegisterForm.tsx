@@ -1,5 +1,7 @@
 import { Button } from "@shared/components/Core/Buttons/Button";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
+import { InputFile } from "@shared/components/Core/Form/Fields/InputFile";
+import { InputNumber } from "@/shared/components/Core/Form/Fields/InputNumber";
 import { Select } from "@shared/components/Core/Form/Fields/Select";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { Skeleton } from "@shared/components/Core/Skeleton";
@@ -9,26 +11,15 @@ import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
-import { InputNumber } from "@/shared/components/Core/Form/Fields/InputNumber";
 
-import { 
-  equipmentValidationSchema, 
-  IEquipmentRegisterForm 
-} from "./RegisterForm.form";
+import { equipmentValidationSchema, IEquipmentRegisterForm } from "./RegisterForm.form";
 
 interface Props {
   initialValues: IEquipmentRegisterForm | null;
   onSubmit: (data: IEquipmentRegisterForm) => void;
-  customersOptions: IOption[];
-  tiposPecaOptions: IOption[];
 }
 
-export function EquipmentRegisterForm({ 
-  initialValues, 
-  onSubmit, 
-  customersOptions, 
-  tiposPecaOptions 
-}: Props) {
+export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
 
@@ -74,52 +65,31 @@ export function EquipmentRegisterForm({
           <Row className="mb-4">
             <Col xl={4}>
               <Field
-                as={Select}
-                label="Tipo de Peça"
-                name="uuidTipoPeca"
-                placeholder="Selecione o tipo"
-                options={tiposPecaOptions}
-                error={touched.uuidTipoPeca && !!errors.uuidTipoPeca}
-                helperText={
-                  touched.uuidTipoPeca && !!errors.uuidTipoPeca
-                    ? errors.uuidTipoPeca
-                    : ""
-                }
-                onChange={({ value }: IOption) => {
-                  setFieldTouched("uuidTipoPeca");
-                  setFieldValue("uuidTipoPeca", value);
-                }}
+                as={InputText}
+                label="Nome do Equipamento"
+                name="name"
+                placeholder="Informe o nome do equipamento"
+                maxLength={100}
+                type="text"
+                error={touched.name && !!errors.name}
+                helperText={touched.name && !!errors.name ? errors.name : ""}
               />
             </Col>
 
             <Col xl={4}>
               <Field
                 as={InputText}
-                label="Nome do Equipamento"
-                name="nomeEquipamento"
-                placeholder="Informe o nome do equipamento"
-                maxLength={100}
-                type="text"
-                error={touched.nomeEquipamento && !!errors.nomeEquipamento}
-                helperText={
-                  touched.nomeEquipamento && !!errors.nomeEquipamento
-                    ? errors.nomeEquipamento
-                    : ""
-                }
-              />
-            </Col>
-
-            <Col xl={4}>
-              <Field
-                as={InputNumber}
                 label="Pontos de Inspeção"
-                name="ttPontoInspecao"
+                name="totalInspectionPoints"
                 placeholder="0"
-                decimalScale={0}
-                error={touched.ttPontoInspecao && !!errors.ttPontoInspecao}
+                error={touched.totalInspectionPoints && !!errors.totalInspectionPoints}
+                allowedCharsPattern={/[^0-9/-]/g}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setFieldValue("totalInspectionPoints", e.target.value);
+                }}
                 helperText={
-                  touched.ttPontoInspecao && !!errors.ttPontoInspecao
-                    ? errors.ttPontoInspecao
+                  touched.totalInspectionPoints && !!errors.totalInspectionPoints
+                    ? errors.totalInspectionPoints
                     : ""
                 }
               />
@@ -127,43 +97,46 @@ export function EquipmentRegisterForm({
           </Row>
 
           <Row className="mb-4">
-            <Col xl={10}>
+            <Col xl={4}>
               <Field
-                as={Select}
-                label="Cliente"
-                name="uuidCliente"
-                placeholder="Selecione o cliente"
-                options={customersOptions}
-                error={touched.uuidCliente && !!errors.uuidCliente}
-                helperText={
-                  touched.uuidCliente && !!errors.uuidCliente ? errors.uuidCliente : ""
-                }
-                onChange={({ value }: IOption) => {
-                  setFieldTouched("uuidCliente");
-                  setFieldValue("uuidCliente", value);
-                }}
+                as={InputFile}
+                label="Croqui"
+                name="coverUrl"
+                placeholder="Selecione um croqui"
+                type="file"
+                accept="image/*"
+                error={touched.coverUrl && !!errors.coverUrl}
+                helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
               />
             </Col>
+
+            {/* <Col xl={4}>
+              <Field
+                as={InputText}
+                label="Croqui"
+                name="coverUrl"
+                placeholder="Selecione um croqui"
+                type="file"
+                error={touched.coverUrl && !!errors.coverUrl}
+                helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
+              />
+            </Col> */}
 
             <Col xl={2} className="d-flex justify-content-end">
               <Field
                 as={Select}
                 label="Status"
-                name="inStatusCadastroEquipamento"
+                name="isActive"
                 placeholder="Selecionar"
                 options={[
                   { value: "true", label: "Ativo" },
                   { value: "false", label: "Inativo" },
                 ]}
-                error={touched.inStatusCadastroEquipamento && !!errors.inStatusCadastroEquipamento}
-                helperText={
-                  touched.inStatusCadastroEquipamento && !!errors.inStatusCadastroEquipamento
-                    ? errors.inStatusCadastroEquipamento
-                    : ""
-                }
+                error={touched.isActive && !!errors.isActive}
+                helperText={touched.isActive && !!errors.isActive ? errors.isActive : ""}
                 onChange={({ value }: IOption) => {
-                  setFieldTouched("inStatusCadastroEquipamento");
-                  setFieldValue("inStatusCadastroEquipamento", value);
+                  setFieldTouched("isActive");
+                  setFieldValue("isActive", value);
                 }}
               />
             </Col>
@@ -173,17 +146,13 @@ export function EquipmentRegisterForm({
             <Col xl={12}>
               <Field
                 as={TextArea}
-                label="Observação"
-                name="dsObservacao"
-                placeholder="Informe observações sobre a peça"
+                label="Descrição"
+                name="description"
+                placeholder="Informe a descrição da peça"
                 maxlength={1024}
                 type="text"
-                error={touched.dsObservacao && !!errors.dsObservacao}
-                helperText={
-                  touched.dsObservacao && !!errors.dsObservacao
-                    ? errors.dsObservacao
-                    : ""
-                }
+                error={touched.description && !!errors.description}
+                helperText={touched.description && !!errors.description ? errors.description : ""}
               />
             </Col>
           </Row>

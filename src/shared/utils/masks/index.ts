@@ -25,7 +25,7 @@ export function cnpjMask(value: string | number | undefined): string {
     .replace(/(-\d{2})\d+?$/, "$1");
 }
 
-export { 
+export {
   phoneInputMask,
   phoneNumberMask,
   cleanPhoneNumber,
@@ -34,8 +34,8 @@ export {
   getPhoneType,
   getPhoneTypeDescription,
   legacyPhoneNumberMask as phoneNumberMask_legacy,
-  legacyCellPhoneNumberMask as cellPhoneNumberMask_legacy
-} from './phoneMask';
+  legacyCellPhoneNumberMask as cellPhoneNumberMask_legacy,
+} from "./phoneMask";
 
 export function cellPhoneNumberMask(value: string): string {
   return value
@@ -52,6 +52,7 @@ export function phoneNumberMask_old(value: string): string {
 }
 
 export function cepMask(value: string): string {
+  if (!value) return "";
   return value
     .replace(/\D/g, "")
     .replace(/(\d{2})(\d)/, "$1$2")

@@ -98,7 +98,7 @@ export async function login(
   }
 }
 
-export async function post(
+export async function post<T>(
   path: string,
   body?: any,
   header?: Record<string, unknown>,
@@ -124,7 +124,7 @@ export async function post(
   }
 }
 
-export async function put(
+export async function put<T>(
   path: string,
   body?: any,
   header?: Record<string, unknown>,
@@ -150,7 +150,7 @@ export async function put(
   }
 }
 
-export async function get(
+export async function get<T>(
   path: string,
   params?: Record<string, any>,
   controller?: AbortController,
@@ -167,7 +167,7 @@ export async function get(
       signal: controller?.signal,
     });
 
-    return response.data;
+    return response;
   } catch (error: any) {
     return {
       status: error?.response?.status || 0,

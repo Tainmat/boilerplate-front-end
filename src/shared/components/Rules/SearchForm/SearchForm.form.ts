@@ -1,11 +1,11 @@
 export interface IParamsSearchForm {
-  searchIn?: string | number;
-  value?: string;
+  searchingBy?: string | number;
+  search?: string;
   status?: "" | "true" | "false";
 }
 
 export const initialValuesSchema: IParamsSearchForm = {
-  searchIn: "",
-  value: "",
+  searchingBy: "",
+  search: "",
   status: "",
 };

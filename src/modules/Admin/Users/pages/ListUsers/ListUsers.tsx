@@ -36,16 +36,12 @@ export function ListUsers() {
 
   const SEARCH_OPTIONS: IOption[] = [
     {
-      value: "nomeUsuario",
+      value: "socialName",
       label: "Nome do Usuário",
     },
     {
-      value: "emailUsuario",
+      value: "email",
       label: "E-mail",
-    },
-    {
-      value: "dsPerfil",
-      label: "Perfil",
     },
   ];
 
@@ -82,10 +78,10 @@ export function ListUsers() {
       } else {
         params = {
           ...initialValuesSchema,
-          items: DEFAULT_ITEMS_PER_PAGE,
+          records: DEFAULT_ITEMS_PER_PAGE,
           page: 1,
-          order: "ASC",
-          sort: "nomeUsuario",
+          order: "socialName",
+          /* sort: "nomeUsuario", */
         };
       }
 
@@ -95,13 +91,13 @@ export function ListUsers() {
 
   function handleOnSearch(data: IParamsSearchForm) {
     if (params) {
-      const { value, searchIn, status } = data;
+      const { search, searchingBy, status } = data;
 
       const newParams = {
         ...params,
         page: 1,
-        searchIn,
-        value,
+        searchingBy,
+        search,
         status,
       };
 
@@ -153,9 +149,9 @@ export function ListUsers() {
                 defaultValues={
                   params
                     ? {
-                        status: params.inStatusCadastroUsuario,
-                        searchIn: params.searchIn,
-                        value: params.value,
+                        status: params.status,
+                        searchingBy: params.searchingBy,
+                        search: params.search,
                       }
                     : null
                 }
@@ -174,9 +170,9 @@ export function ListUsers() {
             >
               <Thead>
                 <Tr>
-                  <Th>
+                  {/* <Th>
                     <Heading size="xs">#</Heading>
-                  </Th>
+                  </Th> */}
 
                   <Th>
                     <Heading size="xs">Nome</Heading>
@@ -213,11 +209,11 @@ export function ListUsers() {
                   result.data.length > 0 ? (
                     result.data.map((item) => (
                       <UsersTable
-                        key={item.uuidUsuario}
+                        key={item.id}
                         data={item}
-                        onEdit={() => addNew(item.uuidUsuario)}
-                        expanded={expandedRow === item.uuidUsuario}
-                        onToggleExpand={() => toggleRowExpand(item.uuidUsuario)}
+                        onEdit={() => addNew(item.id)}
+                        expanded={expandedRow === item.id}
+                        onToggleExpand={() => toggleRowExpand(item.id)}
                         isSmartphone={isSmartphone}
                         isTablet={isTablet}
                       />
@@ -242,7 +238,7 @@ export function ListUsers() {
                 <Pagination
                   key={params.page}
                   defaultCurrent={params.page}
-                  pageSize={Number(params.items)}
+                  pageSize={Number(params.records)}
                   total={result.total}
                   onChange={(page) => handleOnChangePage(page)}
                 />

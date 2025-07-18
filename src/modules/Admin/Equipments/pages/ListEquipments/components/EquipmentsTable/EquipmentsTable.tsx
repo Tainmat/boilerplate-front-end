@@ -17,46 +17,32 @@ interface Props {
   isTablet?: boolean;
 }
 
-export function EquipmentsTable({ 
-  data, 
-  onEdit, 
-  onShowLogs, 
-  expanded, 
-  onToggleExpand,
-  isSmartphone,
-  isTablet
-}: Props) {
+export function EquipmentsTable({ data, onEdit, expanded, onToggleExpand, isSmartphone }: Props) {
   return (
     <>
-      <Tr 
-        expandable={isSmartphone} 
-        expanded={expanded}
-        onToggleExpand={onToggleExpand}
-      >
+      <Tr expandable={isSmartphone} expanded={expanded} onToggleExpand={onToggleExpand}>
         <Td>
-          <Paragraph size="sm">{data.idEquipamento}</Paragraph>
-        </Td>
-
-        <Td>
-          <Paragraph size="sm" title={data.nomeEquipamento}>{data.nomeEquipamento}</Paragraph>
-        </Td>
-
-        <Td>
-          <Paragraph size="sm" title={data.nmTipoPeca}>{data.nmTipoPeca}</Paragraph>
+          <Paragraph size="sm" title={data.name}>
+            {data.name}
+          </Paragraph>
         </Td>
 
         <Td hideOnMobile={true}>
-          <Paragraph size="sm" title={data.ttPontoInspecao.toString()}>{data.ttPontoInspecao}</Paragraph>
+          <Paragraph size="sm" title={data.totalInspectionPoints.toString()}>
+            {data.totalInspectionPoints}
+          </Paragraph>
         </Td>
 
-        <Td hideOnMobile={isSmartphone}>
-          <Paragraph size="sm" title={data.nomeCliente}>{data.nomeCliente}</Paragraph>
+        <Td hideOnMobile={true}>
+          <Paragraph size="sm" title={data.description.toString()}>
+            {data.description}
+          </Paragraph>
         </Td>
 
         <Td>
           <div className="d-flex justify-content-center">
-            <Tag size="lg" status={data.inStatusCadastroEquipamento ? "success" : "warning"}>
-              {data.dsStatusCadastroEquipamento}
+            <Tag size="lg" status={data.isActive ? "success" : "warning"}>
+              {data.isActive ? "Ativo" : "Inativo"}
             </Tag>
           </div>
         </Td>
@@ -64,19 +50,19 @@ export function EquipmentsTable({
         <Td>
           <div className="d-flex justify-content-center">
             <Tooltip title="Editar" place="top-start">
-              <ButtonIcon size="sm" icon="edit" onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }} />
+              <ButtonIcon
+                size="sm"
+                icon="edit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+              />
             </Tooltip>
-
-            {/* <Tooltip title="Visualizar Logs" place="top-start">
-              <ButtonIcon size="sm" icon="open_in_new" onClick={() => onShowLogs()} />
-            </Tooltip> */}
           </div>
         </Td>
       </Tr>
-      
+
       {/* Mobile expanded details row */}
       {isSmartphone && expanded && (
         <Tr className="no-hover">
@@ -87,23 +73,23 @@ export function EquipmentsTable({
                   <Heading size="xxs">Pontos de Inspeção:</Heading>
                 </Col>
                 <Col xs={7}>
-                  <Paragraph size="sm">{data.ttPontoInspecao}</Paragraph>
+                  <Paragraph size="sm">{data.totalInspectionPoints}</Paragraph>
                 </Col>
               </Row>
-              <Row className="mb-2">
+              {/* <Row className="mb-2">
                 <Col xs={5}>
                   <Heading size="xxs">Cliente:</Heading>
                 </Col>
                 <Col xs={7}>
                   <Paragraph size="sm">{data.nomeCliente}</Paragraph>
                 </Col>
-              </Row>
+              </Row> */}
               <Row>
                 <Col xs={5}>
-                  <Heading size="xxs">Observação:</Heading>
+                  <Heading size="xxs">Descrição:</Heading>
                 </Col>
                 <Col xs={7}>
-                  <Paragraph size="sm">{data.dsObservacao || "Nenhuma observação"}</Paragraph>
+                  <Paragraph size="sm">{data.description || "Nenhuma descrição"}</Paragraph>
                 </Col>
               </Row>
             </div>

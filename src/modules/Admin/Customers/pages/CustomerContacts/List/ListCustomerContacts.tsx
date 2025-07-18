@@ -39,7 +39,7 @@ export function ListCustomerContacts() {
 
   const SEARCH_OPTIONS: IOption[] = [
     {
-      value: "nomeContatoCliente",
+      value: "name",
       label: "Nome do Contato",
     },
   ];
@@ -65,7 +65,7 @@ export function ListCustomerContacts() {
 
       setParams({
         ...params,
-        uuidCustomer: uuid,
+        customerId: uuid,
       });
     },
     [setSearchParams, setParams, uuid],
@@ -80,10 +80,9 @@ export function ListCustomerContacts() {
       } else {
         params = {
           ...initialValuesSchema,
-          items: 12,
+          records: 12,
           page: 1,
-          order: "ASC",
-          sort: "nomeContatoCliente",
+          order: "name",
         };
       }
 
@@ -93,13 +92,13 @@ export function ListCustomerContacts() {
 
   function handleOnSearch(data: IParamsSearchForm) {
     if (params) {
-      const { value, searchIn, status } = data;
+      const { search, searchingBy, status } = data;
 
       const newParams = {
         ...params,
         page: 1,
-        searchIn,
-        value,
+        searchingBy,
+        search,
         status,
       };
 
@@ -107,12 +106,12 @@ export function ListCustomerContacts() {
     }
   }
 
-  function handleOnChangeItemsPerPage(items: number) {
+  function handleOnChangeItemsPerPage(records: number) {
     if (params) {
       const newParams = {
         ...params,
         page: 1,
-        items,
+        records,
       };
 
       handleSearchParams(newParams);
@@ -146,8 +145,8 @@ export function ListCustomerContacts() {
         <Container fluid>
           <Row className="mb-4">
             <Col className="d-flex align-items-center gap-2">
-              <Tag size="sm">{`# ${customer.idCliente}`}</Tag>
-              <Heading size="xs">{customer.nomeRazaoSocialCliente}</Heading>
+              <Tag size="sm">{`# ${customer.id}`}</Tag>
+              <Heading size="xs">{customer.corporateName}</Heading>
             </Col>
           </Row>
           <Row className="mb-4">
@@ -157,9 +156,9 @@ export function ListCustomerContacts() {
                 defaultValues={
                   params
                     ? {
-                        status: params.inStatusCadastroClassificacao,
-                        searchIn: params.searchIn,
-                        value: params.value,
+                        status: params.isActive,
+                        searchingBy: params.searchingBy,
+                        search: params.search,
                       }
                     : null
                 }
@@ -174,11 +173,11 @@ export function ListCustomerContacts() {
                 result.data && result.data.length > 0 ? (
                   <Row>
                     {result.data.map((item) => (
-                      <Col key={item.uuidContatoCliente} xxl={4} xl={6}>
+                      <Col key={item.id} xxl={4} xl={6}>
                         <ContactCard
                           item={item}
                           onRefetch={() => refetch()}
-                          onEdit={() => addNew(item.uuidContatoCliente)}
+                          onEdit={() => addNew(item.id)}
                         />
                       </Col>
                     ))}
@@ -202,7 +201,7 @@ export function ListCustomerContacts() {
             <Col xs={9}>
               {params && result && result.data.length >= 8 && (
                 <ItemsPerPage
-                  onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))}
+                  onChange={(records) => handleOnChangeItemsPerPage(Number(records.value))}
                   options={[
                     { value: 12, label: "12" },
                     { value: 24, label: "24" },
@@ -217,7 +216,7 @@ export function ListCustomerContacts() {
                 <Pagination
                   key={params.page}
                   defaultCurrent={params.page}
-                  pageSize={Number(params.items)}
+                  pageSize={Number(params.records)}
                   total={result.total}
                   onChange={(page) => handleOnChangePage(page)}
                 />

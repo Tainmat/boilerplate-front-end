@@ -18,47 +18,51 @@ interface Props {
   isTablet?: boolean;
 }
 
-export function UsersTable({ 
-  data, 
-  onEdit, 
-  onShowLogs, 
+export function UsersTable({
+  data,
+  onEdit,
+  onShowLogs,
   onAddProfile,
   expanded,
   onToggleExpand,
   isSmartphone,
-  isTablet
+  isTablet,
 }: Props) {
   return (
     <>
-      <Tr 
-        expandable={isSmartphone} 
-        expanded={expanded}
-        onToggleExpand={onToggleExpand}
-      >
-        <Td>
-          <Paragraph size="sm">{data.idUsuario}</Paragraph>
-        </Td>
+      <Tr expandable={isSmartphone} expanded={expanded} onToggleExpand={onToggleExpand}>
+        {/* <Td>
+          <Paragraph size="sm">{data.id}</Paragraph>
+        </Td> */}
 
         <Td>
-          <Paragraph size="sm" title={data.nomeUsuario}>{data.nomeUsuario}</Paragraph>
+          <Paragraph size="sm" title={data.name}>
+            {data.name}
+          </Paragraph>
         </Td>
 
         <Td hideOnMobile={true}>
-          <Paragraph size="sm" title={data.nomeSocialUsuario || "-"}>{data.nomeSocialUsuario || "-"}</Paragraph>
+          <Paragraph size="sm" title={data.socialName || "-"}>
+            {data.socialName || "-"}
+          </Paragraph>
         </Td>
 
         <Td hideOnMobile={isSmartphone}>
-          <Paragraph size="sm" title={data.emailUsuario}>{data.emailUsuario}</Paragraph>
+          <Paragraph size="sm" title={data.email}>
+            {data.email}
+          </Paragraph>
         </Td>
 
         <Td hideOnMobile={true}>
-          <Paragraph size="sm" title={data.dsPerfil || "-"}>{data.dsPerfil || "-"}</Paragraph>
+          <Paragraph size="sm" title={data.profileName || "-"}>
+            {data.profileName || "-"}
+          </Paragraph>
         </Td>
 
         <Td>
           <div className="d-flex justify-content-center">
-            <Tag size="lg" status={data.inStatusCadastroUsuario ? "success" : "warning"}>
-              {data.dsStatusCadastroUsuario}
+            <Tag size="lg" status={data.status ? "success" : "warning"}>
+              {data.status ? "Ativo" : "Inativo"}
             </Tag>
           </div>
         </Td>
@@ -66,15 +70,19 @@ export function UsersTable({
         <Td>
           <div className="d-flex justify-content-center">
             <Tooltip title="Editar" place="top-start">
-              <ButtonIcon size="sm" icon="edit" onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }} />
+              <ButtonIcon
+                size="sm"
+                icon="edit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+              />
             </Tooltip>
           </div>
         </Td>
       </Tr>
-      
+
       {/* Mobile expanded details row */}
       {isSmartphone && expanded && (
         <Tr className="no-hover">
@@ -85,7 +93,7 @@ export function UsersTable({
                   <Heading size="xxs">E-mail:</Heading>
                 </Col>
                 <Col xs={8}>
-                  <Paragraph size="sm">{data.emailUsuario}</Paragraph>
+                  <Paragraph size="sm">{data.email}</Paragraph>
                 </Col>
               </Row>
               <Row className="mb-2">
@@ -93,7 +101,7 @@ export function UsersTable({
                   <Heading size="xxs">Nome Social:</Heading>
                 </Col>
                 <Col xs={8}>
-                  <Paragraph size="sm">{data.nomeSocialUsuario || "-"}</Paragraph>
+                  <Paragraph size="sm">{data.socialName || "-"}</Paragraph>
                 </Col>
               </Row>
               <Row>
@@ -101,7 +109,7 @@ export function UsersTable({
                   <Heading size="xxs">Perfil:</Heading>
                 </Col>
                 <Col xs={8}>
-                  <Paragraph size="sm">{data.dsPerfil || "-"}</Paragraph>
+                  <Paragraph size="sm">{data.profileName || "-"}</Paragraph>
                 </Col>
               </Row>
             </div>

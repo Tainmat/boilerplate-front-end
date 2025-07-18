@@ -5,6 +5,7 @@ import { Tooltip } from "@shared/components/Core/Tooltip";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { Row, Col } from "react-bootstrap";
+import { cnpjMask, cpfMask, phoneNumberMask, cepMask } from "@/shared/utils/masks";
 
 import { ICustomer } from "@/shared/hooks/services/Admin/useCustomers";
 
@@ -19,47 +20,63 @@ interface Props {
   isTablet?: boolean;
 }
 
-export function CustomersTable({ 
-  data, 
-  onEdit, 
-  onShowLogs, 
+export function CustomersTable({
+  data,
+  onEdit,
+  onShowLogs,
   onOpenContacts,
   expanded,
   onToggleExpand,
   isSmartphone,
-  isTablet
+  isTablet,
 }: Props) {
   return (
     <>
-      <Tr 
-        expandable={isSmartphone} 
-        expanded={expanded}
-        onToggleExpand={onToggleExpand}
-      >
+      <Tr expandable={isSmartphone} expanded={expanded} onToggleExpand={onToggleExpand}>
         <Td>
-          <Paragraph size="sm">{data.idCliente}</Paragraph>
+          <Paragraph size="sm">{cnpjMask(data.cnpj)}</Paragraph>
         </Td>
 
         <Td>
-          <Paragraph size="sm" title={data.nomeRazaoSocialCliente}>{data.nomeRazaoSocialCliente}</Paragraph>
+          <Paragraph size="sm" title={data.corporateName}>
+            {data.corporateName}
+          </Paragraph>
+        </Td>
+
+        {/* <Td>
+          <Paragraph size="sm" title={data.fantasyName}>
+            {data.corporateName}
+          </Paragraph>
+        </Td> */}
+
+        <Td hideOnMobile={isSmartphone}>
+          <Paragraph size="sm" title={data.city}>
+            {data.city}
+          </Paragraph>
+        </Td>
+
+        {/* <Td hideOnMobile={true}>
+          <Paragraph size="sm" title={data.state}>
+            {data.state}
+          </Paragraph>
+        </Td> */}
+
+        <Td hideOnMobile={isSmartphone}>
+          <Paragraph size="sm" title={data.phone}>
+            {phoneNumberMask(data.phone).formatted}
+          </Paragraph>
         </Td>
 
         <Td hideOnMobile={isSmartphone}>
-          <Paragraph size="sm" title={data.dsMunicipioCliente}>{data.dsMunicipioCliente}</Paragraph>
-        </Td>
-
-        <Td hideOnMobile={true}>
-          <Paragraph size="sm" title={data.dsUfCliente}>{data.dsUfCliente}</Paragraph>
-        </Td>
-        
-        <Td hideOnMobile={isSmartphone}>
-          <Paragraph size="sm" title={data.dsEmailCliente}>{data.dsEmailCliente}</Paragraph>
+          <Paragraph size="sm" title={data.email}>
+            {data.email}
+          </Paragraph>
         </Td>
 
         <Td>
           <div className="d-flex justify-content-center">
-            <Tag size="lg" status={data.inStatusCadastroCliente ? "success" : "warning"}>
-              {data.dsStatusCadastroCliente}
+            <Tag size="lg" status={data.isActive ? "success" : "warning"}>
+              {data.isActive ? "Ativo" : "Inativo"}
             </Tag>
           </div>
         </Td>
@@ -67,22 +84,30 @@ export function CustomersTable({
         <Td>
           <div className="d-flex justify-content-center">
             <Tooltip title="Editar" place="top-start">
-              <ButtonIcon size="sm" icon="edit" onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }} />
+              <ButtonIcon
+                size="sm"
+                icon="edit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+              />
             </Tooltip>
 
             <Tooltip title="Contatos" place="top-start">
-              <ButtonIcon size="sm" icon="contacts" onClick={(e) => {
-                e.stopPropagation();
-                onOpenContacts();
-              }} />
+              <ButtonIcon
+                size="sm"
+                icon="contacts"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenContacts();
+                }}
+              />
             </Tooltip>
           </div>
         </Td>
       </Tr>
-      
+
       {/* Mobile expanded details row */}
       {isSmartphone && expanded && (
         <Tr className="no-hover">
@@ -93,7 +118,7 @@ export function CustomersTable({
                   <Heading size="xxs">Município:</Heading>
                 </Col>
                 <Col xs={8}>
-                  <Paragraph size="sm">{data.dsMunicipioCliente}</Paragraph>
+                  <Paragraph size="sm">{data.city}</Paragraph>
                 </Col>
               </Row>
               <Row className="mb-2">
@@ -101,7 +126,7 @@ export function CustomersTable({
                   <Heading size="xxs">UF:</Heading>
                 </Col>
                 <Col xs={8}>
-                  <Paragraph size="sm">{data.dsUfCliente}</Paragraph>
+                  <Paragraph size="sm">{data.state}</Paragraph>
                 </Col>
               </Row>
               <Row className="mb-2">
@@ -109,7 +134,7 @@ export function CustomersTable({
                   <Heading size="xxs">E-mail:</Heading>
                 </Col>
                 <Col xs={8}>
-                  <Paragraph size="sm">{data.dsEmailCliente}</Paragraph>
+                  <Paragraph size="sm">{data.email}</Paragraph>
                 </Col>
               </Row>
               <Row>
@@ -117,7 +142,7 @@ export function CustomersTable({
                   <Heading size="xxs">Telefone:</Heading>
                 </Col>
                 <Col xs={8}>
-                  <Paragraph size="sm">{data.numeroTelefoneCliente}</Paragraph>
+                  <Paragraph size="sm">{data.phone}</Paragraph>
                 </Col>
               </Row>
             </div>

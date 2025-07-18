@@ -40,6 +40,14 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 3001,
+    port: 15975,
+    proxy: {
+      "/api": {
+        target: "https://qas-usincheck.jometto.com.br/",
+        changeOrigin: true,
+        secure: false, // apenas se for ambiente de teste sem certificado válido
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
 });

@@ -8,7 +8,10 @@ interface Props {
   disabled?: boolean;
 }
 
-export const Container = styled.div<Props>`
+export const Container = styled.div.withConfig({
+  shouldForwardProp: (prop) =>
+    prop !== "error" && prop !== "hasValue" && prop !== "readOnly" && prop !== "disabled",
+})<Props>`
   ${(props) => css`
     position: relative;
     width: 100%;
@@ -133,7 +136,9 @@ export const Container = styled.div<Props>`
   `}
 `;
 
-export const Footer = styled.div<Omit<Props, "hasValue">>`
+export const Footer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "error" && prop !== "readOnly" && prop !== "disabled",
+})<Omit<Props, "hasValue">>`
   ${(props) => css`
     display: flex;
     justify-content: space-between;

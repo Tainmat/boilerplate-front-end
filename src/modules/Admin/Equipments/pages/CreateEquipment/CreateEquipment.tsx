@@ -4,13 +4,12 @@ import { Icon } from "@shared/components/Core/Icons/Icon";
 import { Subtitle } from "@shared/components/Core/Typography/Subtitle";
 import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
 import { TITLE_ADMIN_EQUIPMENTS } from "@shared/constants/title.browser";
-/* import { URL_PROC_LIST_EQUIP, URL_PROC_SAVE_EQUIP } from "@shared/constants/urls"; */
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
-import { IEquipment, equipments } from "@shared/hooks/services/Admin/useEquipments";
-import { customers } from "@shared/hooks/services/Admin/useCustomers";
-import { fakeRequest, post, put } from "@shared/services/api/api.service";
+import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
+/* import { customers } from "@shared/hooks/services/Admin/useCustomers"; */
+import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
@@ -23,13 +22,18 @@ import { EquipmentRegisterForm } from "./components/RegisterForm";
 import { IEquipmentRegisterForm } from "./components/RegisterForm/RegisterForm.form";
 
 // Dados fictícios para tipos de peça
-const tiposDePeca = [
+/* const tiposDePeca = [
   { id: 1, uuidTipoPeca: "tp-a1b2c3d4", nmTipoPeca: "Moenda", dsObse: "Moendas de cana" },
   { id: 2, uuidTipoPeca: "tp-b2c3d4e5", nmTipoPeca: "Caldeira", dsObse: "Caldeiras de vapor" },
   { id: 3, uuidTipoPeca: "tp-c3d4e5f6", nmTipoPeca: "Turbina", dsObse: "Turbinas geradoras" },
-  { id: 4, uuidTipoPeca: "tp-d4e5f6a7", nmTipoPeca: "Centrífuga", dsObse: "Centrífugas de separação" },
+  {
+    id: 4,
+    uuidTipoPeca: "tp-d4e5f6a7",
+    nmTipoPeca: "Centrífuga",
+    dsObse: "Centrífugas de separação",
+  },
   { id: 5, uuidTipoPeca: "tp-e5f6a7b8", nmTipoPeca: "Evaporador", dsObse: "Evaporadores de caldo" },
-];
+]; */
 
 export function CreateEquipment() {
   const navigate = useNavigate();
@@ -39,12 +43,12 @@ export function CreateEquipment() {
   const { uuid } = useParams();
 
   // Opções para o select de tipos de peça
-  const tiposPecaOptions: IOption[] = tiposDePeca.map(tipo => ({
+  /*   const tiposPecaOptions: IOption[] = tiposDePeca.map((tipo) => ({
     value: tipo.uuidTipoPeca,
-    label: tipo.nmTipoPeca
-  }));
+    label: tipo.nmTipoPeca,
+  })); */
 
-  const fakeGetEquipment = (uuid: string) => {
+  /*   const fakeGetEquipment = (uuid: string) => {
     return fakeRequest(500, { uuid }).then(() => {
       const equipment = equipments.find((e) => e.uuidEquipamento === uuid);
 
@@ -54,9 +58,9 @@ export function CreateEquipment() {
 
       return { data: equipment };
     });
-  };
+  }; */
 
-  const fakePostEquipment = async (payload: Partial<IEquipment>) => {
+  /*   const fakePostEquipment = async (payload: Partial<IEquipment>) => {
     const newEquipment = {
       ...payload,
       idTipoPeca: tiposDePeca.find(t => t.uuidTipoPeca === payload.uuidTipoPeca)?.id || 0,
@@ -77,9 +81,9 @@ export function CreateEquipment() {
       data: newEquipment,
       message: "Equipamento cadastrado com sucesso!",
     });
-  };
+  }; */
 
-  const fakePutEquipment = async (uuid: string, payload: Partial<IEquipment>) => {
+  /*  const fakePutEquipment = async (uuid: string, payload: Partial<IEquipment>) => {
     const index = equipments.findIndex((e) => e.uuidEquipamento === uuid);
 
     if (index === -1) {
@@ -102,15 +106,15 @@ export function CreateEquipment() {
       data: updatedEquipment,
       message: "Equipamento atualizado com sucesso!",
     });
-  };
+  }; */
 
   const [equipment, setEquipment] = useState<IEquipmentRegisterForm | null>(null);
 
   // Opções de clientes para o select
-  const customersOptions = customers.map(customer => ({
+  /*   const customersOptions = customers.map((customer) => ({
     value: customer.uuidCliente,
     label: customer.nomeRazaoSocialCliente,
-  }));
+  })); */
 
   useEffect(() => {
     document.title = TITLE_ADMIN_EQUIPMENTS;
@@ -123,16 +127,16 @@ export function CreateEquipment() {
     ]);
 
     if (uuid) {
-      fakeGetEquipment(uuid)
+      get<IEquipment>(`${"/parametrizations/part-types"}/${uuid}`)
         .then((data) => {
           if (data.data) {
+            const response = data.data.data;
             setEquipment({
-              uuidTipoPeca: data.data.uuidTipoPeca,
-              ttPontoInspecao: data.data.ttPontoInspecao,
-              nomeEquipamento: data.data.nomeEquipamento,
-              dsObservacao: data.data.dsObservacao,
-              inStatusCadastroEquipamento: data.data.inStatusCadastroEquipamento ? "true" : "false",
-              uuidCliente: data.data.uuidCliente || "",
+              name: response.name,
+              description: response.description,
+              totalInspectionPoints: response.totalInspectionPoints,
+              isActive: response.isActive ? "true" : "false",
+              coverUrl: response.coverUrl || "",
             });
           } else {
             addToast({
@@ -140,6 +144,7 @@ export function CreateEquipment() {
               title: "Ooops.",
               description: "Equipamento não encontrado.",
             });
+
             navigate(-1);
           }
         })
@@ -149,52 +154,16 @@ export function CreateEquipment() {
             title: "Ooops.",
             description: "Erro ao recuperar dados do Equipamento.",
           });
+
           navigate(-1);
         });
-
-      /* getOne<IEquipment>(`${URL_PROC_LIST_EQUIP}/${uuid}`)
-        .then((data) => {
-          if (data.data) {
-            setEquipment({
-              tipoEquipamento: data.data.tipoEquipamento,
-              numeroSerieEquipamento: data.data.numeroSerieEquipamento,
-              nomeEquipamento: data.data.nomeEquipamento,
-              marcaEquipamento: data.data.marcaEquipamento,
-              modeloEquipamento: data.data.modeloEquipamento,
-              anoFabricacaoEquipamento: data.data.anoFabricacaoEquipamento,
-              numeroPatrimonioEquipamento: data.data.numeroPatrimonioEquipamento,
-              localizacaoEquipamento: data.data.localizacaoEquipamento,
-              descricaoObservacoesEquipamento: data.data.descricaoObservacoesEquipamento,
-              inStatusCadastroEquipamento: data.data.inStatusCadastroEquipamento ? "true" : "false",
-              uuidCliente: data.data.uuidCliente || "",
-            });
-          } else {
-            addToast({
-              type: "helper",
-              title: "Ooops.",
-              description: "Equipamento não encontrado.",
-            });
-
-            navigate(-1);
-          }
-        })
-        .catch(() => {
-          addToast({
-            type: "helper",
-            title: "Ooops.",
-            description: "Erro ao recuperar dados do Equipamento.",
-          });
-
-          navigate(-1);
-        }); */
     } else {
       setEquipment({
-        uuidTipoPeca: "",
-        ttPontoInspecao: 0,
-        nomeEquipamento: "",
-        dsObservacao: "",
-        inStatusCadastroEquipamento: "true",
-        uuidCliente: "",
+        name: "",
+        description: "",
+        totalInspectionPoints: "0",
+        isActive: "true",
+        coverUrl: "",
       });
     }
   }, [setPageBreadcrumb, uuid, navigate, addToast]);
@@ -202,25 +171,18 @@ export function CreateEquipment() {
   async function handleOnSubmit(formValues: IEquipmentRegisterForm) {
     const payload = {
       ...formValues,
-      ttPontoInspecao: Number(formValues.ttPontoInspecao),
-      inStatusCadastroEquipamento: formValues.inStatusCadastroEquipamento === "true",
+      totalInspectionPoints: Number(formValues.totalInspectionPoints),
+      isActive: formValues.isActive === "true",
     };
 
     try {
       showLoader();
-      let response;
 
       if (uuid) {
-        response = await fakePutEquipment(uuid, payload);
-
-        if (response.data) {
-          addToast({
-            type: "success",
-            title: "Sucesso!",
-            description: response.message,
-          });
-        }
-        /* const { data, message } = await put<IEquipment>(`${URL_PROC_SAVE_EQUIP}/${uuid}`, payload);
+        const { data, message } = await put<IEquipment>(
+          `${"/parametrizations/part-types"}/${uuid}`,
+          payload,
+        );
         if (data) {
           addToast({
             type: "success",
@@ -229,22 +191,12 @@ export function CreateEquipment() {
           });
         }
       } else {
-        const { data, message } = await post<IEquipment>(URL_PROC_SAVE_EQUIP, payload);
+        const { data, message } = await post<IEquipment>("/parametrizations/part-types", payload);
         if (data) {
           addToast({
             type: "success",
             title: "Sucesso!",
-            description: message || "Equipamento cadastrado com sucesso!",
-          });
-        } */
-      } else {
-        response = await fakePostEquipment(payload);
-
-        if (response.data) {
-          addToast({
-            type: "success",
-            title: "Sucesso!",
-            description: response.message,
+            description: message || "Equipamento criado com sucesso!",
           });
         }
       }
@@ -274,8 +226,6 @@ export function CreateEquipment() {
             <Col xs={12}>
               <EquipmentRegisterForm
                 initialValues={equipment && equipment}
-                customersOptions={customersOptions}
-                tiposPecaOptions={tiposPecaOptions}
                 onSubmit={(values) => handleOnSubmit(values)}
               />
             </Col>

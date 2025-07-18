@@ -44,16 +44,16 @@ export function ListCustomers() {
 
   const SEARCH_OPTIONS: IOption[] = [
     {
-      value: "nomeRazaoSocialCliente",
+      value: "corporateName",
       label: "Razão Social",
     },
     {
-      value: "numeroDocumentoCliente",
+      value: "cnpj",
       label: "CNPJ",
     },
     {
-      value: "dsMunicipioCliente",
-      label: "Município",
+      value: "fantasyName",
+      label: "Nome Fantasia",
     },
   ];
 
@@ -90,10 +90,9 @@ export function ListCustomers() {
       } else {
         params = {
           ...initialValuesSchema,
-          items: DEFAULT_ITEMS_PER_PAGE,
+          records: DEFAULT_ITEMS_PER_PAGE,
           page: 1,
-          order: "ASC",
-          sort: "nomeRazaoSocialCliente",
+          order: "corporateName",
         };
       }
 
@@ -103,13 +102,13 @@ export function ListCustomers() {
 
   function handleOnSearch(data: IParamsSearchForm) {
     if (params) {
-      const { value, searchIn, status } = data;
+      const { search, searchingBy, status } = data;
 
       const newParams = {
         ...params,
         page: 1,
-        searchIn,
-        value,
+        searchingBy,
+        search,
         status,
       };
 
@@ -117,12 +116,12 @@ export function ListCustomers() {
     }
   }
 
-  function handleOnChangeItemsPerPage(items: number) {
+  function handleOnChangeItemsPerPage(records: number) {
     if (params) {
       const newParams = {
         ...params,
         page: 1,
-        items,
+        records,
       };
 
       handleSearchParams(newParams);
@@ -142,12 +141,12 @@ export function ListCustomers() {
     }
   }
 
-  function addNew(uuid?: string) {
-    navigate(!uuid ? ROUTE_SAVE_CUSTOMER : `${ROUTE_UPDATE_CUSTOMER}/${uuid}`);
+  function addNew(id?: string) {
+    navigate(!id ? ROUTE_SAVE_CUSTOMER : `${ROUTE_UPDATE_CUSTOMER}/${id}`);
   }
 
-  function toggleRowExpand(uuid: string) {
-    setExpandedRow(expandedRow === uuid ? null : uuid);
+  function toggleRowExpand(id: string) {
+    setExpandedRow(expandedRow === id ? null : id);
   }
 
   return (
@@ -162,9 +161,9 @@ export function ListCustomers() {
                   defaultValues={
                     params
                       ? {
-                          status: params.inStatusCadastroCliente,
-                          searchIn: params.searchIn,
-                          value: params.value,
+                          status: params.isActive,
+                          searchingBy: params.searchingBy,
+                          search: params.search,
                         }
                       : null
                   }
@@ -184,7 +183,7 @@ export function ListCustomers() {
                 <Thead>
                   <Tr>
                     <Th>
-                      <Heading size="xs">#</Heading>
+                      <Heading size="xs">CNPJ</Heading>
                     </Th>
 
                     <Th>
@@ -195,8 +194,8 @@ export function ListCustomers() {
                       <Heading size="xs">Município</Heading>
                     </Th>
 
-                    <Th hideOnMobile={true}>
-                      <Heading size="xs">UF</Heading>
+                    <Th hideOnMobile={isSmartphone}>
+                      <Heading size="xs">Telefone</Heading>
                     </Th>
 
                     <Th hideOnMobile={isSmartphone}>
@@ -222,16 +221,16 @@ export function ListCustomers() {
                     result.data.length > 0 ? (
                       result.data.map((item) => (
                         <CustomersTable
-                          key={item.uuidCliente}
+                          key={item.id}
                           data={item}
-                          onEdit={() => addNew(item.uuidCliente)}
-                          expanded={expandedRow === item.uuidCliente}
-                          onToggleExpand={() => toggleRowExpand(item.uuidCliente)}
+                          onEdit={() => addNew(item.id)}
+                          expanded={expandedRow === item.id}
+                          onToggleExpand={() => toggleRowExpand(item.id)}
                           isSmartphone={isSmartphone}
                           isTablet={isTablet}
                           onOpenContacts={() => {
                             selectCustomer(item);
-                            navigate(`${ROUTE_LIST_CUSTOMERS}/${item.uuidCliente}/contacts`);
+                            navigate(`${ROUTE_LIST_CUSTOMERS}/${item.id}/contacts`);
                           }}
                         />
                       ))
@@ -239,7 +238,7 @@ export function ListCustomers() {
                       <Empty columns={7} />
                     )
                   ) : (
-                    <LoadingLines lines={params ? Number(params.items) : 10} columns={7} />
+                    <LoadingLines lines={params ? Number(params.records) : 10} columns={7} />
                   )}
                 </Tbody>
               </Table>
@@ -257,7 +256,7 @@ export function ListCustomers() {
                   <Pagination
                     key={params.page}
                     defaultCurrent={params.page}
-                    pageSize={Number(params.items)}
+                    pageSize={Number(params.records)}
                     total={result.total}
                     onChange={(page) => handleOnChangePage(page)}
                   />

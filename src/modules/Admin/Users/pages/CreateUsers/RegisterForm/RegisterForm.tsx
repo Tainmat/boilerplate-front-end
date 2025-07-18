@@ -12,16 +12,17 @@ import { useAlertContext } from "@shared/contexts/Alert";
 import { Field, Form, Formik } from "formik";
 import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useProfileNotAssociatedDropdown } from "@/shared/hooks/services/Admin/Dropdown/useProfileNotAssociatedDropdown";
 
 interface Props {
   initialValues: IUserRegisterForm | null;
   onSubmit: (data: IUserRegisterForm) => void;
-  perfilOptions: IOption[];
 }
 
-export function UserRegisterForm({ initialValues, onSubmit, perfilOptions }: Props) {
+export function UserRegisterForm({ initialValues, onSubmit }: Props) {
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
+  const { result: profilesOptions } = useProfileNotAssociatedDropdown();
 
   if (!initialValues) {
     return (
@@ -62,25 +63,25 @@ export function UserRegisterForm({ initialValues, onSubmit, perfilOptions }: Pro
               <Field
                 as={InputText}
                 label="Nome do Usuário"
-                name="nomeUsuario"
+                name="name"
                 placeholder="Informe o Nome do Usuário"
                 maxLength={50}
                 type="text"
-                error={touched.nomeUsuario && !!errors.nomeUsuario}
-                helperText={touched.nomeUsuario && !!errors.nomeUsuario ? errors.nomeUsuario : ""}
+                error={touched.name && !!errors.name}
+                helperText={touched.name && !!errors.name ? errors.name : ""}
               />
             </Col>
-            
+
             <Col xl={5}>
               <Field
                 as={InputText}
                 label="Nome Social"
-                name="nomeSocialUsuario"
+                name="socialName"
                 placeholder="Informe o Nome Social do Usuário"
                 maxLength={50}
                 type="text"
-                error={touched.nomeSocialUsuario && !!errors.nomeSocialUsuario}
-                helperText={touched.nomeSocialUsuario && !!errors.nomeSocialUsuario ? errors.nomeSocialUsuario : ""}
+                error={touched.socialName && !!errors.socialName}
+                helperText={touched.socialName && !!errors.socialName ? errors.socialName : ""}
               />
             </Col>
 
@@ -88,21 +89,17 @@ export function UserRegisterForm({ initialValues, onSubmit, perfilOptions }: Pro
               <Field
                 as={Select}
                 label="Status"
-                name="inStatusCadastroUsuario"
+                name="isActive"
                 placeholder="Selecionar"
                 options={[
                   { value: "true", label: "Ativo" },
                   { value: "false", label: "Inativo" },
                 ]}
-                error={touched.inStatusCadastroUsuario && !!errors.inStatusCadastroUsuario}
-                helperText={
-                  touched.inStatusCadastroUsuario && !!errors.inStatusCadastroUsuario
-                    ? errors.inStatusCadastroUsuario
-                    : ""
-                }
+                error={touched.isActive && !!errors.isActive}
+                helperText={touched.isActive && !!errors.isActive ? errors.isActive : ""}
                 onChange={({ value }: IOption) => {
-                  setFieldTouched("inStatusCadastroUsuario");
-                  setFieldValue("inStatusCadastroUsuario", value);
+                  setFieldTouched("isActive");
+                  setFieldValue("isActive", value);
                 }}
               />
             </Col>
@@ -113,46 +110,58 @@ export function UserRegisterForm({ initialValues, onSubmit, perfilOptions }: Pro
               <Field
                 as={InputText}
                 label="E-mail do Usuário"
-                name="emailUsuario"
+                name="email"
                 placeholder="Informe o e-mail do Usuário"
                 maxLength={100}
                 inputMode="email"
                 type="email"
-                error={touched.emailUsuario && !!errors.emailUsuario}
-                helperText={
-                  touched.emailUsuario && !!errors.emailUsuario ? errors.emailUsuario : ""
-                }
+                error={touched.email && !!errors.email}
+                helperText={touched.email && !!errors.email ? errors.email : ""}
               />
             </Col>
-            
+
             <Col xl={3}>
               <Field
                 as={InputDatePicker}
                 label="Data de Nascimento"
-                name="dataNascimento"
+                name="birthDate"
                 placeholder="dd/mm/aaaa"
-                value={initialValues?.dataNascimento ? new Date(initialValues.dataNascimento) : null}
+                value={initialValues?.birthDate ? new Date(initialValues.birthDate) : null}
                 onChange={(date: Date | null) => {
-                  setFieldValue("dataNascimento", date ? date.toISOString().split('T')[0] : "");
+                  setFieldValue("birthDate", date ? date.toISOString().split("T")[0] : "");
                 }}
               />
             </Col>
-            
+
             <Col xl={4}>
               <Field
                 as={Select}
                 label="Perfil"
-                name="idPerfil"
+                name="profileId"
                 placeholder="Selecione um Perfil"
-                options={perfilOptions}
-                error={touched.idPerfil && !!errors.idPerfil}
-                helperText={
-                  touched.idPerfil && !!errors.idPerfil ? errors.idPerfil : ""
-                }
+                options={profilesOptions}
+                error={touched.profileId && !!errors.profileId}
+                helperText={touched.profileId && !!errors.profileId ? errors.profileId : ""}
                 onChange={({ value }: IOption) => {
-                  setFieldTouched("idPerfil");
-                  setFieldValue("idPerfil", value);
+                  setFieldTouched("profileId");
+                  setFieldValue("profileId", value);
                 }}
+              />
+            </Col>
+          </Row>
+
+          <Row className="mb-4">
+            <Col xl={5}>
+              <Field
+                as={InputText}
+                label="Senha do Usuário"
+                name="password"
+                placeholder="Informe a senha do Usuário"
+                maxLength={20}
+                inputMode="password"
+                type="password"
+                error={touched.password && !!errors.password}
+                helperText={touched.password && !!errors.password ? errors.password : ""}
               />
             </Col>
           </Row>

@@ -10,7 +10,9 @@ interface Props {
   disabled?: boolean;
 }
 
-export const Container = styled.div<Props>`
+export const Container = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "hasValue",
+})<Props>`
   ${(props) => css`
     position: relative;
     width: 100%;

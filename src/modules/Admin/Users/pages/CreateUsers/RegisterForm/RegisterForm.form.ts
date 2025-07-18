@@ -2,23 +2,24 @@ import { isEmailValid } from "@shared/utils/validations";
 import * as Yup from "yup";
 
 export interface IUserRegisterForm {
-  nomeUsuario: string;
-  emailUsuario: string;
-  nomeSocialUsuario: string;
-  dataNascimento: string;
-  idPerfil: string;
-  inStatusCadastroUsuario: "true" | "false";
+  id?: string;
+  name: string;
+  socialName: string;
+  password: string;
+  birthDate: string;
+  email: string;
+  profileId: string;
+  isActive: "true" | "false";
 }
 
 export const usersValidationSchema = Yup.object().shape({
-  nomeUsuario: Yup.string()
+  name: Yup.string()
     .required("O campo é obrigatório!")
     .max(50, "O campo deve conter no máximo 50 caracteres!"),
-  nomeSocialUsuario: Yup.string()
-    .max(50, "O campo deve conter no máximo 50 caracteres!"),
-  dataNascimento: Yup.string(),
-  idPerfil: Yup.string().required("Selecione um perfil!"),
-  emailUsuario: Yup.string()
+  socialName: Yup.string().max(50, "O campo deve conter no máximo 50 caracteres!"),
+  birthDate: Yup.string(),
+  profileId: Yup.string().required("Selecione um perfil!"),
+  email: Yup.string()
     .email("E-mail inválido!")
     .test({
       name: "isEmailValid",
@@ -30,5 +31,5 @@ export const usersValidationSchema = Yup.object().shape({
     })
     .max(100, "O campo deve conter no máximo 100 caracteres!")
     .required("O campo é obrigatório"),
-  inStatusCadastroUsuario: Yup.string().required("O campo é obrigatório!").oneOf(["false", "true"]),
+  isActive: Yup.string().required("O campo é obrigatório!").oneOf(["false", "true"]),
 });

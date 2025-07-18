@@ -11,9 +11,9 @@ import { TITLE_ADMIN_USERS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
-import { usuarios } from "@shared/hooks/services/Admin/useUsers";
+/* import { usuarios } from "@shared/hooks/services/Admin/useUsers"; */
 import { IUsers } from "@shared/hooks/services/Admin/useUsers";
-import { fakeRequest, post, put } from "@shared/services/api/api.service";
+import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
@@ -33,70 +33,6 @@ export function CreateUsers() {
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { uuid } = useParams();
 
-  // Opções para o select de perfil
-  const perfilOptions = perfis.map(perfil => ({
-    value: perfil.uuidPerfil,
-    label: perfil.dsPerfil
-  }));
-
-  const fakeGetUser = (uuid: string) => {
-    return fakeRequest(500, { uuid }).then(() => {
-      const user = usuarios.find((u) => u.uuidUsuario === uuid);
-
-      if (!user) {
-        return { data: null };
-      }
-
-      return { data: user };
-    });
-  };
-
-  const fakePostUsuario = async (payload: any) => {
-    const novoUsuario = {
-      ...payload,
-      idUsuario: usuarios.length + 1,
-      uuidUsuario: uuidv4(),
-      dataCadastroUsuario: new Date().toISOString(),
-      nomeSocialUsuario: payload.nomeSocialUsuario || "",
-      dataNascimento: payload.dataNascimento || null,
-      idPerfil: payload.idPerfil,
-      dsPerfil: perfis.find(p => p.uuidPerfil === payload.idPerfil)?.dsPerfil || "",
-      dsStatusCadastroUsuario: payload.inStatusCadastroUsuario ? "Ativo" : "Inativo",
-    };
-
-    usuarios.push(novoUsuario);
-
-    return fakeRequest(1000, {
-      data: novoUsuario,
-      message: "Usuário cadastrado com sucesso!",
-    });
-  };
-
-  const fakePutUsuario = async (uuid: string, payload: any) => {
-    const index = usuarios.findIndex((u) => u.uuidUsuario === uuid);
-
-    if (index === -1) {
-      throw new Error("Usuário não encontrado");
-    }
-
-    const atualizado = {
-      ...usuarios[index],
-      ...payload,
-      nomeSocialUsuario: payload.nomeSocialUsuario || usuarios[index].nomeSocialUsuario || "",
-      dataNascimento: payload.dataNascimento || usuarios[index].dataNascimento || null,
-      idPerfil: payload.idPerfil || usuarios[index].idPerfil,
-      dsPerfil: perfis.find(p => p.uuidPerfil === payload.idPerfil)?.dsPerfil || usuarios[index].dsPerfil || "",
-      dsStatusCadastroUsuario: payload.inStatusCadastroUsuario ? "Ativo" : "Inativo",
-    };
-
-    usuarios[index] = atualizado;
-
-    return fakeRequest(1000, {
-      data: atualizado,
-      message: "Usuário atualizado com sucesso!",
-    });
-  };
-
   const [user, setUser] = useState<IUserRegisterForm | null>(null);
 
   useEffect(() => {
@@ -110,16 +46,19 @@ export function CreateUsers() {
     ]);
 
     if (uuid) {
-      fakeGetUser(uuid)
+      get<IUsers>(`${"/parametrizations/profile-management/users"}/${uuid}`)
         .then((data) => {
           if (data.data) {
+            const response = data.data.data;
             setUser({
-              nomeUsuario: data.data.nomeUsuario,
-              nomeSocialUsuario: data.data.nomeSocialUsuario || "",
-              dataNascimento: data.data.dataNascimento || "",
-              idPerfil: data.data.idPerfil || "",
-              emailUsuario: data.data.emailUsuario,
-              inStatusCadastroUsuario: data.data.inStatusCadastroUsuario ? "true" : "false",
+              id: response.id,
+              name: response.name,
+              socialName: response.socialName,
+              password: response.password,
+              birthDate: response.birthDate,
+              email: response.email,
+              profileId: response.profileId,
+              isActive: response.isActive ? "true" : "false",
             });
           } else {
             addToast({
@@ -127,6 +66,7 @@ export function CreateUsers() {
               title: "Ooops.",
               description: "Módulo não encontrado.",
             });
+
             navigate(-1);
           }
         })
@@ -134,48 +74,20 @@ export function CreateUsers() {
           addToast({
             type: "helper",
             title: "Ooops.",
-            description: "Erro ao recuperar dados do Módulo.",
+            description: "Dados de usuário não encontrados.",
           });
+
           navigate(-1);
         });
-
-      /* getOne<IUsers>(`${URL_LIST_USUA}/${uuid}`)
-        .then((data) => {
-          if (data.data) {
-            setUser({
-              nomeUsuario: data.data.nomeUsuario,
-              emailUsuario: data.data.emailUsuario,
-              uuidCargo: data.data.uuidCargo,
-              uuidDepartamento: data.data.uuidDepartamento,
-              inStatusCadastroUsuario: data.data.inStatusCadastroUsuario ? "true" : "false",
-            });
-          } else {
-            addToast({
-              type: "helper",
-              title: "Ooops.",
-              description: "Módulo não encontrado.",
-            });
-
-            navigate(-1);
-          }
-        })
-        .catch(() => {
-          addToast({
-            type: "helper",
-            title: "Ooops.",
-            description: "Erro ao recuperar dados do Módulo.",
-          });
-
-          navigate(-1);
-        }); */
     } else {
       setUser({
-        nomeUsuario: "",
-        emailUsuario: "",
-        nomeSocialUsuario: "",
-        dataNascimento: "",
-        idPerfil: "",
-        inStatusCadastroUsuario: "true",
+        name: "",
+        socialName: "",
+        password: "",
+        birthDate: "",
+        email: "",
+        profileId: "",
+        isActive: "false",
       });
     }
   }, [setPageBreadcrumb, uuid, navigate, addToast]);
@@ -183,58 +95,36 @@ export function CreateUsers() {
   async function handleOnSubmit(formValues: IUserRegisterForm) {
     const payload = {
       ...formValues,
-      inStatusCadastroUsuario: formValues.inStatusCadastroUsuario === "true",
+      isActive: formValues.isActive === "true",
     };
 
     try {
       showLoader();
-      let response;
 
       if (uuid) {
-        response = await fakePutUsuario(uuid, payload);
+        const { data, message } = await put<IUsers>(
+          `${"/parametrizations/profile-management/users"}/${uuid}`,
+          payload,
+        );
 
-        if (response.data) {
-          addToast({
-            type: "success",
-            title: "Sucesso!",
-            description: response.message,
-          });
-
-          /* navigate(-1); */
-        }
-
-        /* const { data, message } = await put<IUsers>(`${URL_SAVE_USUA}/${uuid}`, payload);
         if (data) {
           addToast({
             type: "success",
             title: "Sucesso!",
             description: message || "Usuário atualizado com sucesso!",
           });
-
-          navigate(-1);
         }
       } else {
-        const { data, message } = await post<IUsers>(URL_SAVE_USUA, payload);
+        const { data, message } = await post<IUsers>(
+          "/parametrizations/profile-management/users",
+          payload,
+        );
         if (data) {
           addToast({
             type: "success",
             title: "Sucesso!",
             description: message || "Usuário cadastrado com sucesso!",
           });
-
-          navigate(-1);
-        }*/
-      } else {
-        response = await fakePostUsuario(payload);
-
-        if (response.data) {
-          addToast({
-            type: "success",
-            title: "Sucesso!",
-            description: response.message,
-          });
-
-          /* navigate(-1); */
         }
       }
       navigate(-1);
@@ -262,7 +152,6 @@ export function CreateUsers() {
             <Col xs={12}>
               <UserRegisterForm
                 initialValues={user && user}
-                perfilOptions={perfilOptions}
                 onSubmit={(values) => handleOnSubmit(values)}
               />
             </Col>

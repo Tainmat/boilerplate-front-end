@@ -6,31 +6,21 @@ import { useCallback, useEffect, useState } from "react";
 import { IApiResponse } from "@/shared/services/api/api.service.interface";
 
 export interface ICustomerContacts {
-  dataCadastroContatoCliente: string;
-  descricaoObservacoesContatoCliente: string;
-  dsRecebeEmail: string;
-  dsResponsavelLegal: string;
-  dsResponsavelTecnico: string;
-  inWhatsAppContatoCliente: boolean;
-  dsWhatsAppContatoCliente: string;
-  dsStatusCadastroContatoCliente: string;
-  idCliente: number;
-  idContatoCliente: number;
-  inRecebeEmail: boolean;
-  inResponsavelLegal: boolean;
-  inResponsavelTecnico: boolean;
-  inStatusCadastroContatoCliente: boolean;
-  nomeCliente: string;
-  numeroRamalContatoCliente: string;
-  numeroCelularContatoCliente: string;
-  nomeContatoCliente: string;
-  dsEmailContatoCliente: string;
-  numeroTelefoneContatoCliente: string;
-  uuidCliente: string;
-  uuidContatoCliente: string;
+  customerId: string;
+  id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  phone: string;
+  extension: string;
+  isWhatsApp: boolean;
+  receiveInspectionEmail: boolean;
+  isActive: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
-export const customerContacts: ICustomerContacts[] = [
+/* export const customerContacts: ICustomerContacts[] = [
   {
     idContatoCliente: 1,
     uuidContatoCliente: "111a-222b-333c-444d",
@@ -127,7 +117,7 @@ export const customerContacts: ICustomerContacts[] = [
     inResponsavelTecnico: true,
     dsResponsavelTecnico: "Sim",
   },
-];
+]; */
 
 export function useCustomerContacts() {
   const [params, setParams] = useState<Record<string, any> | null>(null);
@@ -138,35 +128,25 @@ export function useCustomerContacts() {
       setResult(null);
 
       const queryParams = removeEmptyEntries({
-        searchIn: params?.searchIn,
-        value: params?.value,
-        items: params?.items,
+        customerId: params.customerId,
+        searchingBy: params?.searchingBy,
+        search: params?.search,
+        records: params?.records,
         page: params?.page,
-        sort: params?.sort,
         order: params?.order,
-        inStatusCadastroContatoCliente: params?.status,
-        uuidCliente: params.uuidCustomer,
+        status: params?.status,
       });
 
-      /* const { data } = await get<ICustomerContacts>(URL_PROC_LIST_CONT_CLIE, queryParams); */
+      const { data } = await get<ICustomerContacts>(
+        `${"parametrizations/customers"}/${queryParams.customerId}/contacts`,
+        queryParams,
+      );
 
-      const { uuidCliente } = queryParams;
-
-      const filteredContacts = customerContacts.filter((c) => c.uuidCliente === uuidCliente);
-
-      let { data } = await fakeRequest(2000, queryParams);
-
-      data = {
-        items: filteredContacts,
-        current_page: 1,
-        total_items: filteredContacts.length,
-      };
-
-      if (data) {
+      if (data.data.length > 0) {
         setResult({
-          data: data.items,
-          page: data.current_page,
-          total: data.total_items,
+          data: data.data,
+          page: data.page,
+          total: data.total,
         });
       } else {
         setResult({

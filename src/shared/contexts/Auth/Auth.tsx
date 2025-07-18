@@ -90,14 +90,7 @@ function AuthContext({ children }: Props) {
         setUser(null);
         removeLocalStorageItem("Usincheck@JOmetto:user");
 
-        /* const { username } = credentials; */
-
-        /* const params = {
-          username,
-          password: credentials.password,
-        }; */
-
-        const { data } = await login("/api/auth/login", credentials);
+        const { data } = await login("auth/login", credentials);
 
         if (data) {
           const user: UserAuth = {

@@ -42,16 +42,8 @@ export function ListEquipments() {
 
   const SEARCH_OPTIONS: IOption[] = [
     {
-      value: "nomeEquipamento",
+      value: "name",
       label: "Nome do Equipamento",
-    },
-    {
-      value: "nmTipoPeca",
-      label: "Tipo de Peça",
-    },
-    {
-      value: "nomeCliente",
-      label: "Cliente",
     },
   ];
 
@@ -88,10 +80,9 @@ export function ListEquipments() {
       } else {
         params = {
           ...initialValuesSchema,
-          items: DEFAULT_ITEMS_PER_PAGE,
+          records: DEFAULT_ITEMS_PER_PAGE,
           page: 1,
-          order: "ASC",
-          sort: "nomeEquipamento",
+          order: "name",
         };
       }
 
@@ -101,13 +92,13 @@ export function ListEquipments() {
 
   function handleOnSearch(data: IParamsSearchForm) {
     if (params) {
-      const { value, searchIn, status } = data;
+      const { search, searchingBy, status } = data;
 
       const newParams = {
         ...params,
         page: 1,
-        searchIn,
-        value,
+        searchingBy,
+        search,
         status,
       };
 
@@ -159,9 +150,9 @@ export function ListEquipments() {
                 defaultValues={
                   params
                     ? {
-                        status: params.inStatusCadastroEquipamento,
-                        searchIn: params.searchIn,
-                        value: params.value,
+                        status: params.status,
+                        searchingBy: params.searchingBy,
+                        search: params.search,
                       }
                     : null
                 }
@@ -180,24 +171,24 @@ export function ListEquipments() {
             >
               <Thead>
                 <Tr>
-                  <Th>
+                  {/* <Th>
                     <Heading size="xs">#</Heading>
-                  </Th>
+                  </Th> */}
 
                   <Th>
                     <Heading size="xs">Nome</Heading>
                   </Th>
 
-                  <Th>
+                  {/* <Th>
                     <Heading size="xs">Tipo de Peça</Heading>
-                  </Th>
+                  </Th> */}
 
-                  <Th hideOnMobile={true}>
+                  <Th>
                     <Heading size="xs">Pontos de Inspeção</Heading>
                   </Th>
 
                   <Th hideOnMobile={isSmartphone}>
-                    <Heading size="xs">Cliente</Heading>
+                    <Heading size="xs">Descrição</Heading>
                   </Th>
 
                   <Th>
@@ -219,11 +210,11 @@ export function ListEquipments() {
                   result.data.length > 0 ? (
                     result.data.map((item) => (
                       <EquipmentsTable
-                        key={item.uuidEquipamento}
+                        key={item.id}
                         data={item}
-                        onEdit={() => addNew(item.uuidEquipamento)}
-                        expanded={expandedRow === item.uuidEquipamento}
-                        onToggleExpand={() => toggleRowExpand(item.uuidEquipamento)}
+                        onEdit={() => addNew(item.id)}
+                        expanded={expandedRow === item.id}
+                        onToggleExpand={() => toggleRowExpand(item.id)}
                         isSmartphone={isSmartphone}
                         isTablet={isTablet}
                       />
@@ -248,7 +239,7 @@ export function ListEquipments() {
                 <Pagination
                   key={params.page}
                   defaultCurrent={params.page}
-                  pageSize={Number(params.items)}
+                  pageSize={Number(params.records)}
                   total={result.total}
                   onChange={(page) => handleOnChangePage(page)}
                 />

@@ -73,192 +73,120 @@ export function CustomerContactRegisterForm({ initialValues, onSubmit }: Props) 
     >
       {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => (
         <Form>
-          {/* LINHA 1 */}
+          {/* LINHA 1 - Checkbox*/}
           <Row className="mb-4">
             <Col className="d-flex flex-row gap-3">
               <Field
                 as={Checkbox}
-                name="inResponsavelLegal"
-                description="Responsável Legal"
-                checked={values.inResponsavelLegal === "true"}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const { checked } = e.target;
-                  setFieldValue("inResponsavelLegal", checked ? "true" : "false");
-                }}
-              />
-
-              <Field
-                as={Checkbox}
-                name="inResponsavelTecnico"
-                description="Responsável Técnico"
-                checked={values.inResponsavelTecnico === "true"}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const { checked } = e.target;
-                  setFieldValue("inResponsavelTecnico", checked ? "true" : "false");
-                }}
-              />
-
-              <Field
-                as={Checkbox}
-                name="inRecebeEmail"
+                name="receiveInspectionEmail"
                 description="Recebe E-mail"
-                checked={values.inRecebeEmail === "true"}
+                checked={values.receiveInspectionEmail === "true"}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const { checked } = e.target;
-                  setFieldValue("inRecebeEmail", checked ? "true" : "false");
+                  setFieldValue("receiveInspectionEmail", checked ? "true" : "false");
                 }}
               />
-              
+
               <Field
                 as={Checkbox}
-                name="inWhatsAppContatoCliente"
+                name="isWhatsApp"
                 description="WhatsApp"
-                checked={values.inWhatsAppContatoCliente === "true"}
+                checked={values.isWhatsApp === "true"}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const { checked } = e.target;
-                  setFieldValue("inWhatsAppContatoCliente", checked ? "true" : "false");
+                  setFieldValue("isWhatsApp", checked ? "true" : "false");
                 }}
               />
             </Col>
           </Row>
 
-          {/* LINHA 2 */}
+          {/* LINHA 2 - Dados básicos*/}
           <Row className="mb-4">
             <Col xl={4}>
               <Field
                 as={InputText}
                 label="Nome"
-                name="nomeContatoCliente"
+                name="name"
                 placeholder="Nome do Contato do Cliente"
                 maxLength={128}
                 type="text"
-                error={touched.nomeContatoCliente && !!errors.nomeContatoCliente}
-                helperText={
-                  touched.nomeContatoCliente && !!errors.nomeContatoCliente
-                    ? errors.nomeContatoCliente
-                    : ""
-                }
-              />
-            </Col>
-
-            <Col xl={2}>
-              <Field
-                as={InputPhone}
-                label="Telefone"
-                name="numeroTelefoneContatoCliente"
-                placeholder="(99) 9999-9999"
-                type="text"
-                error={
-                  touched.numeroTelefoneContatoCliente && !!errors.numeroTelefoneContatoCliente
-                }
-                helperText={
-                  touched.numeroTelefoneContatoCliente && !!errors.numeroTelefoneContatoCliente
-                    ? errors.numeroTelefoneContatoCliente
-                    : ""
-                }
-              />
-            </Col>
-            
-            <Col xl={2}>
-              <Field
-                as={InputText}
-                label="Ramal"
-                name="numeroRamalContatoCliente"
-                placeholder="Ramal"
-                maxLength={10}
-                type="text"
-                error={touched.numeroRamalContatoCliente && !!errors.numeroRamalContatoCliente}
-                helperText={
-                  touched.numeroRamalContatoCliente && !!errors.numeroRamalContatoCliente
-                    ? errors.numeroRamalContatoCliente
-                    : ""
-                }
+                error={touched.name && !!errors.name}
+                helperText={touched.name && !!errors.name ? errors.name : ""}
               />
             </Col>
 
             <Col xl={4}>
               <Field
-                as={InputPhone}
+                as={InputText}
                 label="E-mail"
-                name="dsEmailContatoCliente"
-                placeholder="nome@dominio.com"
-                maxLength={128}
-                type="email"
-                error={touched.dsEmailContatoCliente && !!errors.dsEmailContatoCliente}
-                helperText={
-                  touched.dsEmailContatoCliente && !!errors.dsEmailContatoCliente
-                    ? errors.dsEmailContatoCliente
-                    : ""
-                }
+                name="email"
+                placeholder="email@dominio.com.br"
+                maxLength={100}
+                type="text"
+                error={touched.email && !!errors.email}
+                helperText={touched.email && !!errors.email ? errors.email : ""}
               />
             </Col>
 
-            <Col xl={2} className="d-flex justify-content-end">
+            <Col xl={4} className="d-flex justify-content-end">
               <Field
                 as={Select}
                 label="Status"
-                name="inStatusCadastroContatoCliente"
+                name="isActive"
                 placeholder="Selecionar"
                 options={[
                   { value: "true", label: "Ativo" },
                   { value: "false", label: "Inativo" },
                 ]}
-                error={
-                  touched.inStatusCadastroContatoCliente && !!errors.inStatusCadastroContatoCliente
-                }
-                helperText={
-                  touched.inStatusCadastroContatoCliente && !!errors.inStatusCadastroContatoCliente
-                    ? errors.inStatusCadastroContatoCliente
-                    : ""
-                }
+                error={touched.isActive && !!errors.isActive}
+                helperText={touched.isActive && !!errors.isActive ? errors.isActive : ""}
                 onChange={({ value }: IOption) => {
-                  setFieldTouched("inStatusCadastroContatoCliente");
-                  setFieldValue("inStatusCadastroContatoCliente", value);
+                  setFieldTouched("isActive");
+                  setFieldValue("isActive", value);
                 }}
               />
             </Col>
           </Row>
 
-          {/* LINHA 3 - Celular */}
+          {/* LINHA 3 - Fones */}
           <Row className="mb-4">
             <Col xl={4}>
               <Field
                 as={InputPhone}
+                label="Telefone"
+                name="phone"
+                value={phoneNumberMask(values.phone).formatted}
+                placeholder="(99) 9999-9999"
+                country="BR"
+                error={touched.phone && !!errors.phone}
+                helperText={touched.phone && !!errors.phone ? errors.phone : ""}
+              />
+            </Col>
+
+            <Col xl={4}>
+              <Field
+                as={InputText}
+                label="Ramal"
+                name="extension"
+                placeholder="Ramal"
+                maxLength={10}
+                type="text"
+                error={touched.extension && !!errors.extension}
+                helperText={touched.extension && !!errors.extension ? errors.extension : ""}
+              />
+            </Col>
+
+            <Col xl={4}>
+              <Field
+                as={InputPhone}
                 label="Celular"
-                name="numeroCelularContatoCliente"
+                name="mobile"
+                value={phoneNumberMask(values.mobile).formatted}
                 placeholder="(99) 99999-9999"
                 country="BR"
                 showValidation={true}
-                error={touched.numeroCelularContatoCliente && !!errors.numeroCelularContatoCliente}
-                helperText={
-                  touched.numeroCelularContatoCliente && !!errors.numeroCelularContatoCliente
-                    ? errors.numeroCelularContatoCliente
-                    : ""
-                }
-              />
-            </Col>
-          </Row>
-
-          {/* LINHA 3 */}
-          <Row className="mb-4">
-            <Col xl={12}>
-              <Field
-                as={TextArea}
-                label="Observações"
-                name="descricaoObservacoesContatoCliente"
-                placeholder="Informe Observações"
-                maxlength={1024}
-                type="text"
-                error={
-                  touched.descricaoObservacoesContatoCliente &&
-                  !!errors.descricaoObservacoesContatoCliente
-                }
-                helperText={
-                  touched.descricaoObservacoesContatoCliente &&
-                  !!errors.descricaoObservacoesContatoCliente
-                    ? errors.descricaoObservacoesContatoCliente
-                    : ""
-                }
+                error={touched.mobile && !!errors.mobile}
+                helperText={touched.mobile && !!errors.mobile ? errors.mobile : ""}
               />
             </Col>
           </Row>

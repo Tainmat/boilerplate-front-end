@@ -99,34 +99,41 @@ export function ClientRegisterForm({ initialValues, onSubmit }: Props) {
               <Field
                 as={InputText}
                 label="CNPJ"
-                name="numeroDocumentoCliente"
-                value={cnpjMask(values.numeroDocumentoCliente)}
+                name="cnpj"
+                value={cnpjMask(values.cnpj)}
                 placeholder="00.000.000/0000-00"
                 maxLength={18}
                 type="text"
-                error={touched.numeroDocumentoCliente && !!errors.numeroDocumentoCliente}
+                error={touched.cnpj && !!errors.cnpj}
+                helperText={touched.cnpj && !!errors.cnpj ? errors.cnpj : ""}
+              />
+            </Col>
+
+            <Col xl={4}>
+              <Field
+                as={InputText}
+                label="Razão Social"
+                name="corporateName"
+                placeholder="Informe a Razão Social"
+                maxLength={50}
+                type="text"
+                error={touched.corporateName && !!errors.corporateName}
                 helperText={
-                  touched.numeroDocumentoCliente && !!errors.numeroDocumentoCliente
-                    ? errors.numeroDocumentoCliente
-                    : ""
+                  touched.corporateName && !!errors.corporateName ? errors.corporateName : ""
                 }
               />
             </Col>
 
-            <Col xl={8}>
+            <Col xl={4}>
               <Field
                 as={InputText}
-                label="Razão Social"
-                name="nomeRazaoSocialCliente"
-                placeholder="Informe a Razão Social"
+                label="Nome Fantasia"
+                name="fantasyName"
+                placeholder="Informe o Nome Fantasia"
                 maxLength={50}
                 type="text"
-                error={touched.nomeRazaoSocialCliente && !!errors.nomeRazaoSocialCliente}
-                helperText={
-                  touched.nomeRazaoSocialCliente && !!errors.nomeRazaoSocialCliente
-                    ? errors.nomeRazaoSocialCliente
-                    : ""
-                }
+                error={touched.fantasyName && !!errors.fantasyName}
+                helperText={touched.fantasyName && !!errors.fantasyName ? errors.fantasyName : ""}
               />
             </Col>
           </Row>
@@ -137,34 +144,26 @@ export function ClientRegisterForm({ initialValues, onSubmit }: Props) {
               <Field
                 as={InputText}
                 label="CEP"
-                name="numeroCepCliente"
-                value={cepMask(values.numeroCepCliente)}
+                name="cep"
+                value={cepMask(values.cep)}
                 placeholder="00000-000"
                 maxLength={9}
                 type="text"
-                error={touched.numeroCepCliente && !!errors.numeroCepCliente}
-                helperText={
-                  touched.numeroCepCliente && !!errors.numeroCepCliente
-                    ? errors.numeroCepCliente
-                    : ""
-                }
+                error={touched.cep && !!errors.cep}
+                helperText={touched.cep && !!errors.cep ? errors.cep : ""}
               />
             </Col>
-            
+
             <Col xl={6}>
               <Field
                 as={InputText}
                 label="Logradouro"
-                name="dsLogradouroCliente"
+                name="street"
                 placeholder="Informe o Logradouro"
                 maxLength={100}
                 type="text"
-                error={touched.dsLogradouroCliente && !!errors.dsLogradouroCliente}
-                helperText={
-                  touched.dsLogradouroCliente && !!errors.dsLogradouroCliente
-                    ? errors.dsLogradouroCliente
-                    : ""
-                }
+                error={touched.street && !!errors.street}
+                helperText={touched.street && !!errors.street ? errors.street : ""}
               />
             </Col>
 
@@ -172,128 +171,102 @@ export function ClientRegisterForm({ initialValues, onSubmit }: Props) {
               <Field
                 as={InputText}
                 label="Número"
-                name="numeroLogradouroCliente"
+                name="number"
                 placeholder="Número"
                 maxLength={10}
                 type="text"
-                error={touched.numeroLogradouroCliente && !!errors.numeroLogradouroCliente}
-                helperText={
-                  touched.numeroLogradouroCliente && !!errors.numeroLogradouroCliente
-                    ? errors.numeroLogradouroCliente
-                    : ""
-                }
+                error={touched.number && !!errors.number}
+                helperText={touched.number && !!errors.number ? errors.number : ""}
               />
             </Col>
           </Row>
-          
+
           {/* LINHA 3 - Complemento, Bairro, Município e UF */}
           <Row className="mb-4">
             <Col xl={3}>
               <Field
                 as={InputText}
                 label="Complemento"
-                name="dsComplementoCliente"
+                name="complement"
                 placeholder="Informe o Complemento"
                 maxLength={100}
                 type="text"
-                error={touched.dsComplementoCliente && !!errors.dsComplementoCliente}
-                helperText={
-                  touched.dsComplementoCliente && !!errors.dsComplementoCliente
-                    ? errors.dsComplementoCliente
-                    : ""
-                }
+                error={touched.complement && !!errors.complement}
+                helperText={touched.complement && !!errors.complement ? errors.complement : ""}
               />
             </Col>
-            
+
             <Col xl={3}>
               <Field
                 as={InputText}
                 label="Bairro"
-                name="dsBairroCliente"
+                name="neighborhood"
                 placeholder="Informe o Bairro"
                 maxLength={50}
                 type="text"
-                error={touched.dsBairroCliente && !!errors.dsBairroCliente}
+                error={touched.neighborhood && !!errors.neighborhood}
                 helperText={
-                  touched.dsBairroCliente && !!errors.dsBairroCliente
-                    ? errors.dsBairroCliente
-                    : ""
+                  touched.neighborhood && !!errors.neighborhood ? errors.neighborhood : ""
                 }
               />
             </Col>
-            
+
             <Col xl={4}>
               <Field
                 as={InputText}
                 label="Município"
-                name="dsMunicipioCliente"
+                name="city"
                 placeholder="Informe o Município"
                 maxLength={50}
                 type="text"
-                error={touched.dsMunicipioCliente && !!errors.dsMunicipioCliente}
-                helperText={
-                  touched.dsMunicipioCliente && !!errors.dsMunicipioCliente
-                    ? errors.dsMunicipioCliente
-                    : ""
-                }
+                error={touched.city && !!errors.city}
+                helperText={touched.city && !!errors.city ? errors.city : ""}
               />
             </Col>
-            
+
             <Col xl={2}>
               <Field
                 as={Select}
                 label="UF"
-                name="dsUfCliente"
+                name="state"
                 placeholder="UF"
                 options={UF_OPTIONS}
-                error={touched.dsUfCliente && !!errors.dsUfCliente}
-                helperText={
-                  touched.dsUfCliente && !!errors.dsUfCliente
-                    ? errors.dsUfCliente
-                    : ""
-                }
+                error={touched.state && !!errors.state}
+                helperText={touched.state && !!errors.state ? errors.state : ""}
                 onChange={({ value }: IOption) => {
-                  setFieldTouched("dsUfCliente");
-                  setFieldValue("dsUfCliente", value);
+                  setFieldTouched("state");
+                  setFieldValue("state", value);
                 }}
               />
             </Col>
           </Row>
-          
+
           {/* LINHA 4 - Email, Telefone e Status */}
           <Row className="mb-4">
             <Col xl={4}>
               <Field
                 as={InputText}
                 label="E-mail"
-                name="dsEmailCliente"
+                name="email"
                 placeholder="email@dominio.com.br"
                 maxLength={100}
                 type="text"
-                error={touched.dsEmailCliente && !!errors.dsEmailCliente}
-                helperText={
-                  touched.dsEmailCliente && !!errors.dsEmailCliente
-                    ? errors.dsEmailCliente
-                    : ""
-                }
+                error={touched.email && !!errors.email}
+                helperText={touched.email && !!errors.email ? errors.email : ""}
               />
             </Col>
-            
+
             <Col xl={4}>
               <Field
                 as={InputPhone}
                 label="Telefone"
-                name="numeroTelefoneCliente"
-                value={values.numeroTelefoneCliente}
+                name="phone"
+                value={phoneNumberMask(values.phone).formatted}
                 placeholder="(99) 99999-9999"
                 country="BR"
                 showValidation={true}
-                error={touched.numeroTelefoneCliente && !!errors.numeroTelefoneCliente}
-                helperText={
-                  touched.numeroTelefoneCliente && !!errors.numeroTelefoneCliente
-                    ? errors.numeroTelefoneCliente
-                    : ""
-                }
+                error={touched.phone && !!errors.phone}
+                helperText={touched.phone && !!errors.phone ? errors.phone : ""}
               />
             </Col>
 
@@ -301,28 +274,24 @@ export function ClientRegisterForm({ initialValues, onSubmit }: Props) {
               <Field
                 as={Select}
                 label="Status"
-                name="inStatusCadastroCliente"
+                name="isActive"
                 placeholder="Selecionar"
                 options={[
                   { value: "true", label: "Ativo" },
                   { value: "false", label: "Inativo" },
                 ]}
-                error={touched.inStatusCadastroCliente && !!errors.inStatusCadastroCliente}
-                helperText={
-                  touched.inStatusCadastroCliente && !!errors.inStatusCadastroCliente
-                    ? errors.inStatusCadastroCliente
-                    : ""
-                }
+                error={touched.isActive && !!errors.isActive}
+                helperText={touched.isActive && !!errors.isActive ? errors.isActive : ""}
                 onChange={({ value }: IOption) => {
-                  setFieldTouched("inStatusCadastroCliente");
-                  setFieldValue("inStatusCadastroCliente", value);
+                  setFieldTouched("isActive");
+                  setFieldValue("isActive", value);
                 }}
               />
             </Col>
           </Row>
 
           {/* LINHA 5 - Observações */}
-          <Row className="mb-4">
+          {/* <Row className="mb-4">
             <Col xl={12}>
               <Field
                 as={TextArea}
@@ -339,7 +308,7 @@ export function ClientRegisterForm({ initialValues, onSubmit }: Props) {
                 }
               />
             </Col>
-          </Row>
+          </Row> */}
 
           <Row className="justify-content-end">
             <Col xs="auto">

@@ -9,7 +9,10 @@ interface Props {
   $itemsPerPage?: boolean;
 }
 
-export const Container = styled.div<Props>`
+export const Container = styled.div.withConfig({
+  shouldForwardProp: (prop) =>
+    prop !== "error" && prop !== "readOnly" && prop !== "disabled" && prop !== "$itemsPerPage",
+})<Props>`
   ${(props) => css`
     position: relative;
     min-width: 1rem;
