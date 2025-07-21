@@ -30,7 +30,7 @@ export function ListUsers() {
   const { isSmartphone, isTablet } = useDeviceDetection();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { result, params, refetch, setParams } = useUsers();
+  const { result, params, setParams } = useUsers();
   const [loaded, setLoaded] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 

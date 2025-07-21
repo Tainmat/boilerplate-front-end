@@ -53,17 +53,17 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                         <Field
                           as={SelectSearch}
                           placeholder="Pesquisar por"
-                          name="searchIn"
+                          name="searchingBy"
                           value={values.searchingBy}
                           options={options}
                           readOnly={options.length === 1}
                           onChange={(option: IOption) => {
-                            setFieldValue("searchIn", option.value);
-                            setFieldValue("value", "");
+                            setFieldValue("searchingBy", option.value);
+                            setFieldValue("search", "");
                           }}
                           onReset={() => {
-                            setFieldValue("searchIn", "");
-                            setFieldValue("value", "");
+                            setFieldValue("searchingBy", "");
+                            setFieldValue("search", "");
                           }}
                         />
                       </Col>
@@ -71,12 +71,12 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                         <Field
                           as={InputSearch}
                           placeholder="Pesquisar"
-                          name="value"
+                          name="search"
                           type="text"
                           submitForm
                           disabled={!values.searchingBy}
                           onReset={() => {
-                            setFieldValue("value", "");
+                            setFieldValue("search", "");
                             submitForm();
                           }}
                         />
@@ -120,17 +120,17 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                         <Field
                           as={SelectSearch}
                           placeholder="Pesquisar por"
-                          name="searchIn"
+                          name="searchingBy"
                           value={values.searchingBy}
                           options={options}
                           readOnly={options.length === 1}
                           onChange={(option: IOption) => {
-                            setFieldValue("searchIn", option.value);
-                            setFieldValue("value", "");
+                            setFieldValue("searchingBy", option.value);
+                            setFieldValue("search", "");
                           }}
                           onReset={() => {
-                            setFieldValue("searchIn", "");
-                            setFieldValue("value", "");
+                            setFieldValue("searchingBy", "");
+                            setFieldValue("search", "");
                           }}
                         />
                       </Col>
@@ -138,12 +138,12 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                         <Field
                           as={InputSearch}
                           placeholder="Pesquisar"
-                          name="value"
+                          name="search"
                           type="text"
                           submitForm
                           disabled={!values.searchingBy}
                           onReset={() => {
-                            setFieldValue("value", "");
+                            setFieldValue("search", "");
                             submitForm();
                           }}
                         />
@@ -187,17 +187,17 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                         <Field
                           as={SelectSearch}
                           placeholder="Pesquisar por"
-                          name="searchIn"
+                          name="searchingBy"
                           value={values.searchingBy}
                           options={options}
                           readOnly={options.length === 1}
                           onChange={(option: IOption) => {
-                            setFieldValue("searchIn", option.value);
-                            setFieldValue("value", "");
+                            setFieldValue("searchingBy", option.value);
+                            setFieldValue("search", "");
                           }}
                           onReset={() => {
-                            setFieldValue("searchIn", "");
-                            setFieldValue("value", "");
+                            setFieldValue("searchingBy", "");
+                            setFieldValue("search", "");
                           }}
                         />
                       </Col>
@@ -206,12 +206,12 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                         <Field
                           as={InputSearch}
                           placeholder="Pesquisar"
-                          name="value"
+                          name="search"
                           type="text"
                           submitForm
                           disabled={!values.searchingBy}
                           onReset={() => {
-                            setFieldValue("value", "");
+                            setFieldValue("search", "");
                             submitForm();
                           }}
                         />
