@@ -8,9 +8,9 @@ import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 import { IInspection, inspections } from "@shared/hooks/services/Admin/useInspections";
-import { customers } from "@shared/hooks/services/Admin/useCustomers";
+/* import { customers } from "@shared/hooks/services/Admin/useCustomers";
 import { equipments } from "@shared/hooks/services/Admin/useEquipments";
-import { usuarios } from "@shared/hooks/services/Admin/useUsers";
+import { usuarios } from "@shared/hooks/services/Admin/useUsers"; */
 import { fakeRequest, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
@@ -53,9 +53,9 @@ export function CreateInspection() {
       inStatusCadastroInspecao: !!payload.inStatusCadastroInspecao,
       dsStatusCadastroInspecao: payload.inStatusCadastroInspecao ? "Ativo" : "Inativo",
       // Buscar nomes relacionados
-      nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || "",
+      /* nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || "",
       nomeEquipamento: equipments.find(e => e.uuidEquipamento === payload.uuidEquipamento)?.nomeEquipamento || "",
-      nomeInspector: usuarios.find(u => u.uuidUsuario === payload.uuidInspector)?.nomeUsuario || "",
+      nomeInspector: usuarios.find(u => u.uuidUsuario === payload.uuidInspector)?.nomeUsuario || "", */
     };
 
     inspections.push(newInspection as IInspection);
@@ -76,13 +76,19 @@ export function CreateInspection() {
     const updatedInspection: IInspection = {
       ...inspections[index],
       ...payload,
-      dsTipoInspecao: getInspectionTypeDescription(payload.tipoInspecao || inspections[index].tipoInspecao),
-      dsStatusInspecao: getStatusDescription(payload.statusInspecao || inspections[index].statusInspecao),
-      dsPrioridadeInspecao: getPriorityDescription(payload.prioridadeInspecao || inspections[index].prioridadeInspecao),
+      dsTipoInspecao: getInspectionTypeDescription(
+        payload.tipoInspecao || inspections[index].tipoInspecao,
+      ),
+      dsStatusInspecao: getStatusDescription(
+        payload.statusInspecao || inspections[index].statusInspecao,
+      ),
+      dsPrioridadeInspecao: getPriorityDescription(
+        payload.prioridadeInspecao || inspections[index].prioridadeInspecao,
+      ),
       dsStatusCadastroInspecao: payload.inStatusCadastroInspecao ? "Ativo" : "Inativo",
-      nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || inspections[index].nomeCliente,
+      /* nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || inspections[index].nomeCliente,
       nomeEquipamento: equipments.find(e => e.uuidEquipamento === payload.uuidEquipamento)?.nomeEquipamento || inspections[index].nomeEquipamento,
-      nomeInspector: usuarios.find(u => u.uuidUsuario === payload.uuidInspector)?.nomeUsuario || inspections[index].nomeInspector,
+      nomeInspector: usuarios.find(u => u.uuidUsuario === payload.uuidInspector)?.nomeUsuario || inspections[index].nomeInspector, */
     };
 
     inspections[index] = updatedInspection;
@@ -129,7 +135,7 @@ export function CreateInspection() {
   const [inspection, setInspection] = useState<IInspectionRegisterForm | null>(null);
 
   // Opções para os selects
-  const customersOptions = customers.map(customer => ({
+  /* const customersOptions = customers.map(customer => ({
     value: customer.uuidCliente,
     label: customer.nomeRazaoSocialCliente,
   }));
@@ -142,7 +148,7 @@ export function CreateInspection() {
   const inspectorsOptions = usuarios.map(user => ({
     value: user.uuidUsuario,
     label: user.nomeUsuario,
-  }));
+  })); */
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -264,9 +270,9 @@ export function CreateInspection() {
             <Col xs={12}>
               <InspectionRegisterForm
                 initialValues={inspection && inspection}
-                customersOptions={customersOptions}
+                /* customersOptions={customersOptions}
                 equipmentsOptions={equipmentsOptions}
-                inspectorsOptions={inspectorsOptions}
+                inspectorsOptions={inspectorsOptions} */
                 onSubmit={(values) => handleOnSubmit(values)}
               />
             </Col>

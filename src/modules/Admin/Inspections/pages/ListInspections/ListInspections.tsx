@@ -106,13 +106,13 @@ export function ListInspections() {
 
   function handleOnSearch(data: IParamsSearchForm) {
     if (params) {
-      const { value, searchIn, status } = data;
+      const { search, searchingBy, status } = data;
 
       const newParams = {
         ...params,
         page: 1,
-        searchIn,
-        value,
+        searchingBy,
+        search,
         status,
       };
 
@@ -161,8 +161,8 @@ export function ListInspections() {
                   params
                     ? {
                         status: params.inStatusCadastroInspecao,
-                        searchIn: params.searchIn,
-                        value: params.value,
+                        searchingBy: params.searchIn,
+                        search: params.value,
                       }
                     : null
                 }

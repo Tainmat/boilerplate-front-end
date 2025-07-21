@@ -31,7 +31,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
       if (defaultValues) {
         setInitialValues(defaultValues);
       } else if (options.length === 1) {
-        setInitialValues({ ...initialValuesSchema, searchIn: options[0].value });
+        setInitialValues({ ...initialValuesSchema, searchingBy: options[0].value });
       } else {
         setInitialValues(initialValuesSchema);
       }
@@ -54,7 +54,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                           as={SelectSearch}
                           placeholder="Pesquisar por"
                           name="searchIn"
-                          value={values.searchIn}
+                          value={values.searchingBy}
                           options={options}
                           readOnly={options.length === 1}
                           onChange={(option: IOption) => {
@@ -74,7 +74,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                           name="value"
                           type="text"
                           submitForm
-                          disabled={!values.searchIn}
+                          disabled={!values.searchingBy}
                           onReset={() => {
                             setFieldValue("value", "");
                             submitForm();
@@ -95,12 +95,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                       <Col xs={4} className="d-flex justify-content-end align-items-start">
                         <div className="d-flex gap-2">
                           <Tooltip title="Buscar" place="top">
-                            <ButtonIcon
-                              type="submit"
-                              size="md"
-                              icon="search"
-                              mode="helper"
-                            />
+                            <ButtonIcon type="submit" size="md" icon="search" mode="helper" />
                           </Tooltip>
                           {onAdd && (
                             <Tooltip title="Adicionar" place="top">
@@ -126,7 +121,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                           as={SelectSearch}
                           placeholder="Pesquisar por"
                           name="searchIn"
-                          value={values.searchIn}
+                          value={values.searchingBy}
                           options={options}
                           readOnly={options.length === 1}
                           onChange={(option: IOption) => {
@@ -146,7 +141,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                           name="value"
                           type="text"
                           submitForm
-                          disabled={!values.searchIn}
+                          disabled={!values.searchingBy}
                           onReset={() => {
                             setFieldValue("value", "");
                             submitForm();
@@ -167,12 +162,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                       <Col md={4} className="d-flex justify-content-end align-items-start">
                         <div className="d-flex gap-2">
                           <Tooltip title="Buscar" place="top">
-                            <ButtonIcon
-                              type="submit"
-                              size="lg"
-                              icon="search"
-                              mode="helper"
-                            />
+                            <ButtonIcon type="submit" size="lg" icon="search" mode="helper" />
                           </Tooltip>
                           {onAdd && (
                             <Tooltip title="Adicionar" place="top">
@@ -198,7 +188,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                           as={SelectSearch}
                           placeholder="Pesquisar por"
                           name="searchIn"
-                          value={values.searchIn}
+                          value={values.searchingBy}
                           options={options}
                           readOnly={options.length === 1}
                           onChange={(option: IOption) => {
@@ -219,7 +209,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                           name="value"
                           type="text"
                           submitForm
-                          disabled={!values.searchIn}
+                          disabled={!values.searchingBy}
                           onReset={() => {
                             setFieldValue("value", "");
                             submitForm();
@@ -242,12 +232,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                       <Col lg={2} xxl={2} className="d-flex justify-content-end">
                         <div className="d-flex justify-content-between align-items-center">
                           <Tooltip title="Buscar" place="top-start">
-                            <ButtonIcon
-                              type="submit"
-                              size="lg"
-                              icon="search"
-                              mode="helper"
-                            />
+                            <ButtonIcon type="submit" size="lg" icon="search" mode="helper" />
                           </Tooltip>
                           {onAdd && (
                             <Tooltip title="Adicionar" place="top-start">

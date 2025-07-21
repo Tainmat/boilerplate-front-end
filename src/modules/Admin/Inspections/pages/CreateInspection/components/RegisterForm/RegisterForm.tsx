@@ -15,9 +15,9 @@ import { inspectionValidationSchema, IInspectionRegisterForm } from "./RegisterF
 interface Props {
   initialValues: IInspectionRegisterForm | null;
   onSubmit: (data: IInspectionRegisterForm) => void;
-  customersOptions: IOption[];
+  /* customersOptions: IOption[];
   equipmentsOptions: IOption[];
-  inspectorsOptions: IOption[];
+  inspectorsOptions: IOption[]; */
 }
 
 const INSPECTION_TYPE_OPTIONS: IOption[] = [
@@ -44,12 +44,12 @@ const PRIORITY_OPTIONS: IOption[] = [
   { value: "CRITICA", label: "Crítica" },
 ];
 
-export function InspectionRegisterForm({ 
-  initialValues, 
-  onSubmit, 
-  customersOptions,
+export function InspectionRegisterForm({
+  initialValues,
+  onSubmit,
+  /* customersOptions,
   equipmentsOptions,
-  inspectorsOptions 
+  inspectorsOptions  */
 }: Props) {
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
@@ -103,9 +103,7 @@ export function InspectionRegisterForm({
                 options={INSPECTION_TYPE_OPTIONS}
                 error={touched.tipoInspecao && !!errors.tipoInspecao}
                 helperText={
-                  touched.tipoInspecao && !!errors.tipoInspecao
-                    ? errors.tipoInspecao
-                    : ""
+                  touched.tipoInspecao && !!errors.tipoInspecao ? errors.tipoInspecao : ""
                 }
                 onChange={({ value }: IOption) => {
                   setFieldTouched("tipoInspecao");
@@ -124,9 +122,7 @@ export function InspectionRegisterForm({
                 type="text"
                 error={touched.numeroInspecao && !!errors.numeroInspecao}
                 helperText={
-                  touched.numeroInspecao && !!errors.numeroInspecao
-                    ? errors.numeroInspecao
-                    : ""
+                  touched.numeroInspecao && !!errors.numeroInspecao ? errors.numeroInspecao : ""
                 }
               />
             </Col>
@@ -140,9 +136,7 @@ export function InspectionRegisterForm({
                 type="date"
                 error={touched.dataInspecao && !!errors.dataInspecao}
                 helperText={
-                  touched.dataInspecao && !!errors.dataInspecao
-                    ? errors.dataInspecao
-                    : ""
+                  touched.dataInspecao && !!errors.dataInspecao ? errors.dataInspecao : ""
                 }
               />
             </Col>
@@ -156,16 +150,14 @@ export function InspectionRegisterForm({
                 type="time"
                 error={touched.horaInspecao && !!errors.horaInspecao}
                 helperText={
-                  touched.horaInspecao && !!errors.horaInspecao
-                    ? errors.horaInspecao
-                    : ""
+                  touched.horaInspecao && !!errors.horaInspecao ? errors.horaInspecao : ""
                 }
               />
             </Col>
           </Row>
 
           <Row className="mb-4">
-            <Col xl={4}>
+            {/* <Col xl={4}>
               <Field
                 as={Select}
                 label="Cliente"
@@ -183,9 +175,9 @@ export function InspectionRegisterForm({
                   setFieldValue("uuidEquipamento", "");
                 }}
               />
-            </Col>
+            </Col> */}
 
-            <Col xl={4}>
+            {/* <Col xl={4}>
               <Field
                 as={Select}
                 label="Equipamento"
@@ -204,9 +196,9 @@ export function InspectionRegisterForm({
                   setFieldValue("uuidEquipamento", value);
                 }}
               />
-            </Col>
+            </Col> */}
 
-            <Col xl={4}>
+            {/* <Col xl={4}>
               <Field
                 as={Select}
                 label="Inspetor"
@@ -224,7 +216,7 @@ export function InspectionRegisterForm({
                   setFieldValue("uuidInspector", value);
                 }}
               />
-            </Col>
+            </Col> */}
           </Row>
 
           <Row className="mb-4">
@@ -237,9 +229,7 @@ export function InspectionRegisterForm({
                 options={STATUS_OPTIONS}
                 error={touched.statusInspecao && !!errors.statusInspecao}
                 helperText={
-                  touched.statusInspecao && !!errors.statusInspecao
-                    ? errors.statusInspecao
-                    : ""
+                  touched.statusInspecao && !!errors.statusInspecao ? errors.statusInspecao : ""
                 }
                 onChange={({ value }: IOption) => {
                   setFieldTouched("statusInspecao");
