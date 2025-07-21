@@ -133,7 +133,10 @@ function AuthContext({ children }: Props) {
           setUser(user);
           setLocalStorageItem("Usincheck@JOmetto:user", user);
 
-          return { authenticated: true };
+          return {
+            authenticated: true,
+            firstLogin: user.isFirstAccess,
+          };
         }
         return { authenticated: false };
         /* return { authenticated: false }; */

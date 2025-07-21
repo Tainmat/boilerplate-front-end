@@ -1,6 +1,7 @@
 const brand = "USINCHECK -";
 
 export const TITLE_LOGIN = `${brand} Login`;
+export const TITLE_FIRST_LOGIN = `${brand} Primeiro acesso`;
 export const TITLE_RECOVER_PASSWORD = `Recuperar Senha - ${brand}`;
 
 export const TITLE_HOME = `${brand} Home`;

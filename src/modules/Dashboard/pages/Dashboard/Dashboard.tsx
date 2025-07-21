@@ -18,7 +18,7 @@ import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { useAuthRoles } from "@shared/hooks/services/Rules/Auth/useRoles";
 import { useAuthContext } from "@shared/contexts/Auth";
 import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
-import { customers } from "@shared/hooks/services/Admin/useCustomers";
+/* import { customers } from "@shared/hooks/services/Admin/useCustomers"; */
 import { inspections } from "@shared/hooks/services/Admin/useInspections";
 import { fakeRequest } from "@shared/services/api/api.service";
 import { format } from "date-fns";
@@ -136,12 +136,18 @@ export function Dashboard() {
         await fakeRequest(500);
 
         // Filtrar apenas clientes ativos
-        const activeCustomers = customers.filter((c) => c.inStatusCadastroCliente);
+        /* const activeCustomers = customers.filter((c) => c.inStatusCadastroCliente); */
 
-        const options = activeCustomers.map((customer) => ({
+        /*  const options = activeCustomers.map((customer) => ({
           value: customer.uuidCliente,
           label: customer.nomeRazaoSocialCliente,
-        }));
+        })); */
+
+        const options = [
+          { value: "all", label: "Todos os Clientes" },
+          { value: "client1", label: "Cliente 1" },
+          { value: "client2", label: "Cliente 2" },
+        ];
 
         setClientOptions(options);
 
@@ -680,14 +686,14 @@ export function Dashboard() {
                 onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
               />
 
-              <Button
+              {/* <Button
                 styles="primary"
                 onClick={exportData}
                 disabled={!dashboardData}
                 icon="download"
               >
                 Exportar CSV
-              </Button>
+              </Button> */}
             </Col>
           </Row>
 
