@@ -106,12 +106,12 @@ export function ListEquipments() {
     }
   }
 
-  function handleOnChangeItemsPerPage(items: number) {
+  function handleOnChangeItemsPerPage(records: number) {
     if (params) {
       const newParams = {
         ...params,
         page: 1,
-        items,
+        records,
       };
 
       handleSearchParams(newParams);
@@ -223,7 +223,7 @@ export function ListEquipments() {
                     <Empty columns={6} />
                   )
                 ) : (
-                  <LoadingLines lines={params ? Number(params.items) : 10} columns={6} />
+                  <LoadingLines lines={params ? Number(params.records) : 10} columns={6} />
                 )}
               </Tbody>
             </Table>

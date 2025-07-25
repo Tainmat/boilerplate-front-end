@@ -94,35 +94,8 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                 }
               />
             </Col>
-          </Row>
 
-          <Row className="mb-4">
-            <Col xl={4}>
-              <Field
-                as={InputFile}
-                label="Croqui"
-                name="coverUrl"
-                placeholder="Selecione um croqui"
-                type="file"
-                accept="image/*"
-                error={touched.coverUrl && !!errors.coverUrl}
-                helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
-              />
-            </Col>
-
-            {/* <Col xl={4}>
-              <Field
-                as={InputText}
-                label="Croqui"
-                name="coverUrl"
-                placeholder="Selecione um croqui"
-                type="file"
-                error={touched.coverUrl && !!errors.coverUrl}
-                helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
-              />
-            </Col> */}
-
-            <Col xl={2} className="d-flex justify-content-end">
+            <Col xl={4} className="d-flex justify-content-end">
               <Field
                 as={Select}
                 label="Status"
@@ -143,7 +116,19 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
           </Row>
 
           <Row className="mb-4">
-            <Col xl={12}>
+            {/* <Col xl={4}>
+              <Field
+                as={InputText}
+                label="Croqui"
+                name="coverUrl"
+                placeholder="Selecione um croqui"
+                type="file"
+                error={touched.coverUrl && !!errors.coverUrl}
+                helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
+              />
+            </Col> */}
+
+            <Col xl={8}>
               <Field
                 as={TextArea}
                 label="Descrição"
@@ -155,7 +140,22 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                 helperText={touched.description && !!errors.description ? errors.description : ""}
               />
             </Col>
+
+            <Col xl={4}>
+              <Field
+                as={InputFile}
+                label="Croqui"
+                name="coverUrl"
+                placeholder="Clique para selecionar ou arraste o croqui do equipamento"
+                type="file"
+                accept="image/*"
+                error={touched.coverUrl && !!errors.coverUrl}
+                helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
+              />
+            </Col>
           </Row>
+
+          {/* <Row className="mb-4"></Row> */}
 
           <Row className="justify-content-end">
             <Col xs="auto">

@@ -105,12 +105,12 @@ export function ListUsers() {
     }
   }
 
-  function handleOnChangeItemsPerPage(items: number) {
+  function handleOnChangeItemsPerPage(records: number) {
     if (params) {
       const newParams = {
         ...params,
         page: 1,
-        items,
+        records,
       };
 
       handleSearchParams(newParams);
@@ -222,7 +222,7 @@ export function ListUsers() {
                     <Empty columns={7} />
                   )
                 ) : (
-                  <LoadingLines lines={params ? Number(params.items) : 10} columns={7} />
+                  <LoadingLines lines={params ? Number(params.records) : 10} columns={7} />
                 )}
               </Tbody>
             </Table>

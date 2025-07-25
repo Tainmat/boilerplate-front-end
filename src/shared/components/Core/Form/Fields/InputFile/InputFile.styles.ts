@@ -10,6 +10,14 @@ interface Props {
   disabled?: boolean;
 }
 
+interface DropZoneProps {
+  isDragging: boolean;
+  hasFile: boolean;
+  error?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+}
+
 export const Container = styled.div.withConfig({
   shouldForwardProp: (prop) => !["hasValue", "error", "readOnly", "disabled"].includes(prop),
 })<Props>`
@@ -184,6 +192,161 @@ export const Container = styled.div.withConfig({
         position: absolute;
         right: 1rem;
         top: 0.75rem;
+      }
+    }
+  `}
+`;
+
+export const DropZone = styled.div<DropZoneProps>`
+  ${(props) => css`
+    position: relative;
+    min-height: 120px;
+    border: 2px dashed ${props.theme.colors.neutral.low.light};
+    border-radius: ${props.theme.border.radius.md};
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: ${rgba(props.theme.colors.neutral.low.pure, 0.02)};
+
+    ${props.isDragging &&
+    css`
+      border-color: ${props.theme.colors.feedback.success.pure};
+      background-color: ${rgba(props.theme.colors.feedback.success.pure, 0.1)};
+      transform: scale(1.02);
+    `}
+
+    ${props.error &&
+    css`
+      border-color: ${props.theme.colors.feedback.warning.pure};
+      background-color: ${rgba(props.theme.colors.feedback.warning.pure, 0.05)};
+    `}
+
+    ${props.disabled &&
+    css`
+      opacity: ${props.theme.opacity.level.medium};
+      cursor: not-allowed;
+    `}
+
+    ${props.readOnly &&
+    css`
+      cursor: default;
+      pointer-events: none;
+    `}
+
+    &:hover:not([disabled]) {
+      ${!props.error &&
+      css`
+        border-color: ${props.theme.colors.brand.primary.pure};
+        background-color: ${rgba(props.theme.colors.brand.primary.pure, 0.05)};
+      `}
+    }
+
+    .drop-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      height: 100%;
+      min-height: 120px;
+
+      .text {
+        margin-top: 1rem;
+        text-align: center;
+
+        .primary {
+          display: block;
+          font-size: ${props.theme.font.size.sm};
+          font-weight: ${props.theme.font.weight.medium};
+          color: ${props.theme.colors.neutral.low.pure};
+          margin-bottom: 0.5rem;
+        }
+
+        .secondary {
+          display: block;
+          font-size: ${props.theme.font.size.xxs};
+          color: ${props.theme.colors.neutral.low.light};
+        }
+      }
+    }
+
+    .error-icon {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+    }
+  `}
+`;
+
+export const ImagePreview = styled.div`
+  ${(props) => css`
+    position: relative;
+    width: 100%;
+    height: 120px;
+    border-radius: ${props.theme.border.radius.md};
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: ${props.theme.border.radius.md};
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0) 50%,
+        rgba(0, 0, 0, 0.7) 100%
+      );
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover .overlay {
+      opacity: 1;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      font-size: ${props.theme.font.size.xxs};
+      font-weight: ${props.theme.font.weight.medium};
+
+      span {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .remove-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      color: white;
+
+      &:hover {
+        background: rgba(255, 0, 0, 0.7);
       }
     }
   `}
