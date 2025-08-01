@@ -15,12 +15,8 @@ import { Pagination } from "@shared/components/Core/Pagination";
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
-import { useAuthRoles } from "@shared/hooks/services/Rules/Auth/useRoles";
-import { useAuthContext } from "@shared/contexts/Auth";
-import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
 /* import { customers } from "@shared/hooks/services/Admin/useCustomers"; */
-import { inspections } from "@shared/hooks/services/Admin/useInspections";
-import { fakeRequest } from "@shared/services/api/api.service";
+import { useInspections } from "@shared/hooks/services/Admin/useInspections";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -108,13 +104,9 @@ const chartColors = {
 
 export function Dashboard() {
   const { setPageBreadcrumb } = useBreadcrumbContext();
-  const { isSmartphone, isTablet } = useDeviceDetection();
-  const { isSystemAdmin, isAdministrator, isCustomer } = useAuthRoles();
-  const { user } = useAuthContext();
+  const { isSmartphone } = useDeviceDetection();
 
   // Estados
-  const [selectedClient, setSelectedClient] = useState<string>("");
-  const [clientOptions, setClientOptions] = useState<IOption[]>([]);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [dateRange, setDateRange] = useState<string>("last12months");
@@ -125,58 +117,16 @@ export function Dashboard() {
 
   // Configurar breadcrumb
   useEffect(() => {
-    setPageBreadcrumb([{ text: "Home", route: ROUTE_HOME }, { text: "Dashboard" }]);
+    setPageBreadcrumb([{ text: "Dashboard" }]);
   }, [setPageBreadcrumb]);
 
-  // Carregar opções de clientes
-  useEffect(() => {
-    const loadClientOptions = async () => {
-      try {
-        // Simular carregamento de clientes
-        await fakeRequest(500);
-
-        // Filtrar apenas clientes ativos
-        /* const activeCustomers = customers.filter((c) => c.inStatusCadastroCliente); */
-
-        /*  const options = activeCustomers.map((customer) => ({
-          value: customer.uuidCliente,
-          label: customer.nomeRazaoSocialCliente,
-        })); */
-
-        const options = [
-          { value: "all", label: "Todos os Clientes" },
-          { value: "client1", label: "Cliente 1" },
-          { value: "client2", label: "Cliente 2" },
-        ];
-
-        setClientOptions(options);
-
-        // Se for cliente, selecionar automaticamente
-        if (isCustomer()) {
-          // Em um cenário real, buscaríamos o cliente associado ao usuário logado
-          // Para este exemplo, vamos selecionar o primeiro cliente
-          if (options.length > 0) {
-            setSelectedClient(options[0].value as string);
-          }
-        } else if (options.length > 0) {
-          // Para admin, selecionar o primeiro por padrão
-          setSelectedClient(options[0].value as string);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar clientes:", error);
-      }
-    };
-
-    loadClientOptions();
-  }, [isCustomer]);
 
   // Função para processar os dados das inspeções
   const processInspectionData = useCallback(
-    (clientId: string, dateRangeFilter: string): DashboardData => {
-      // Filtrar inspeções pelo cliente selecionado
-      let filteredInspections = inspections.filter(
-        (inspection) => inspection.uuidCliente === clientId,
-      );
+    (dateRangeFilter: string): DashboardData => {
+      // TODO: Integrar com dados reais quando disponível
+      // Temporariamente usando array vazio até integração
+      let filteredInspections: any[] = [];
 
       // Aplicar filtro de data
       const today = new Date();
@@ -198,18 +148,17 @@ export function Dashboard() {
           break;
       }
 
-      filteredInspections = filteredInspections.filter(
-        (inspection) => new Date(inspection.dataInspecao) >= startDate,
-      );
+      // TODO: Implementar filtro quando dados reais estiverem disponíveis
+      // filteredInspections = filteredInspections.filter(
+      //   (inspection) => new Date(inspection.reportStartDate) >= startDate,
+      // );
 
-      // Calcular métricas
-      const aprovadas = filteredInspections.filter((i) => i.statusInspecao === "CONCLUIDA").length;
-      const reprovadas = filteredInspections.filter((i) => i.statusInspecao === "CANCELADA").length;
-      const emAnalise = filteredInspections.filter(
-        (i) => i.statusInspecao === "EM_ANDAMENTO",
-      ).length;
-      const pendentes = filteredInspections.filter((i) => i.statusInspecao === "AGENDADA").length;
-      const total = filteredInspections.length;
+      // Calcular métricas - valores padrão até integração
+      const aprovadas = 0;
+      const reprovadas = 0;
+      const emAnalise = 0;
+      const pendentes = 0;
+      const total = 0;
 
       // Dados por status para gráfico de pizza
       const statusLabels = ["Aprovadas", "Reprovadas", "Em Análise", "Pendentes"];
@@ -230,51 +179,31 @@ export function Dashboard() {
       const inAnalysisByMonth = Array(12).fill(0);
       const pendingByMonth = Array(12).fill(0);
 
-      filteredInspections.forEach((inspection) => {
-        const inspectionDate = new Date(inspection.dataInspecao);
-        const monthIndex = lastMonths.findIndex(
-          (date) =>
-            date.getMonth() === inspectionDate.getMonth() &&
-            date.getFullYear() === inspectionDate.getFullYear(),
-        );
+      // TODO: Implementar agrupamento por mês quando dados reais estiverem disponíveis
+      // filteredInspections.forEach((inspection) => {
+      //   const inspectionDate = new Date(inspection.reportStartDate);
+      //   ...
+      // });
 
-        if (monthIndex !== -1) {
-          if (inspection.statusInspecao === "CONCLUIDA") {
-            approvedByMonth[monthIndex]++;
-          } else if (inspection.statusInspecao === "CANCELADA") {
-            rejectedByMonth[monthIndex]++;
-          } else if (inspection.statusInspecao === "EM_ANDAMENTO") {
-            inAnalysisByMonth[monthIndex]++;
-          } else if (inspection.statusInspecao === "AGENDADA") {
-            pendingByMonth[monthIndex]++;
-          }
-        }
-      });
-
-      // Dados por tipo de inspeção
-      const tiposInspecao = [...new Set(filteredInspections.map((i) => i.dsTipoInspecao))];
-      const dadosPorTipo = tiposInspecao.map((tipo) => {
-        return filteredInspections.filter((i) => i.dsTipoInspecao === tipo).length;
-      });
+      // Dados por tipo de inspeção - valores padrão
+      const tiposInspecao: string[] = [];
+      const dadosPorTipo: number[] = [];
 
       // Comparativo de aprovações vs reprovações ao longo do tempo
       const comparativoLabels = monthLabels;
       const comparativoAprovadas = approvedByMonth;
       const comparativoReprovadas = rejectedByMonth;
 
-      // Últimas inspeções
-      const ultimasInspecoes = filteredInspections
-        .sort((a, b) => new Date(b.dataInspecao).getTime() - new Date(a.dataInspecao).getTime())
-        .slice(0, 10)
-        .map((inspection) => ({
-          id: inspection.idInspecao,
-          data: format(new Date(inspection.dataInspecao), "dd/MM/yyyy"),
-          tipo: inspection.dsTipoInspecao,
-          status: inspection.dsStatusInspecao,
-          responsavel: inspection.nomeInspector,
-          observacoes: inspection.observacoesInspecao || "-",
-          prioridade: inspection.dsPrioridadeInspecao,
-        }));
+      // Últimas inspeções - array vazio até integração
+      const ultimasInspecoes: Array<{
+        id: number;
+        data: string;
+        tipo: string;
+        status: string;
+        responsavel: string;
+        observacoes: string;
+        prioridade: string;
+      }> = [];
 
       return {
         totalInspecoes: total,
@@ -309,15 +238,11 @@ export function Dashboard() {
 
   // Carregar dados da dashboard
   const loadDashboardData = useCallback(async () => {
-    if (!selectedClient) return;
-
     setLoading(true);
     try {
-      // Simular tempo de carregamento
-      await fakeRequest(1000);
-
-      // Processar dados
-      const data = processInspectionData(selectedClient, dateRange);
+      // TODO: Aguardar implementação da integração real com a API
+      // Processar dados temporários
+      const data = processInspectionData(dateRange);
       setDashboardData(data);
       setLastUpdated(new Date());
     } catch (error) {
@@ -325,14 +250,12 @@ export function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [selectedClient, dateRange, processInspectionData]);
+  }, [dateRange, processInspectionData]);
 
-  // Carregar dados quando o cliente ou período mudar
+  // Carregar dados quando o período mudar
   useEffect(() => {
-    if (selectedClient) {
-      loadDashboardData();
-    }
-  }, [selectedClient, dateRange, loadDashboardData]);
+    loadDashboardData();
+  }, [dateRange, loadDashboardData]);
 
   // Auto-refresh a cada 5 minutos
   useEffect(() => {
@@ -564,38 +487,6 @@ export function Dashboard() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems =
     dashboardData?.ultimasInspecoes.slice(indexOfFirstItem, indexOfLastItem) || [];
-  const totalPages = dashboardData
-    ? Math.ceil(dashboardData.ultimasInspecoes.length / itemsPerPage)
-    : 0;
-
-  // Função para exportar dados
-  const exportData = () => {
-    if (!dashboardData) return;
-
-    // Criar CSV
-    let csv = "data:text/csv;charset=utf-8,";
-
-    // Cabeçalho
-    csv += "ID,Data,Tipo,Status,Responsável,Prioridade,Observações\n";
-
-    // Dados
-    dashboardData.ultimasInspecoes.forEach((inspecao) => {
-      csv += `${inspecao.id},${inspecao.data},"${inspecao.tipo}","${inspecao.status}","${inspecao.responsavel}","${inspecao.prioridade}","${inspecao.observacoes.replace(/"/g, '""')}"\n`;
-    });
-
-    // Criar link de download
-    const encodedUri = encodeURI(csv);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `inspecoes_${format(new Date(), "dd-MM-yyyy")}.csv`);
-    document.body.appendChild(link);
-
-    // Trigger download
-    link.click();
-
-    // Limpar
-    document.body.removeChild(link);
-  };
 
   // Função para obter cor do status
   const getStatusColor = (status: string) => {
@@ -641,22 +532,8 @@ export function Dashboard() {
 
           {/* Filtros */}
           <Row className="mb-4">
-            {/* Seleção de Cliente (apenas para admin) */}
-            {(isSystemAdmin() || isAdministrator()) && (
-              <Col md={4} sm={12} className="mb-3 mb-md-0">
-                <Select
-                  label="Cliente"
-                  name="cliente"
-                  placeholder="Selecione um cliente"
-                  options={clientOptions}
-                  value={selectedClient}
-                  onChange={(option: IOption) => setSelectedClient(option.value as string)}
-                />
-              </Col>
-            )}
-
             {/* Filtro de período */}
-            <Col md={isSystemAdmin() || isAdministrator() ? 4 : 6} sm={12} className="mb-3 mb-md-0">
+            <Col md={6} sm={12} className="mb-3 mb-md-0">
               <Select
                 label="Período"
                 name="periodo"
@@ -673,11 +550,7 @@ export function Dashboard() {
             </Col>
 
             {/* Auto-refresh e Exportar */}
-            <Col
-              md={isSystemAdmin() || isAdministrator() ? 4 : 6}
-              sm={12}
-              className="d-flex align-items-end justify-content-between"
-            >
+            <Col md={6} sm={12} className="d-flex align-items-end justify-content-between">
               <Form.Check
                 type="switch"
                 id="auto-refresh"

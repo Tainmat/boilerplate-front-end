@@ -1,6 +1,5 @@
 import { ROLE_ADMINISTRATOR, ROLE_CUSTOMER, ROLE_SYSTEM_ADMIN } from "@shared/constants/user.roles";
 
-import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
 import { ROUTE_LIST_USERS } from "@/modules/Admin/Users/routes/Users.paths";
 import { ROUTE_LIST_CUSTOMERS } from "@/modules/Admin/Customers/routes/Customer.paths";
 import { ROUTE_LIST_EQUIPMENTS } from "@/modules/Admin/Equipments/routes/Equipment.paths";
@@ -23,12 +22,6 @@ interface INavigation {
 
 export const nav: INavigation[] = [
   {
-    icon: "home",
-    label: "Home",
-    route: ROUTE_HOME,
-    mobileVisible: true,
-  },
-  {
     icon: "show_chart",
     label: "Dashboard",
     route: ROUTE_DASHBOARD,
@@ -49,20 +42,20 @@ export const nav: INavigation[] = [
     allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR],
     list: [
       {
+        icon: "assignment",
         label: "Usuários",
-        icon: "person",
         route: ROUTE_LIST_USERS,
         mobileVisible: true,
       },
       {
+        icon: "show_chart",
         label: "Clientes",
-        icon: "business",
         route: ROUTE_LIST_CUSTOMERS,
         mobileVisible: true,
       },
       {
+        icon: "multiline_chart",
         label: "Equipamentos",
-        icon: "precision_manufacturing",
         route: ROUTE_LIST_EQUIPMENTS,
         mobileVisible: true,
       },

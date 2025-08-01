@@ -7,7 +7,6 @@ import { useSideMenuContext } from "@shared/contexts/Layout/SideMenu";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthRoles } from "@shared/hooks/services/Rules/Auth/useRoles";
 import { useState, useEffect } from "react";
-import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 
 // Filter navigation items based on device type
 const filterNavItems = (items: any[], isMobile: boolean) => {
@@ -18,36 +17,41 @@ const filterNavItems = (items: any[], isMobile: boolean) => {
 export function SideMenu() {
   const location = useLocation(); 
   const { visible } = useSideMenuContext();
-  const { hover, closeMenu } = useSideMenuOpenContext();
-  const { isSmartphone, isTablet } = useDeviceDetection();
+  const { hover, closeMenu, shouldShowOverlay, isSmartphone, isTablet } = useSideMenuOpenContext();
   const { checkIfUserHasRole } = useAuthRoles();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  
 
   // Filter navigation items for mobile
   const filteredNav = filterNavItems(nav, isSmartphone);
 
-  // Close menu when clicking on mobile overlay
+  // Close menu when clicking on overlay (all resolutions)
   const handleOverlayClick = () => {
-    if (isSmartphone || isTablet) {
-      closeMenu();
-    }
+    closeMenu();
   };
 
-  // Close menu when route changes on mobile
+  // Close menu when route changes on mobile  
   useEffect(() => {
     if ((isSmartphone || isTablet) && hover) {
       closeMenu();
     }
-  }, [location.pathname, isSmartphone, isTablet, hover, closeMenu]);
-
+  }, [location.pathname, isSmartphone, isTablet, closeMenu]);
+  
   if (!visible) return null;
 
   return (
     <>
-      {/* Mobile Overlay */}
-      <S.MobileOverlay $visible={(isSmartphone || isTablet) && hover} onClick={handleOverlayClick} />
+      {/* Universal Overlay for all screen sizes */}
+      <S.MenuOverlay $visible={hover} onClick={handleOverlayClick} />
       
       <S.Container $hover={hover} $isMobile={isSmartphone} $isTablet={isTablet}>
+        {/* Close Button for all screen sizes when menu is open */}
+        {hover && (
+          <S.CloseButton onClick={closeMenu}>
+            <Icon icon="close" mode="light" size="sm" />
+          </S.CloseButton>
+        )}
+        
         <S.Brand className={`${hover && "open"}`} />
 
         <S.List className={`${hover && "open"}`}>
@@ -105,7 +109,7 @@ export function SideMenu() {
                             appearance={location.pathname === subitem.route ? undefined : "filled"}
                             icon={subitem.icon}
                             mode="light"
-                            size={hover ? "xs" : "sm"}
+                            size="xs"
                           />
 
                           <span>{subitem.label}</span>

@@ -5,37 +5,24 @@ interface ContainerProps {
 }
 
 const defaultContainerProps = styled.div<ContainerProps>`
-  ${(props) => css`
+  ${() => css`
     position: fixed;
+    margin: 0;
+    padding: 0 1rem;
+    width: 100vw;
+    transition: none; /* Remove transitions since menu no longer affects layout */
 
-    margin: 0 0 0 5rem;
-    padding: 0 0.5rem;
-    transition: margin 0.3s ease, width 0.3s ease;
-
-    ${props.$sideMenuIsOpen &&
-    css`
-      margin-left: 18rem;
-    `}
-
-    width: calc(100vw - ${props.$sideMenuIsOpen ? "18rem" : "5rem"});
-
-    /* Mobile */
+    /* All screen sizes now have consistent layout */
     @media (max-width: 767px) {
-      margin: 0;
       padding: 0 1rem;
-      width: 100vw;
     }
 
-    /* Tablet */
     @media (min-width: 768px) and (max-width: 1023px) {
-      margin: 0 0 0 4rem;
-      width: calc(100vw - 4rem);
-      
-      ${props.$sideMenuIsOpen &&
-      css`
-        margin-left: 240px;
-        width: calc(100vw - 240px);
-      `}
+      padding: 0 1rem;
+    }
+
+    @media (min-width: 1024px) {
+      padding: 0 1rem;
     }
   `}
 `;
@@ -45,14 +32,14 @@ export const Container = styled(defaultContainerProps)<ContainerProps>`
     position: fixed;
     z-index: 1080;
     height: ${props.theme.spacing.xl};
-    width: calc(100% - ${props.$sideMenuIsOpen ? "18rem" : "5rem"});
+    width: 100%;
     background-color: ${props.theme.colors.neutral.high.pure};
     border-bottom: 1px solid ${props.theme.colors.neutral.low.light};
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 10px;
     align-items: center;
-    transition: height 0.3s ease, margin 0.3s ease, width 0.3s ease;
+    transition: height 0.3s ease; /* Only keep height transition */
 
     .col1 {
       display: flex;
@@ -127,7 +114,7 @@ export const Container = styled(defaultContainerProps)<ContainerProps>`
     /* Tablet */
     @media (min-width: 768px) and (max-width: 1023px) {
       height: 3.75rem;
-      width: calc(100% - ${props.$sideMenuIsOpen ? "240px" : "4rem"});
+      width: 100%;
       
       .col1 {
         gap: 0.4375rem;
@@ -168,6 +155,47 @@ export const BreadcrumbContainer = styled(defaultContainerProps)`
     @media (min-width: 768px) and (max-width: 1023px) {
       margin-top: 3.75rem;
       padding: 0 0.875rem;
+    }
+  `}
+`;
+
+export const MenuButton = styled.button`
+  ${(props) => css`
+    background: ${props.theme.colors.brand.primary.pure};
+    border: none;
+    border-radius: ${props.theme.border.radius.sm};
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background: ${props.theme.colors.brand.primary.dark};
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    svg {
+      color: ${props.theme.colors.neutral.high.pure};
+    }
+
+    /* Mobile */
+    @media (max-width: 767px) {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    /* Tablet */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      width: 2.375rem;
+      height: 2.375rem;
     }
   `}
 `;

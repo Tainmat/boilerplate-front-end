@@ -1,12 +1,15 @@
-import { createContext, ReactNode, useCallback, useContext, useMemo, useState, useEffect } from "react";
-import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
-import { useMediaQuery } from "react-responsive";
+import { createContext, ReactNode, useContext, useState, useEffect, useCallback } from "react";
 
 interface SideMenuOpenContextData {
   hover: boolean;
   openMenu: () => void;
   closeMenu: () => void;
   toggleMenu: () => void; 
+  isMenuAlwaysVisible: boolean;
+  shouldShowOverlay: boolean;
+  isSmartphone: boolean;
+  isTablet: boolean;
+  isDesktop: boolean;
 }
 
 const Context = createContext<SideMenuOpenContextData>({} as SideMenuOpenContextData);
@@ -16,20 +19,33 @@ interface Props {
 }
 
 function SideMenuOpenContext({ children }: Props) {
-  const { isSmartphone, isTablet, isDesktop } = useDeviceDetection();
-  const isLargeScreen = useMediaQuery({ minWidth: 1200 });
-  const [hover, setHover] = useState(isDesktop && !isSmartphone && !isTablet);
-
-  // Adjust menu state based on device type
+  const [hover, setHover] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  // Update window width on resize
   useEffect(() => {
-    if (isSmartphone || isTablet) {
-      // On mobile and tablet, menu should be closed by default
-      setHover(false);
-    } else if (isDesktop) {
-      // On desktop, open by default only on large screens
-      setHover(isLargeScreen);
-    }
-  }, [isSmartphone, isTablet, isDesktop, isLargeScreen]);
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Determinar comportamento baseado na resolução usando window width
+  const isSmartphone = windowWidth <= 767;
+  const isTablet = windowWidth >= 768 && windowWidth <= 1023;
+  const isDesktop = windowWidth >= 1024;
+  
+  // Now menu is always overlay, so these properties change
+  const isMenuAlwaysVisible = false; // Menu is never always visible, always overlay
+  const shouldShowOverlay = true; // Always show overlay when menu is open
+  
+  // Configurar estado inicial APENAS na primeira renderização
+  useEffect(() => {
+    // Menu always starts closed since it's now always overlay mode
+    setHover(false);
+  }, []); // Array vazio - roda apenas uma vez
 
   const openMenu = useCallback(() => {
     setHover(true);
@@ -43,10 +59,18 @@ function SideMenuOpenContext({ children }: Props) {
     setHover(prev => !prev);
   }, []);
 
-  const providerValue = useMemo(
-    () => ({ hover, openMenu, closeMenu, toggleMenu }),
-    [hover, openMenu, closeMenu, toggleMenu],
-  );
+  // Criar o value do provider
+  const providerValue = { 
+    hover, 
+    openMenu, 
+    closeMenu, 
+    toggleMenu,
+    isMenuAlwaysVisible,
+    shouldShowOverlay,
+    isSmartphone,
+    isTablet,
+    isDesktop
+  };
 
   return <Context.Provider value={providerValue}>{children}</Context.Provider>;
 }

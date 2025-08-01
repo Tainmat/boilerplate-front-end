@@ -4,7 +4,6 @@ import { useSideMenuOpenContext } from "@shared/components/Layout/contexts/SideM
 import * as S from "@shared/components/Layout/Header/Header.styles";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useHeaderContext } from "@shared/contexts/Layout/Header";
-import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { useState } from "react";
 
 import { useAuthContext } from "@/shared/contexts/Auth";
@@ -12,14 +11,18 @@ import { useAuthContext } from "@/shared/contexts/Auth";
 import { ButtonIcon } from "../../Core/Buttons/ButtonIcon";
 import { Tooltip } from "../../Core/Tooltip";
 import { Paragraph } from "../../Core/Typography/Paragraph";
+import { Icon } from "../../Core/Icons/Icon";
 import { UserDropdown } from "./Dropdown";
 
 export function Header() {
-  const { hover, toggleMenu } = useSideMenuOpenContext();
+  const { hover, toggleMenu, isSmartphone, isTablet } = useSideMenuOpenContext();
   const { user } = useAuthContext();
-  const { isSmartphone, isTablet } = useDeviceDetection();
   const { visible } = useHeaderContext();
   const { breadcrumb } = useBreadcrumbContext();
+
+  const handleMenuClick = () => {
+    toggleMenu();
+  };
 
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   
@@ -39,16 +42,13 @@ export function Header() {
     <>
       <S.Container $sideMenuIsOpen={hover}>
         <div className="col1">
-          <div>
-            <Tooltip title={hover ? "Fechar menu" : "Abrir menu"} place={isSmartphone ? "bottom" : "bottom-start"}>
-              <ButtonIcon
-                icon={hover ? "menu_open" : "menu"}
-                size="sm"
-                appearance="round"
-                onClick={toggleMenu}
-              />
-            </Tooltip>
-          </div>
+          <S.MenuButton onClick={handleMenuClick}>
+            <Icon 
+              icon={hover ? "close" : "menu"} 
+              mode="light" 
+              size="sm" 
+            />
+          </S.MenuButton>
 
           <div className="username">
             <Paragraph size="lg" className="hello">

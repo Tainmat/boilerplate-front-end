@@ -7,20 +7,18 @@ import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
-import { IInspection, inspections } from "@shared/hooks/services/Admin/useInspections";
-/* import { customers } from "@shared/hooks/services/Admin/useCustomers";
-import { equipments } from "@shared/hooks/services/Admin/useEquipments";
-import { usuarios } from "@shared/hooks/services/Admin/useUsers"; */
-import { fakeRequest, post, put } from "@shared/services/api/api.service";
+import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
+import { useInspection, IInspectionCreateData, IInspectionAttachment } from "@shared/hooks/services/Admin/useInspection";
+import { filesToBase64 } from "@shared/utils/fileToBase64";
 
 import { InspectionRegisterForm } from "./components/RegisterForm";
 import { IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
+import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
 
 export function CreateInspection() {
   const navigate = useNavigate();
@@ -28,127 +26,20 @@ export function CreateInspection() {
   const { addToast, handleApiRejection } = useToastContext();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { uuid } = useParams();
-
-  const fakeGetInspection = (uuid: string) => {
-    return fakeRequest(500, { uuid }).then(() => {
-      const inspection = inspections.find((i) => i.uuidInspecao === uuid);
-
-      if (!inspection) {
-        return { data: null };
-      }
-
-      return { data: inspection };
-    });
-  };
-
-  const fakePostInspection = async (payload: Partial<IInspection>) => {
-    const newInspection = {
-      ...payload,
-      idInspecao: inspections.length + 1,
-      uuidInspecao: uuidv4(),
-      dsTipoInspecao: getInspectionTypeDescription(payload.tipoInspecao || ""),
-      dsStatusInspecao: getStatusDescription(payload.statusInspecao || "AGENDADA"),
-      dsPrioridadeInspecao: getPriorityDescription(payload.prioridadeInspecao || "MEDIA"),
-      dataCadastroInspecao: new Date().toISOString(),
-      inStatusCadastroInspecao: !!payload.inStatusCadastroInspecao,
-      dsStatusCadastroInspecao: payload.inStatusCadastroInspecao ? "Ativo" : "Inativo",
-      // Buscar nomes relacionados
-      /* nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || "",
-      nomeEquipamento: equipments.find(e => e.uuidEquipamento === payload.uuidEquipamento)?.nomeEquipamento || "",
-      nomeInspector: usuarios.find(u => u.uuidUsuario === payload.uuidInspector)?.nomeUsuario || "", */
-    };
-
-    inspections.push(newInspection as IInspection);
-
-    return fakeRequest(1000, {
-      data: newInspection,
-      message: "Inspeção cadastrada com sucesso!",
-    });
-  };
-
-  const fakePutInspection = async (uuid: string, payload: Partial<IInspection>) => {
-    const index = inspections.findIndex((i) => i.uuidInspecao === uuid);
-
-    if (index === -1) {
-      throw new Error("Inspeção não encontrada");
-    }
-
-    const updatedInspection: IInspection = {
-      ...inspections[index],
-      ...payload,
-      dsTipoInspecao: getInspectionTypeDescription(
-        payload.tipoInspecao || inspections[index].tipoInspecao,
-      ),
-      dsStatusInspecao: getStatusDescription(
-        payload.statusInspecao || inspections[index].statusInspecao,
-      ),
-      dsPrioridadeInspecao: getPriorityDescription(
-        payload.prioridadeInspecao || inspections[index].prioridadeInspecao,
-      ),
-      dsStatusCadastroInspecao: payload.inStatusCadastroInspecao ? "Ativo" : "Inativo",
-      /* nomeCliente: customers.find(c => c.uuidCliente === payload.uuidCliente)?.nomeRazaoSocialCliente || inspections[index].nomeCliente,
-      nomeEquipamento: equipments.find(e => e.uuidEquipamento === payload.uuidEquipamento)?.nomeEquipamento || inspections[index].nomeEquipamento,
-      nomeInspector: usuarios.find(u => u.uuidUsuario === payload.uuidInspector)?.nomeUsuario || inspections[index].nomeInspector, */
-    };
-
-    inspections[index] = updatedInspection;
-
-    return fakeRequest(1000, {
-      data: updatedInspection,
-      message: "Inspeção atualizada com sucesso!",
-    });
-  };
-
-  function getInspectionTypeDescription(type: string): string {
-    const types: Record<string, string> = {
-      PREVENTIVA: "Preventiva",
-      CORRETIVA: "Corretiva",
-      PREDITIVA: "Preditiva",
-      EMERGENCIAL: "Emergencial",
-      PERIODICA: "Periódica",
-      INICIAL: "Inicial",
-      FINAL: "Final",
-    };
-    return types[type] || type;
-  }
-
-  function getStatusDescription(status: string): string {
-    const statuses: Record<string, string> = {
-      AGENDADA: "Agendada",
-      EM_ANDAMENTO: "Em Andamento",
-      CONCLUIDA: "Concluída",
-      CANCELADA: "Cancelada",
-    };
-    return statuses[status] || status;
-  }
-
-  function getPriorityDescription(priority: string): string {
-    const priorities: Record<string, string> = {
-      BAIXA: "Baixa",
-      MEDIA: "Média",
-      ALTA: "Alta",
-      CRITICA: "Crítica",
-    };
-    return priorities[priority] || priority;
-  }
+  const {
+    loading,
+    inspection: inspectionData,
+    fetchInspection,
+    createInspection,
+    updateInspection,
+    fetchInspectionAttachments,
+    uploadInspectionAttachments,
+  } = useInspection();
 
   const [inspection, setInspection] = useState<IInspectionRegisterForm | null>(null);
-
-  // Opções para os selects
-  /* const customersOptions = customers.map(customer => ({
-    value: customer.uuidCliente,
-    label: customer.nomeRazaoSocialCliente,
-  }));
-
-  const equipmentsOptions = equipments.map(equipment => ({
-    value: equipment.uuidEquipamento,
-    label: equipment.nomeEquipamento,
-  }));
-
-  const inspectorsOptions = usuarios.map(user => ({
-    value: user.uuidUsuario,
-    label: user.nomeUsuario,
-  })); */
+  const [currentStep, setCurrentStep] = useState<"equipment" | "form">("equipment");
+  const [selectedEquipment, setSelectedEquipment] = useState<IEquipment | null>(null);
+  const [existingAttachments, setExistingAttachments] = useState<IInspectionAttachment[]>([]);
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -161,88 +52,254 @@ export function CreateInspection() {
     ]);
 
     if (uuid) {
-      fakeGetInspection(uuid)
-        .then((data) => {
-          if (data.data) {
-            setInspection({
-              tipoInspecao: data.data.tipoInspecao,
-              numeroInspecao: data.data.numeroInspecao,
-              dataInspecao: data.data.dataInspecao,
-              horaInspecao: data.data.horaInspecao,
-              uuidCliente: data.data.uuidCliente,
-              uuidEquipamento: data.data.uuidEquipamento,
-              uuidInspector: data.data.uuidInspector,
-              statusInspecao: data.data.statusInspecao,
-              prioridadeInspecao: data.data.prioridadeInspecao,
-              descricaoObjetivo: data.data.descricaoObjetivo,
-              observacoesInspecao: data.data.observacoesInspecao,
-              inStatusCadastroInspecao: data.data.inStatusCadastroInspecao ? "true" : "false",
-            });
-          } else {
-            addToast({
-              type: "helper",
-              title: "Ooops.",
-              description: "Inspeção não encontrada.",
-            });
-            navigate(-1);
-          }
-        })
-        .catch(() => {
-          addToast({
-            type: "helper",
-            title: "Ooops.",
-            description: "Erro ao recuperar dados da Inspeção.",
-          });
-          navigate(-1);
-        });
-    } else {
-      setInspection({
-        tipoInspecao: "",
-        numeroInspecao: "",
-        dataInspecao: "",
-        horaInspecao: "",
-        uuidCliente: "",
-        uuidEquipamento: "",
-        uuidInspector: "",
-        statusInspecao: "AGENDADA",
-        prioridadeInspecao: "MEDIA",
-        descricaoObjetivo: "",
-        observacoesInspecao: "",
-        inStatusCadastroInspecao: "true",
-      });
+      // Modo edição - pula step de equipamento e carrega dados
+      setCurrentStep("form");
+      loadInspectionData(uuid);
     }
-  }, [setPageBreadcrumb, uuid, navigate, addToast]);
+
+    async function loadInspectionData(id: string) {
+      try {
+        showLoader();
+        const data = await fetchInspection(id);
+
+        // Converter dados da API para o formato do formulário
+        const formData: IInspectionRegisterForm = {
+          customerId: data.customerId || "",
+          inspectorUserId: data.inspectorUserId || "",
+          partTypeId: data.partTypeId || "",
+          reportNumber: data.reportNumber || "",
+          reportStartDate: data.reportStartDate || "",
+          reportEndDate: data.reportEndDate || "",
+          revisionNumber: data.revisionNumber || "00",
+          sheetNumber: data.sheetNumber || "1/1",
+          componentId: data.componentId || "",
+          positionNumber: data.positionNumber || 1,
+          inspectionLocation: data.inspectionLocation || "",
+          mdaInformation: data.mdaInformation || "",
+          isVI: data.isVI || false,
+          isDM: data.isDM || false,
+          isPM: data.isPM || false,
+          isUS: data.isUS || false,
+          isLP: data.isLP || false,
+          isDU: data.isDU || false,
+          finalConclusion: data.finalConclusion || "",
+          inspectionStatusId: data.inspectionStatusId || "",
+          isSandingBrushSandblasting: data.isSandingBrushSandblasting || false,
+          isCleaningChemistry: data.isCleaningChemistry || false,
+          instruments: data.instruments || "",
+          // Determinar qual posição foi preenchida
+          selectedPosition: data.position1
+            ? "1"
+            : data.position2
+              ? "2"
+              : data.position3
+                ? "3"
+                : data.position4
+                  ? "4"
+                  : data.position5
+                    ? "5"
+                    : data.position6
+                      ? "6"
+                      : "1",
+          // Inicializar conclusões dinâmicas com dados existentes
+          inspectionPointsConclusions: {
+            point1: data.flankAndBottomConclusion || "",
+            point2: data.keywayChannelsConclusion || "",
+            ...(data.partType?.totalInspectionPoints
+              ? Array.from({ length: data.partType.totalInspectionPoints }, (_, i) => i + 1)
+                  .slice(2) // Pular os 2 primeiros que já mapeamos
+                  .reduce(
+                    (acc, pointNum) => {
+                      acc[`point${pointNum}`] = "";
+                      return acc;
+                    },
+                    {} as { [key: string]: string },
+                  )
+              : {}),
+          },
+          additionalImages: [], // Imagens não podem ser carregadas do backend
+        };
+
+        setInspection(formData);
+
+        // Se há dados do part type, usar como equipamento selecionado
+        if (data.partType) {
+          setSelectedEquipment({
+            id: data.partType.id,
+            name: data.partType.name,
+            description: data.partType.description || "",
+            coverUrl: data.partType.coverUrl || "",
+            totalInspectionPoints: data.partType.totalInspectionPoints || 0,
+            isActive: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+
+        // Carregar anexos existentes
+        try {
+          const attachments = await fetchInspectionAttachments(id);
+          setExistingAttachments(attachments);
+        } catch (error) {
+          console.warn("Não foi possível carregar os anexos:", error);
+          setExistingAttachments([]);
+        }
+      } catch (error) {
+        handleApiRejection();
+        navigate(-1);
+      } finally {
+        hideLoader();
+      }
+    }
+  }, [
+    setPageBreadcrumb,
+    uuid,
+    navigate,
+    addToast,
+    showLoader,
+    hideLoader,
+    fetchInspection,
+    handleApiRejection,
+  ]);
+
+  function handleEquipmentSelection(equipment: IEquipment) {
+    setSelectedEquipment(equipment);
+
+    setInspection({
+      customerId: "",
+      inspectorUserId: "",
+      partTypeId: equipment.id,
+      reportNumber: "",
+      reportStartDate: "",
+      reportEndDate: "",
+      revisionNumber: "00",
+      sheetNumber: "1/1",
+      componentId: "",
+      positionNumber: 1,
+      inspectionLocation: "",
+      mdaInformation: "",
+      isVI: false,
+      isDM: false,
+      isPM: false,
+      isUS: false,
+      isLP: false,
+      isDU: false,
+      finalConclusion: "",
+      inspectionStatusId: "",
+      isSandingBrushSandblasting: false,
+      isCleaningChemistry: false,
+      instruments: "",
+      /* generalConsiderations: "", */
+      // Posição de inspeção selecionada
+      selectedPosition: "1",
+      // Conclusões dinâmicas dos pontos de inspeção
+      inspectionPointsConclusions: equipment.totalInspectionPoints
+        ? Array.from({ length: equipment.totalInspectionPoints }, (_, i) => i + 1).reduce(
+            (acc, pointNum) => {
+              acc[`point${pointNum}`] = "";
+              return acc;
+            },
+            {} as { [key: string]: string },
+          )
+        : {},
+      // Imagens adicionais
+      additionalImages: [],
+    });
+    setCurrentStep("form");
+  }
+
+  function handleBackToEquipmentSelection() {
+    setCurrentStep("equipment");
+    setSelectedEquipment(null);
+    setInspection(null);
+  }
 
   async function handleOnSubmit(formValues: IInspectionRegisterForm) {
-    const payload = {
-      ...formValues,
-      inStatusCadastroInspecao: formValues.inStatusCadastroInspecao === "true",
-    };
-
     try {
       showLoader();
-      let response;
+
+      // Converter imagens para base64 (mantido para possível uso futuro)
+      const additionalImagesBase64 =
+        formValues.additionalImages && formValues.additionalImages.length > 0
+          ? await filesToBase64(formValues.additionalImages)
+          : [];
+
+      // Converter dados do formulário para o formato da API
+      const apiData: IInspectionCreateData = {
+        customerId: formValues.customerId,
+        inspectorUserId: formValues.inspectorUserId,
+        partTypeId: formValues.partTypeId,
+        reportNumber: formValues.reportNumber,
+        reportStartDate: formValues.reportStartDate,
+        reportEndDate: formValues.reportEndDate,
+        revisionNumber: formValues.revisionNumber,
+        sheetNumber: formValues.sheetNumber,
+        componentId: formValues.componentId,
+        positionNumber: parseInt(formValues.selectedPosition) || 1,
+        inspectionLocation: formValues.inspectionLocation,
+        mdaInformation: formValues.mdaInformation,
+        isVI: formValues.isVI,
+        isDM: formValues.isDM,
+        isPM: formValues.isPM,
+        isUS: formValues.isUS,
+        isLP: formValues.isLP,
+        isDU: formValues.isDU,
+        finalConclusion: formValues.finalConclusion,
+        inspectionStatusId: formValues.inspectionStatusId,
+        isSandingBrushSandblasting: formValues.isSandingBrushSandblasting,
+        isCleaningChemistry: formValues.isCleaningChemistry,
+        instruments: formValues.instruments,
+        /* generalConsiderations: formValues.generalConsiderations, */
+        // Converter selectedPosition para as posições individuais
+        position1: formValues.selectedPosition === "1" ? "Posição 1 selecionada" : "",
+        position2: formValues.selectedPosition === "2" ? "Posição 2 selecionada" : "",
+        position3: formValues.selectedPosition === "3" ? "Posição 3 selecionada" : "",
+        position4: formValues.selectedPosition === "4" ? "Posição 4 selecionada" : "",
+        position5: formValues.selectedPosition === "5" ? "Posição 5 selecionada" : "",
+        position6: formValues.selectedPosition === "6" ? "Posição 6 selecionada" : "",
+        // Mapear conclusões dinâmicas para campos da API
+        flankAndBottomConclusion: formValues.inspectionPointsConclusions?.point1 || "",
+        keywayChannelsConclusion: formValues.inspectionPointsConclusions?.point2 || "",
+        additionalObservations:
+          Object.values(formValues.inspectionPointsConclusions || {})
+            .slice(2)
+            .filter((conclusion) => conclusion.trim())
+            .join("\n\n") || "",
+        // additionalImagesBase64: additionalImagesBase64, // Enviado separadamente via uploadInspectionAttachments
+      };
+
+
+      let inspectionId = uuid;
 
       if (uuid) {
-        response = await fakePutInspection(uuid, payload);
-
-        if (response.data) {
-          addToast({
-            type: "success",
-            title: "Sucesso!",
-            description: response.message,
-          });
+        // Modo edição - PUT
+        await updateInspection(uuid, apiData);
+        
+        // Se há imagens para anexar, enviar separadamente
+        if (formValues.additionalImages && formValues.additionalImages.length > 0) {
+          await uploadInspectionAttachments(uuid, formValues.additionalImages);
         }
+        
+        addToast({
+          type: "success",
+          title: "Sucesso!",
+          description: "Inspeção atualizada com sucesso!",
+        });
       } else {
-        response = await fakePostInspection(payload);
-
-        if (response.data) {
-          addToast({
-            type: "success",
-            title: "Sucesso!",
-            description: response.message,
-          });
+        // Modo criação - POST
+        const createdInspection = await createInspection(apiData);
+        inspectionId = createdInspection?.id || createdInspection;
+        
+        // Se há imagens para anexar e temos o ID da inspeção, enviar attachments
+        if (formValues.additionalImages && formValues.additionalImages.length > 0 && inspectionId) {
+          await uploadInspectionAttachments(inspectionId, formValues.additionalImages);
         }
+        
+        addToast({
+          type: "success",
+          title: "Sucesso!",
+          description: "Inspeção criada com sucesso!",
+        });
       }
 
       navigate(-1);
@@ -258,23 +315,40 @@ export function CreateInspection() {
       <Section>
         <Container fluid>
           <Row>
-            <Col lg={9} xxl={12}>
-              <div className="d-flex align-items-center gap-2 mb-4">
-                <Icon icon="post_add" />
-
-                <Subtitle size="sm">Cadastrar Inspeção</Subtitle>
+            <Col xs={12}>
+              <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 mb-4">
+                <div className="d-flex align-items-center gap-2">
+                  <Icon icon="post_add" />
+                  <Subtitle size="sm">
+                    {currentStep === "equipment" ? "Selecionar Equipamento" : "Cadastrar Inspeção"}
+                  </Subtitle>
+                </div>
+                {currentStep === "form" && selectedEquipment && (
+                  <div className="ms-auto d-flex align-items-center gap-2 mt-2 mt-md-0">
+                    <span className="text-muted d-none d-sm-inline">Equipamento:</span>
+                    <strong className="text-truncate" style={{ maxWidth: "200px" }}>
+                      {selectedEquipment.name}
+                    </strong>
+                  </div>
+                )}
               </div>
             </Col>
           </Row>
           <Row>
             <Col xs={12}>
-              <InspectionRegisterForm
-                initialValues={inspection && inspection}
-                /* customersOptions={customersOptions}
-                equipmentsOptions={equipmentsOptions}
-                inspectorsOptions={inspectorsOptions} */
-                onSubmit={(values) => handleOnSubmit(values)}
-              />
+              {currentStep === "equipment" ? (
+                <EquipmentSelectionStep
+                  onEquipmentSelect={handleEquipmentSelection}
+                  onCancel={() => navigate(-1)}
+                />
+              ) : (
+                <InspectionRegisterForm
+                  initialValues={inspection}
+                  selectedEquipment={selectedEquipment}
+                  onSubmit={(values) => handleOnSubmit(values)}
+                  onBack={!uuid ? handleBackToEquipmentSelection : undefined}
+                />
+              )}
             </Col>
           </Row>
         </Container>

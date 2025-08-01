@@ -8,17 +8,12 @@ export const Container = styled.div<ContainerProps>`
   ${(props) => css`
     position: fixed;
     z-index: 1000;
-    margin: 8.5rem 0 0 6rem;
-    padding: 0 0.5rem 1rem 0.5rem;
-    transition: margin 0.3s ease, width 0.3s ease, height 0.3s ease;
-
-    ${props.$sideMenuIsOpen &&
-    css`
-      margin-left: 19rem;
-    `}
+    margin: 8.5rem 0 0 0;
+    padding: 0 1rem 1rem 1rem;
+    transition: none; /* Remove transitions since menu no longer affects layout */
 
     height: calc(100% - 8.5rem);
-    width: calc(100vw - ${props.$sideMenuIsOpen ? "19.5rem" : "6.5rem"});
+    width: 100vw;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -62,19 +57,25 @@ export const Container = styled.div<ContainerProps>`
 
     /* Tablet */
     @media (min-width: 768px) and (max-width: 1023px) {
-      margin: 6rem 0 0 4rem;
+      margin: 6rem 0 0 0;
       padding: 0 0.875rem 1rem 0.875rem;
-      width: calc(100vw - 4.25rem);
+      width: 100vw;
       height: calc(100vh - 5.5rem);
-
-      ${props.$sideMenuIsOpen &&
-      css`
-        margin-left: 244px;
-        width: calc(100vw - 240px);
-      `}
 
       &::-webkit-scrollbar {
         width: 0.375rem;
+      }
+    }
+
+    /* Desktop */
+    @media (min-width: 1024px) {
+      margin: 8.5rem 0 0 0;
+      padding: 0 1rem 1rem 1rem;
+      width: 100vw;
+      height: calc(100vh - 8rem);
+
+      &::-webkit-scrollbar {
+        width: 0.5rem;
       }
     }
   `}

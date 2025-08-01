@@ -13,84 +13,66 @@ interface Props {
 }
 
 function getStatusColor(status: string): "success" | "warning" | "helper" | "default" {
-  switch (status) {
-    case "CONCLUIDA":
+  switch (status.toLowerCase()) {
+    case "aprovado":
       return "success";
-    case "EM_ANDAMENTO":
+    case "em análise":
+    case "em andamento":
       return "helper";
-    case "CANCELADA":
+    case "rejeitado":
+    case "cancelado":
       return "warning";
     default:
       return "default";
-  }
-}
-
-function getPriorityColor(priority: string): "success" | "warning" | "helper" | "default" {
-  switch (priority) {
-    case "CRITICA":
-      return "warning";
-    case "ALTA":
-      return "helper";
-    case "MEDIA":
-      return "default";
-    default:
-      return "success";
   }
 }
 
 export function InspectionsTable({ data, onEdit, onShowLogs }: Props) {
   return (
     <Tr>
-      <Td>
-        <Paragraph size="sm">{data.idInspecao}</Paragraph>
+      <Td className="d-none d-lg-table-cell">
+        <Paragraph size="sm">{data.id.slice(-8)}</Paragraph>
       </Td>
 
       <Td>
-        <Paragraph size="sm" title={data.numeroInspecao}>{data.numeroInspecao}</Paragraph>
+        <div>
+          <Paragraph size="sm" title={data.reportNumber}>{data.reportNumber}</Paragraph>
+          <div className="d-sm-none">
+            <small className="text-muted d-block">
+              Rev: {data.revisionNumber} | {data.customer.fantasyName || data.customer.corporateName}
+            </small>
+            <small className="text-muted">
+              Inspetor: {data.inspectorUser.name}
+            </small>
+          </div>
+        </div>
       </Td>
 
-      <Td>
-        <Paragraph size="sm" title={data.dsTipoInspecao}>{data.dsTipoInspecao}</Paragraph>
+      <Td className="d-none d-md-table-cell">
+        <Paragraph size="sm" title={data.revisionNumber}>{data.revisionNumber}</Paragraph>
       </Td>
 
-      <Td>
-        <Paragraph size="sm" title={data.nomeCliente}>{data.nomeCliente}</Paragraph>
-      </Td>
-
-      <Td>
-        <Paragraph size="sm" title={data.nomeEquipamento}>{data.nomeEquipamento}</Paragraph>
-      </Td>
-
-      <Td>
-        <Paragraph size="sm" title={data.nomeInspector}>{data.nomeInspector}</Paragraph>
-      </Td>
-
-      <Td>
-        <Paragraph size="sm" title={new Date(data.dataInspecao).toLocaleDateString('pt-BR')}>{new Date(data.dataInspecao).toLocaleDateString('pt-BR')}</Paragraph>
+      <Td className="d-none d-sm-table-cell">
+        <Paragraph size="sm" title={data.customer.fantasyName || data.customer.corporateName}>
+          {data.customer.fantasyName || data.customer.corporateName}
+        </Paragraph>
       </Td>
 
       <Td>
         <div className="d-flex justify-content-center">
-          <Tag size="lg" status={getStatusColor(data.statusInspecao)}>
-            {data.dsStatusInspecao}
+          <Tag size="lg" status={getStatusColor(data.inspectionStatus.description)}>
+            <span className="d-none d-sm-inline">{data.inspectionStatus.description}</span>
+            <span className="d-inline d-sm-none">
+              {data.inspectionStatus.description.length > 8 
+                ? data.inspectionStatus.description.substring(0, 8) + '...' 
+                : data.inspectionStatus.description}
+            </span>
           </Tag>
         </div>
       </Td>
 
-      <Td>
-        <div className="d-flex justify-content-center">
-          <Tag size="lg" status={getPriorityColor(data.prioridadeInspecao)}>
-            {data.dsPrioridadeInspecao}
-          </Tag>
-        </div>
-      </Td>
-
-      <Td>
-        <div className="d-flex justify-content-center">
-          <Tag size="lg" status={data.inStatusCadastroInspecao ? "success" : "warning"}>
-            {data.dsStatusCadastroInspecao}
-          </Tag>
-        </div>
+      <Td className="d-none d-lg-table-cell">
+        <Paragraph size="sm" title={data.inspectorUser.name}>{data.inspectorUser.name}</Paragraph>
       </Td>
 
       <Td>

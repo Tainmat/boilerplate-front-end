@@ -43,19 +43,19 @@ export function ListInspections() {
 
   const SEARCH_OPTIONS: IOption[] = [
     {
-      value: "numeroInspecao",
-      label: "Número da Inspeção",
+      value: "reportNumber",
+      label: "Número do Relatório",
     },
     {
-      value: "nomeCliente",
+      value: "customer",
       label: "Cliente",
     },
     {
-      value: "nomeEquipamento",
-      label: "Equipamento",
+      value: "partType",
+      label: "Tipo de Peça",
     },
     {
-      value: "nomeInspector",
+      value: "inspectorUser",
       label: "Inspetor",
     },
   ];
@@ -95,8 +95,7 @@ export function ListInspections() {
           ...initialValuesSchema,
           items: DEFAULT_ITEMS_PER_PAGE,
           page: 1,
-          order: "ASC",
-          sort: "numeroInspecao",
+          order: "reportNumber",
         };
       }
 
@@ -160,7 +159,7 @@ export function ListInspections() {
                 defaultValues={
                   params
                     ? {
-                        status: params.inStatusCadastroInspecao,
+                        status: params.status,
                         searchingBy: params.searchIn,
                         search: params.value,
                       }
@@ -181,32 +180,20 @@ export function ListInspections() {
             >
               <Thead>
                 <Tr>
-                  <Th>
+                  <Th className="d-none d-lg-table-cell">
                     <Heading size="xs">#</Heading>
                   </Th>
 
                   <Th>
-                    <Heading size="xs">Número</Heading>
+                    <Heading size="xs">Nº Relatório</Heading>
                   </Th>
 
-                  <Th>
-                    <Heading size="xs">Tipo</Heading>
+                  <Th className="d-none d-md-table-cell">
+                    <Heading size="xs">Revisão</Heading>
                   </Th>
 
-                  <Th>
+                  <Th className="d-none d-sm-table-cell">
                     <Heading size="xs">Cliente</Heading>
-                  </Th>
-
-                  <Th>
-                    <Heading size="xs">Equipamento</Heading>
-                  </Th>
-
-                  <Th>
-                    <Heading size="xs">Inspetor</Heading>
-                  </Th>
-
-                  <Th>
-                    <Heading size="xs">Data</Heading>
                   </Th>
 
                   <Th>
@@ -215,16 +202,8 @@ export function ListInspections() {
                     </div>
                   </Th>
 
-                  <Th>
-                    <div className="d-flex justify-content-center">
-                      <Heading size="xs">Prioridade</Heading>
-                    </div>
-                  </Th>
-
-                  <Th>
-                    <div className="d-flex justify-content-center">
-                      <Heading size="xs">Cadastro</Heading>
-                    </div>
+                  <Th className="d-none d-lg-table-cell">
+                    <Heading size="xs">Inspetor</Heading>
                   </Th>
 
                   <Th>
@@ -240,28 +219,28 @@ export function ListInspections() {
                   result.data.length > 0 ? (
                     result.data.map((item) => (
                       <InspectionsTable
-                        key={item.uuidInspecao}
+                        key={item.id}
                         data={item}
-                        onEdit={() => addNew(item.uuidInspecao)}
-                        /* onShowLogs={() => setInspectionLogs(item.uuidInspecao)} */
+                        onEdit={() => addNew(item.id)}
+                        /* onShowLogs={() => setInspectionLogs(item.id)} */
                       />
                     ))
                   ) : (
-                    <Empty columns={11} />
+                    <Empty columns={7} />
                   )
                 ) : (
-                  <LoadingLines lines={params ? Number(params.items) : 10} columns={11} />
+                  <LoadingLines lines={params ? Number(params.items) : 10} columns={7} />
                 )}
               </Tbody>
             </Table>
           </Row>
 
-          <Row>
-            <Col xs={9}>
+          <Row className="align-items-center">
+            <Col xs={12} md={6} lg={4} className="mb-3 mb-md-0">
               <ItemsPerPage onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))} />
             </Col>
 
-            <Col xs={3} className="d-flex justify-content-end ">
+            <Col xs={12} md={6} lg={8} className="d-flex justify-content-center justify-content-md-end">
               {params && result ? (
                 <Pagination
                   key={params.page}

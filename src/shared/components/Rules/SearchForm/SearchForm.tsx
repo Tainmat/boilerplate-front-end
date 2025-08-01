@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
-  const { isDesktop, isSmartphone, isTablet } = useDeviceDetection();
+  const { isDesktop, isSmartphone, isTablet, isNotebook } = useDeviceDetection();
 
   const [initialValues, setInitialValues] = useState<IParamsSearchForm | null>(null);
 
@@ -180,6 +180,76 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
                     </>
                   )}
 
+                  {/* Notebook Layout */}
+                  {isNotebook && (
+                    <>
+                      <Col lg={3} xl={4}>
+                        <Field
+                          as={SelectSearch}
+                          placeholder="Pesquisar por"
+                          name="searchingBy"
+                          value={values.searchingBy}
+                          options={options}
+                          readOnly={options.length === 1}
+                          onChange={(option: IOption) => {
+                            setFieldValue("searchingBy", option.value);
+                            setFieldValue("search", "");
+                          }}
+                          onReset={() => {
+                            setFieldValue("searchingBy", "");
+                            setFieldValue("search", "");
+                          }}
+                        />
+                      </Col>
+
+                      <Col lg={4} xl={4}>
+                        <Field
+                          as={InputSearch}
+                          placeholder="Pesquisar"
+                          name="search"
+                          type="text"
+                          submitForm
+                          disabled={!values.searchingBy}
+                          onReset={() => {
+                            setFieldValue("search", "");
+                            submitForm();
+                          }}
+                        />
+                      </Col>
+
+                      <Col lg={3} xl={2}>
+                        <Field
+                          as={SelectSearch}
+                          placeholder="Selecione"
+                          value={values.status}
+                          options={STATUS_OPTIONS}
+                          onChange={({ value }: IOption) => {
+                            setFieldValue("status", value);
+                          }}
+                        />
+                      </Col>
+
+                      <Col lg={2} xl={2} className="d-flex justify-content-end">
+                        <div className="d-flex justify-content-between align-items-center gap-2">
+                          <Tooltip title="Buscar" place="top-start">
+                            <ButtonIcon type="submit" size="lg" icon="search" mode="helper" />
+                          </Tooltip>
+                          {onAdd && (
+                            <Tooltip title="Adicionar" place="top-start">
+                              <ButtonIcon
+                                type="button"
+                                size="lg"
+                                mode="success"
+                                icon="add"
+                                onClick={() => onAdd()}
+                              />
+                            </Tooltip>
+                          )}
+                        </div>
+                      </Col>
+                    </>
+                  )}
+
                   {/* Desktop Layout (original) */}
                   {isDesktop && (
                     <>
@@ -255,15 +325,19 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
           </Formik>
         ) : (
           <Row className="mb-2">
-            <Col xs={isSmartphone ? 12 : 4} className={isSmartphone ? "mb-3" : ""}>
+            <Col xs={isSmartphone ? 12 : isNotebook ? 3 : 4} className={isSmartphone ? "mb-3" : ""}>
               <Skeleton size="lg" />
             </Col>
 
-            <Col xs={isSmartphone ? 12 : 4} className={isSmartphone ? "mb-3" : ""}>
+            <Col xs={isSmartphone ? 12 : isNotebook ? 4 : 4} className={isSmartphone ? "mb-3" : ""}>
               <Skeleton size="lg" />
             </Col>
 
-            <Col xs={isSmartphone ? 12 : 3}>
+            <Col xs={isSmartphone ? 12 : isNotebook ? 3 : 3}>
+              <Skeleton size="lg" />
+            </Col>
+            
+            <Col xs={isSmartphone ? 12 : 2} className={isSmartphone ? "mb-3" : ""}>
               <Skeleton size="lg" />
             </Col>
           </Row>

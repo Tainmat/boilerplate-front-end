@@ -18,6 +18,7 @@ interface Props {
   helperText?: string;
   readOnly?: boolean;
   disabled?: boolean;
+  multiple?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   placeholder?: string;
@@ -35,6 +36,7 @@ export function InputFile({
   helperText,
   readOnly,
   disabled,
+  multiple = false,
   onChange,
   onBlur,
   placeholder = "Clique para selecionar ou arraste uma imagem",
@@ -42,30 +44,61 @@ export function InputFile({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fileCount, setFileCount] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileSelect = useCallback((file: File) => {
-    setFileName(file.name);
-    
-    // Create preview for images
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
+  const handleFileSelect = useCallback((files: FileList | File) => {
+    if (multiple && files instanceof FileList) {
+      const fileArray = Array.from(files);
+      setFileCount(fileArray.length);
+      setFileName(fileArray.length === 1 ? fileArray[0].name : `${fileArray.length} arquivos selecionados`);
+      
+      // Create preview for first image if multiple
+      if (fileArray[0] && fileArray[0].type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(fileArray[0]);
+      } else {
+        setImagePreview(null);
+      }
+    } else if (!multiple && files instanceof File) {
+      setFileName(files.name);
+      setFileCount(1);
+      
+      // Create preview for images
+      if (files.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(files);
+      } else {
+        setImagePreview(null);
+      }
     }
-  }, []);
+  }, [multiple]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
+    if (multiple) {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        handleFileSelect(files);
+      } else {
+        setFileName("");
+        setImagePreview(null);
+        setFileCount(0);
+      }
     } else {
-      setFileName("");
-      setImagePreview(null);
+      const file = e.target.files?.[0];
+      if (file) {
+        handleFileSelect(file);
+      } else {
+        setFileName("");
+        setImagePreview(null);
+        setFileCount(0);
+      }
     }
     onChange?.(e);
   };
@@ -77,19 +110,22 @@ export function InputFile({
     if (disabled || readOnly) return;
     
     const files = e.dataTransfer.files;
-    if (files && files[0]) {
-      const file = files[0];
+    if (files && files.length > 0) {
       if (inputRef.current) {
         const dt = new DataTransfer();
-        dt.items.add(file);
+        if (multiple) {
+          Array.from(files).forEach(file => dt.items.add(file));
+        } else {
+          dt.items.add(files[0]);
+        }
         inputRef.current.files = dt.files;
         
         const event = new Event('change', { bubbles: true });
         inputRef.current.dispatchEvent(event);
       }
-      handleFileSelect(file);
+      handleFileSelect(multiple ? files : files[0]);
     }
-  }, [disabled, readOnly, handleFileSelect]);
+  }, [disabled, readOnly, handleFileSelect, multiple]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -112,6 +148,7 @@ export function InputFile({
   const handleRemoveFile = () => {
     setFileName("");
     setImagePreview(null);
+    setFileCount(0);
     if (inputRef.current) {
       inputRef.current.value = "";
       const event = new Event('change', { bubbles: true });
@@ -150,6 +187,7 @@ export function InputFile({
           name={name}
           type="file"
           accept={accept}
+          multiple={multiple}
           disabled={disabled}
           readOnly={readOnly}
           ref={inputRef}
@@ -187,11 +225,16 @@ export function InputFile({
             />
             <div className="text">
               <span className="primary">
-                {isDragging ? "Solte a imagem aqui" : placeholder}
+                {isDragging ? (multiple ? "Solte as imagens aqui" : "Solte a imagem aqui") : placeholder}
               </span>
               <span className="secondary">
-                Formatos aceitos: JPG, PNG, GIF (máx. 5MB)
+                Formatos aceitos: JPG, PNG, GIF (máx. 5MB{multiple ? ' cada' : ''})
               </span>
+              {multiple && fileCount > 1 && (
+                <span className="secondary">
+                  {fileCount} {fileCount === 1 ? 'arquivo' : 'arquivos'} selecionado{fileCount === 1 ? '' : 's'}
+                </span>
+              )}
             </div>
           </div>
         )}

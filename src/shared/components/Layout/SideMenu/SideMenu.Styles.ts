@@ -27,45 +27,85 @@ export const Container = styled.nav<ContainerProps>`
     left: 0;
     top: 0;
     z-index: ${props.theme.zindex.ten};
-    padding: 2rem 0rem;
     height: 100vh;
-    width: ${props.theme.spacing.xxl};
-    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out, padding 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 
-    ${props.$hover &&
-    css`
-      width: 288px !important;
-    `}
-
-    ${!props.$hover &&
-    css`
-      justify-content: center;
-      align-items: center;
-    `}
-
-    /* Mobile */
+    /* =================================
+       MOBILE PHONES (320px - 767px)
+       ================================= */
     @media (max-width: 767px) {
-      width: 100%;
-      max-width: 280px;
-      transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
-      box-shadow: ${props.$hover ? "2px 0 10px rgba(0, 0, 0, 0.1)" : "none"};
+      width: 320px;
+      max-width: 320px;
       padding: 1.25rem 0;
-
+      transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+      box-shadow: ${props.$hover ? "8px 0 25px rgba(0, 0, 0, 0.25)" : "none"};
+      
       ${props.$hover &&
       css`
-        width: 280px !important;
+        transform: translateX(0) !important;
       `}
     }
 
-    /* Tablet */
+    /* =================================
+       TABLETS (768px - 1023px)
+       ================================= */
     @media (min-width: 768px) and (max-width: 1023px) {
-      width: 4rem;
+      width: 280px;
       padding: 1.75rem 0;
-
+      transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  box-shadow 0.3s ease;
+      box-shadow: ${props.$hover ? "8px 0 25px rgba(0, 0, 0, 0.25)" : "none"};
+      
       ${props.$hover &&
       css`
-        width: 240px !important;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        transform: translateX(0) !important;
+      `}
+    }
+
+    /* =================================
+       SMALL DESKTOP (1024px - 1199px)
+       ================================= */
+    @media (min-width: 1024px) and (max-width: 1199px) {
+      width: 280px;
+      padding: 2rem 0;
+      transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  box-shadow 0.3s ease;
+      box-shadow: ${props.$hover ? "6px 0 20px rgba(0, 0, 0, 0.15)" : "none"};
+      
+      ${props.$hover &&
+      css`
+        transform: translateX(0) !important;
+      `}
+    }
+
+    /* =================================
+       LARGE DESKTOP (1200px+)
+       ================================= */
+    @media (min-width: 1200px) {
+      width: 320px;
+      padding: 2rem 0;
+      transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.3s ease;
+      box-shadow: ${props.$hover ? "4px 0 15px rgba(0, 0, 0, 0.1)" : "none"};
+      
+      ${props.$hover &&
+      css`
+        transform: translateX(0) !important;
+      `}
+    }
+
+    /* =================================
+       EXTRA LARGE DESKTOP (1400px+)
+       ================================= */
+    @media (min-width: 1400px) {
+      width: 350px;
+      
+      ${props.$hover &&
+      css`
+        transform: translateX(0) !important;
       `}
     }
   `}
@@ -234,7 +274,7 @@ export const List = styled.ul`
 
 export const Item = styled.li<ItemProps>`
   ${(props) => css`
-    min-height: 36px;
+    min-height: 42px;
     width: 100%;
 
     + li {
@@ -247,7 +287,7 @@ export const Item = styled.li<ItemProps>`
       display: flex;
       align-items: center;
 
-      min-height: 36px;
+      min-height: 42px;
       width: 100%;
 
       padding: 0rem;
@@ -266,24 +306,24 @@ export const Item = styled.li<ItemProps>`
 
       span:nth-child(2) {
         font-family: ${props.theme.font.family.base};
-        font-size: ${props.theme.font.size.xs};
+        font-size: ${props.theme.font.size.sm};
         font-weight: ${props.theme.font.weight.regular};
         line-height: ${props.theme.line.height.default};
         margin-left: 0.75rem;
 
         &.big {
-          font-size: ${props.theme.font.size.xs};
+          font-size: ${props.theme.font.size.sm};
         }
 
         /* Mobile */
         @media (max-width: 767px) {
-          font-size: ${props.theme.font.size.xxs};
+          font-size: ${props.theme.font.size.xs};
           margin-left: 0.5rem;
         }
 
         /* Tablet */
         @media (min-width: 768px) and (max-width: 1023px) {
-          font-size: ${props.theme.font.size.xxs};
+          font-size: ${props.theme.font.size.xs};
           margin-left: 0.625rem;
         }
       }
@@ -416,12 +456,15 @@ export const SubList = styled.ul<ItemProps>`
     max-height: 0;
     height: auto;
     width: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
 
     ${props.$openSubItems &&
     css`
       visibility: visible;
       opacity: 1;
-      max-height: 100%;
+      max-height: 500px; /* Valor fixo ao invés de 100% */
       transition:
         visibility 0s,
         opacity 250ms ease,
@@ -433,23 +476,14 @@ export const SubList = styled.ul<ItemProps>`
 export const SubItem = styled.li<ItemProps>`
   ${(props) => css`
     background-color: transparent;
-
-    height: 36px;
+    position: relative;
+    min-height: 40px;
     width: 100%;
+    clear: both;
 
     a,
     .link {
-      ${!props.$hover &&
-      css`
-        justify-content: center;
-        padding: 0;
-        span:nth-child(1) {
-          margin-left: 0;
-        }
-        span:nth-child(2) {
-          display: none;
-        }
-      `}
+      /* SubItems sempre mostram ícone e texto */
     }
 
     &.item-selected {
@@ -477,6 +511,20 @@ export const SubItem = styled.li<ItemProps>`
     .link {
       span {
         color: ${props.theme.colors.brand.primary.pure} !important;
+        font-family: ${props.theme.font.family.base};
+        font-size: ${props.theme.font.size.sm};
+        font-weight: ${props.theme.font.weight.regular};
+        line-height: ${props.theme.line.height.default};
+
+        /* Mobile */
+        @media (max-width: 767px) {
+          font-size: ${props.theme.font.size.xs};
+        }
+
+        /* Tablet */
+        @media (min-width: 768px) and (max-width: 1023px) {
+          font-size: ${props.theme.font.size.xs};
+        }
       }
 
       padding: 0 2.5rem 0 3rem;
@@ -486,7 +534,9 @@ export const SubItem = styled.li<ItemProps>`
         padding: 0 2rem 0 2.5rem;
       `}
 
-      height: 100%;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
 
       &:hover {
         background-color: transparent;
@@ -534,18 +584,18 @@ export const SubItem = styled.li<ItemProps>`
 
     /* Mobile */
     @media (max-width: 767px) {
-      height: 38px;
+      min-height: 38px;
     }
 
     /* Tablet */
     @media (min-width: 768px) and (max-width: 1023px) {
-      height: 36px;
+      min-height: 38px;
     }
   `}
 `;
 
-// Mobile Overlay for when menu is open
-export const MobileOverlay = styled.div<{ $visible: boolean }>`
+// Overlay for when menu is open - now for all screen sizes
+export const MenuOverlay = styled.div<{ $visible: boolean }>`
   ${(props) => css`
     position: fixed;
     top: 0;
@@ -559,9 +609,75 @@ export const MobileOverlay = styled.div<{ $visible: boolean }>`
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
     backdrop-filter: blur(2px);
 
-    /* Only show on mobile */
+    /* Different overlay opacity for different screen sizes */
+    @media (max-width: 767px) {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
     @media (min-width: 1024px) {
-      display: none;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  `}
+`;
+
+// Close Button for all screen sizes
+export const CloseButton = styled.button`
+  ${(props) => css`
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: ${props.theme.zindex.ten};
+    background-color: ${props.theme.colors.brand.primary.pure};
+    border: none;
+    border-radius: ${props.theme.border.radius.circular};
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      background-color: ${props.theme.colors.brand.primary.dark};
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    svg {
+      color: ${props.theme.colors.neutral.high.pure};
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 767px) {
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 36px;
+      height: 36px;
+    }
+
+    /* Tablet adjustments */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      top: 0.875rem;
+      right: 0.875rem;
+      width: 38px;
+      height: 38px;
+    }
+
+    /* Desktop adjustments */
+    @media (min-width: 1024px) {
+      top: 1rem;
+      right: 1rem;
+      width: 42px;
+      height: 42px;
     }
   `}
 `;
