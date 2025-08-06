@@ -18,12 +18,15 @@ import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
 import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
+import { useToastContext } from "@shared/contexts/Toast";
+import { useLoaderContext } from "@shared/contexts/Loader";
+import { getAuthorizationToken } from "@shared/services/api/token";
+import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
-  ROUTE_LIST_INSPECTIONS,
   ROUTE_SAVE_INSPECTION,
   ROUTE_UPDATE_INSPECTION,
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
@@ -34,6 +37,8 @@ export function ListInspections() {
   const navigate = useNavigate();
 
   const { setPageBreadcrumb } = useBreadcrumbContext();
+  const { addToast, handleApiRejection } = useToastContext();
+  const { showLoader, hideLoader } = useLoaderContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -148,6 +153,44 @@ export function ListInspections() {
     navigate(!uuid ? ROUTE_SAVE_INSPECTION : `${ROUTE_UPDATE_INSPECTION}/${uuid}`);
   }
 
+  async function handleGeneratePdf(inspectionId: string) {
+    try {
+      showLoader();
+      
+      const token = getAuthorizationToken();
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/operational/parts-inspection/${inspectionId}/download-pdf`,
+        {
+          headers: {
+            Authorization: token,
+          },
+          responseType: 'blob'
+        }
+      );
+
+      // Criar URL do blob e fazer download
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `inspecao-${inspectionId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      addToast({
+        type: "success",
+        title: "Sucesso!",
+        description: "PDF gerado com sucesso!",
+      });
+    } catch (error) {
+      handleApiRejection();
+    } finally {
+      hideLoader();
+    }
+  }
+
   return (
     <AnimatedPage>
       <Section>
@@ -222,6 +265,7 @@ export function ListInspections() {
                         key={item.id}
                         data={item}
                         onEdit={() => addNew(item.id)}
+                        onGeneratePdf={() => handleGeneratePdf(item.id)}
                         /* onShowLogs={() => setInspectionLogs(item.id)} */
                       />
                     ))

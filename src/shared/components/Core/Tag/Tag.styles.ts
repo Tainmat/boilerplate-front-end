@@ -39,10 +39,10 @@ export const Container = styled.div<Props>`
 
     cursor: ${props.hover ? "pointer" : "default"};
 
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 1.5rem;
     text-align: center;
     height: 1.75rem;
-    min-width: 5.875rem;
+    min-width: 9rem;
     width: fit-content;
 
     transition: all 250ms ease;

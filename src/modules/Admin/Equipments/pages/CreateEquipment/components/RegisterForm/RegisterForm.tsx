@@ -151,6 +151,20 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                 accept="image/*"
                 error={touched.coverUrl && !!errors.coverUrl}
                 helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Converter para base64
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      const base64 = event.target?.result as string;
+                      setFieldValue("coverUrl", base64);
+                    };
+                    reader.readAsDataURL(file);
+                  } else {
+                    setFieldValue("coverUrl", "");
+                  }
+                }}
               />
             </Col>
           </Row>

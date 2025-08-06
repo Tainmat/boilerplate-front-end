@@ -12,12 +12,12 @@ interface UserDropdownProps {
 export function UserDropdown({ onClose }: UserDropdownProps) {
   /* const navigate = useNavigate(); */
   const { signOut } = useAuthContext();
-  
+
   const handleLogout = () => {
     if (onClose) onClose();
     signOut();
   };
-  
+
   return (
     <S.Container>
       <S.List>
@@ -27,7 +27,7 @@ export function UserDropdown({ onClose }: UserDropdownProps) {
         </S.Item> */}
         <S.Item className="logout" onClick={handleLogout}>
           <Icon icon="exit_to_app" size="xs" mode="warning" />
-          <p>Logout</p>
+          <p>Sair</p>
         </S.Item>
       </S.List>
     </S.Container>

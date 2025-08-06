@@ -18,22 +18,48 @@ export function EmptyResult() {
   return (
     <Container>
       <Row className="justify-content-center text-center pt-1 pb-5">
-        <Col xs={5}>
-          <Row className="mb-4">
+        <Col xs={11} sm={8} md={6} lg={5} xl={4}>
+          <Row className="mb-3 mb-md-4">
             <Col>
-              <img src={IconNotFound} alt="Nenhum resultado encontrado" />
+              <img 
+                src={IconNotFound} 
+                alt="Nenhum resultado encontrado"
+                style={{ 
+                  width: '100%', 
+                  height: 'auto',
+                  maxWidth: '200px',
+                  maxHeight: '150px',
+                  objectFit: 'contain'
+                }}
+              />
             </Col>
           </Row>
 
-          <Row className="mb-5">
+          <Row className="mb-4 mb-md-5">
             <Col>
-              <Heading size="md">Nenhum resultado foi encontrado</Heading>
+              <Heading size="md" className="d-none d-md-block">
+                Nenhum resultado foi encontrado
+              </Heading>
+              <Heading size="sm" className="d-block d-md-none">
+                Nenhum resultado foi encontrado
+              </Heading>
             </Col>
           </Row>
 
           <Row className="justify-content-center">
             <Col xs="auto">
-              <Button styles="secondary" onClick={() => handleOnClick()}>
+              <Button 
+                styles="secondary" 
+                onClick={() => handleOnClick()}
+                className="d-block d-md-none"
+              >
+                Nova Pesquisa
+              </Button>
+              <Button 
+                styles="secondary" 
+                onClick={() => handleOnClick()}
+                className="d-none d-md-block"
+              >
                 Nova Pesquisa
               </Button>
             </Col>

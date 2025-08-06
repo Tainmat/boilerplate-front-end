@@ -101,15 +101,7 @@ export function InputText({
   }
 
   function handlePasswordIcon() {
-    if (inputField.current) {
-      if (isShowingPassword) {
-        setIsShowingPassword(false);
-        inputField.current.type = "password";
-      } else {
-        setIsShowingPassword(true);
-        inputField.current.type = "text";
-      }
-    }
+    setIsShowingPassword(!isShowingPassword);
   }
 
   // Valor exibido (com suffix, se houver)
@@ -145,7 +137,7 @@ export function InputText({
             id={v4()}
             name={name}
             inputMode={inputMode}
-            type={type}
+            type={type === "password" && isShowingPassword ? "text" : type}
             value={displayValue}
             placeholder={placeholder}
             maxLength={maxLength}
@@ -169,7 +161,7 @@ export function InputText({
             id={v4()}
             name={name}
             inputMode={inputMode}
-            type={type}
+            type={type === "password" && isShowingPassword ? "text" : type}
             value={displayValue}
             placeholder={placeholder}
             maxLength={maxLength}

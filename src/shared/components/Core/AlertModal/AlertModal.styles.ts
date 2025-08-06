@@ -31,10 +31,18 @@ export const Dialog = styled.div`
   margin-right: auto;
 
   min-height: calc(100% - (1.75rem * 2));
-  width: 810px;
+  width: 100%;
+  max-width: 810px;
+  padding: 0 1rem;
 
   position: relative;
   z-index: 1099;
+
+  @media (max-width: 768px) {
+    padding: 0 0.75rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
 `;
 
 export const Content = styled.div`
@@ -48,6 +56,15 @@ export const Content = styled.div`
     padding: 2.5rem;
     width: 100%;
     position: relative;
+
+    @media (max-width: 768px) {
+      padding: 1.5rem 1rem;
+      border-radius: ${props.theme.border.radius.sm};
+    }
+
+    @media (max-width: 480px) {
+      padding: 1.25rem 0.75rem;
+    }
   `}
 `;
 

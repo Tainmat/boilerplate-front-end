@@ -48,15 +48,7 @@ export function AuthInput({
   }
 
   function handlePasswordIcon() {
-    if (inputField.current) {
-      if (isShowingPassword) {
-        setIsShowingPassword(false);
-        inputField.current.type = "password";
-      } else {
-        setIsShowingPassword(true);
-        inputField.current.type = "text";
-      }
-    }
+    setIsShowingPassword(!isShowingPassword);
   }
 
   return (
@@ -75,7 +67,7 @@ export function AuthInput({
           ref={inputField}
           id={uuidV4()}
           name={name}
-          type={type}
+          type={type === "password" && isShowingPassword ? "text" : type}
           value={inputValue}
           placeholder={placeholder}
           maxLength={maxLength}
@@ -84,7 +76,7 @@ export function AuthInput({
           onBlur={onBlur}
         />
 
-        {type === "password" && inputValue.length > 0 && (
+        {type === "password" && (
           <div className="show-password" onClick={handlePasswordIcon} aria-hidden="true">
             <Icon
               size="sm"

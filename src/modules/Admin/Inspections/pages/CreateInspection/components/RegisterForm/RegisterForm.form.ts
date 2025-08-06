@@ -1,5 +1,18 @@
 import * as Yup from "yup";
 
+export interface IImageData {
+  id?: string; // ID da imagem se vier do servidor (para edição)
+  base64: string;
+  name: string;
+  size: number;
+  type: string;
+}
+
+export interface IAdditionalImages {
+  images: (IImageData | null)[];
+  imagesToDel: string[];
+}
+
 export interface IInspectionRegisterForm {
   customerId: string;
   inspectorUserId: string;
@@ -27,12 +40,8 @@ export interface IInspectionRegisterForm {
   /*   generalConsiderations: string; */
   // Posição de inspeção selecionada
   selectedPosition: string;
-  // Conclusões dinâmicas dos pontos de inspeção
-  inspectionPointsConclusions: { [key: string]: string };
-  // Imagens adicionais
-  additionalImages: File[];
-  // Imagens convertidas para base64 (para envio ao back-end)
-  additionalImagesBase64?: string[];
+  // Nova estrutura de imagens adicionais
+  additionalImages?: IAdditionalImages;
 }
 
 export const inspectionValidationSchema = Yup.object().shape({
@@ -77,35 +86,32 @@ export const inspectionValidationSchema = Yup.object().shape({
   generalConsiderations: Yup.string().max(600, "O campo deve conter no máximo 600 caracteres!"),
   // Posição de inspeção selecionada
   selectedPosition: Yup.string().required("Selecione uma posição de inspeção!"),
-  // Conclusões dinâmicas dos pontos de inspeção
-  inspectionPointsConclusions: Yup.object().test(
-    "conclusions-validation",
-    "Todos os pontos de inspeção devem ter conclusões preenchidas",
-    function (value) {
-      if (!value) return false;
-      // Valida que todas as conclusões tenham no máximo 400 caracteres
-      for (const conclusion of Object.values(value)) {
-        if (typeof conclusion === "string" && conclusion.length > 400) {
-          return this.createError({
-            message: "Cada conclusão deve conter no máximo 400 caracteres",
-          });
-        }
-      }
-      return true;
-    },
-  ),
-  // Imagens adicionais
-  additionalImages: Yup.array()
-    .of(
-      Yup.mixed()
-        .test("fileSize", "Arquivo muito grande (máx. 5MB)", (value: any) => {
-          if (!value || !(value instanceof File)) return true;
-          return value.size <= 5 * 1024 * 1024; // 5MB
+  // Nova estrutura de imagens adicionais
+  additionalImages: Yup.object().shape({
+    images: Yup.array()
+      .of(
+        Yup.mixed().nullable().test("imageValidation", "Dados da imagem inválidos", (value: any) => {
+          if (!value) return true; // null é válido (slot vazio)
+          
+          // Verifica se é um objeto com as propriedades esperadas
+          if (typeof value !== 'object' || !value.base64 || !value.name || !value.size || !value.type) {
+            return false;
+          }
+          
+          // Valida tamanho (2MB)
+          if (value.size > 2 * 1024 * 1024) {
+            return false;
+          }
+          
+          // Valida tipo de arquivo
+          if (!["image/jpeg", "image/png", "image/gif"].includes(value.type)) {
+            return false;
+          }
+          
+          return true;
         })
-        .test("fileType", "Formato não suportado. Use JPG, PNG ou GIF", (value: any) => {
-          if (!value || !(value instanceof File)) return true;
-          return ["image/jpeg", "image/png", "image/gif"].includes(value.type);
-        }),
-    )
-    .max(5, "Máximo de 5 imagens permitidas"),
+      )
+      .max(3, "Máximo de 3 slots de imagem"),
+    imagesToDel: Yup.array().of(Yup.string())
+  }).optional(),
 });

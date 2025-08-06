@@ -42,19 +42,19 @@ export const nav: INavigation[] = [
     allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR],
     list: [
       {
-        icon: "assignment",
+        icon: "",
         label: "Usuários",
         route: ROUTE_LIST_USERS,
         mobileVisible: true,
       },
       {
-        icon: "show_chart",
+        icon: "",
         label: "Clientes",
         route: ROUTE_LIST_CUSTOMERS,
         mobileVisible: true,
       },
       {
-        icon: "multiline_chart",
+        icon: "",
         label: "Equipamentos",
         route: ROUTE_LIST_EQUIPMENTS,
         mobileVisible: true,

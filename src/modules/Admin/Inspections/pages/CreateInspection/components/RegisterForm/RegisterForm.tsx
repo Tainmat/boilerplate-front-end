@@ -2,8 +2,6 @@ import { Button } from "@shared/components/Core/Buttons/Button";
 import { Card } from "react-bootstrap";
 import { Checkbox } from "@shared/components/Core/Form/Fields/Checkbox";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
-import { InputFile } from "@shared/components/Core/Form/Fields/InputFile";
-import { InputRichText } from "@shared/components/Core/Form/Fields/InputRichText/InputRichText";
 import { Radio } from "@shared/components/Core/Form/Fields/Radio";
 import { Select } from "@shared/components/Core/Form/Fields/Select";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
@@ -42,8 +40,7 @@ export function InspectionRegisterForm({
   // Buscar dados para os selects
   const { result: customersOptions, loading: loadingCustomers } = useCustomersDropdown();
   const { result: usersOptions, loading: loadingUsers } = useUsersDropdown();
-  const { result: inspectionStatusOptions, loading: loadingInspectionStatus } =
-    usePartInspectionStatusDropdown();
+  const { result: inspectionStatusOptions } = usePartInspectionStatusDropdown();
 
   // Preparar opções para os selects - já vem pronto dos hooks dropdown
 
@@ -474,7 +471,11 @@ export function InspectionRegisterForm({
                         >
                           <Field
                             as={Checkbox}
-                            label="Lixamento/Escovamento/Jateamento"
+                            label={
+                              <span className="d-block" style={{ wordBreak: "break-word", lineHeight: "1.2" }}>
+                                Lixamento/Escovamento/Jateamento
+                              </span>
+                            }
                             name="isSandingBrushSandblasting"
                             checked={values.isSandingBrushSandblasting}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -490,7 +491,11 @@ export function InspectionRegisterForm({
                         >
                           <Field
                             as={Checkbox}
-                            label="Limpeza Química"
+                            label={
+                              <span className="d-block" style={{ wordBreak: "break-word", lineHeight: "1.2" }}>
+                                Limpeza Química
+                              </span>
+                            }
                             name="isCleaningChemistry"
                             checked={values.isCleaningChemistry}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -696,66 +701,8 @@ export function InspectionRegisterForm({
                     <Heading size="sm" className="mb-1 fw-bold text-success">
                       7. Conclusões
                     </Heading>
-                    <small className="text-muted">Resultados e conclusões da inspeção</small>
+                    <small className="text-muted">Status final da inspeção realizada</small>
                   </div>
-
-                  {/* Campos dinâmicos baseados nos pontos de inspeção do equipamento */}
-                  {selectedEquipment && selectedEquipment.totalInspectionPoints > 0 && (
-                    <Row className="g-3 mb-4">
-                      {Array.from(
-                        { length: selectedEquipment.totalInspectionPoints },
-                        (_, index) => {
-                          const pointNumber = index + 1;
-                          const fieldName = `inspectionPointsConclusions.point${pointNumber}`;
-                          return (
-                            <Col md={6} key={pointNumber}>
-                              <div className="border rounded p-3 bg-light">
-                                <h6 className="mb-3" style={{ color: "#047a32" }}>
-                                  Ponto de Inspeção {pointNumber}
-                                </h6>
-                                <Field
-                                  as={TextArea}
-                                  name={fieldName}
-                                  placeholder={`Descreva os resultados encontrados no ponto de inspeção ${pointNumber}...`}
-                                  maxLength={400}
-                                  rows={3}
-                                  error={
-                                    touched.inspectionPointsConclusions &&
-                                    touched.inspectionPointsConclusions[`point${pointNumber}`] &&
-                                    errors.inspectionPointsConclusions &&
-                                    typeof errors.inspectionPointsConclusions === "object" &&
-                                    errors.inspectionPointsConclusions[`point${pointNumber}`]
-                                  }
-                                  helperText={
-                                    touched.inspectionPointsConclusions &&
-                                    touched.inspectionPointsConclusions[`point${pointNumber}`] &&
-                                    errors.inspectionPointsConclusions &&
-                                    typeof errors.inspectionPointsConclusions === "object" &&
-                                    errors.inspectionPointsConclusions[`point${pointNumber}`]
-                                      ? errors.inspectionPointsConclusions[`point${pointNumber}`]
-                                      : ""
-                                  }
-                                />
-                              </div>
-                            </Col>
-                          );
-                        },
-                      )}
-                    </Row>
-                  )}
-
-                  {/* Mensagem quando nenhum equipamento está selecionado */}
-                  {!selectedEquipment && (
-                    <Row className="g-3 mb-4">
-                      <Col xs={12}>
-                        <div className="text-center p-4 bg-light rounded border">
-                          <p className="text-muted mb-0">
-                            Selecione um equipamento para ver os campos de conclusão específicos
-                          </p>
-                        </div>
-                      </Col>
-                    </Row>
-                  )}
 
                   <Row className="g-3">
                     <Col md={6}>
@@ -793,95 +740,148 @@ export function InspectionRegisterForm({
                       8. Imagens Adicionais
                     </Heading>
                     <small className="text-muted">
-                      Área para inserir imagens complementares (máx. 5 imagens)
+                      Área para inserir até 3 imagens complementares da inspeção (opcional)
                     </small>
                   </div>
+                  
                   <Row className="g-3">
+                    {[0, 1, 2].map((slotIndex) => {
+                      const imageData = values.additionalImages?.images?.[slotIndex];
+                      const hasImage = imageData && imageData.base64;
+                      
+                      return (
+                        <Col md={4} key={slotIndex}>
+                          <div className="border rounded bg-light position-relative" style={{ 
+                            height: '250px',
+                            borderStyle: 'dashed',
+                            borderColor: '#047a32',
+                            borderWidth: '2px'
+                          }}>
+                            {hasImage ? (
+                              // Preview da imagem
+                              <div className="h-100 position-relative">
+                                <img
+                                  src={imageData.base64}
+                                  alt={`Imagem ${slotIndex + 1}`}
+                                  className="w-100 h-100 rounded"
+                                  style={{ 
+                                    objectFit: 'cover',
+                                    height: '250px'
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-danger position-absolute"
+                                  style={{ top: '8px', right: '8px', padding: '4px 8px' }}
+                                  onClick={() => {
+                                    const currentImages = values.additionalImages || { images: [], imagesToDel: [] };
+                                    const updatedImages = [...(currentImages.images || [])];
+                                    const imagesToDel = [...(currentImages.imagesToDel || [])];
+                                    
+                                    // Se a imagem tem um ID (vem do servidor), adiciona à lista de exclusão
+                                    if (imageData.id) {
+                                      imagesToDel.push(imageData.id);
+                                    }
+                                    
+                                    // Remove a imagem do slot
+                                    updatedImages[slotIndex] = null;
+                                    
+                                    setFieldValue('additionalImages', {
+                                      images: updatedImages,
+                                      imagesToDel: imagesToDel
+                                    });
+                                  }}
+                                  title="Remover imagem"
+                                >
+                                  ×
+                                </button>
+                                <div className="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2 rounded-bottom">
+                                  <small className="text-truncate d-block" title={imageData.name || `Imagem ${slotIndex + 1}`}>
+                                    {imageData.name || `Imagem ${slotIndex + 1}`}
+                                  </small>
+                                </div>
+                              </div>
+                            ) : (
+                              // Área de upload
+                              <div className="d-flex flex-column align-items-center justify-content-center h-100 p-3">
+                                <div className="text-center mb-3">
+                                  <div style={{ fontSize: '3rem', color: '#6c757d', opacity: 0.5 }}>
+                                    📷
+                                  </div>
+                                  <h6 className="text-muted mb-2">Slot {slotIndex + 1}</h6>
+                                  <small className="text-muted">
+                                    Clique para adicionar uma imagem
+                                  </small>
+                                </div>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="d-none"
+                                  id={`image-upload-${slotIndex}`}
+                                  onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      // Validar tamanho do arquivo (2MB)
+                                      if (file.size > 2 * 1024 * 1024) {
+                                        alert('Arquivo muito grande! O tamanho máximo é 2MB.');
+                                        e.target.value = ''; // Limpa o input
+                                        return;
+                                      }
+                                      
+                                      // Validar tipo de arquivo
+                                      if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+                                        alert('Formato não suportado! Use apenas JPG, PNG ou GIF.');
+                                        e.target.value = ''; // Limpa o input
+                                        return;
+                                      }
+                                      
+                                      // Converter para base64
+                                      const reader = new FileReader();
+                                      reader.onload = (event) => {
+                                        const base64 = event.target?.result as string;
+                                        
+                                        const currentImages = values.additionalImages || { images: [], imagesToDel: [] };
+                                        const updatedImages = [...(currentImages.images || [])];
+                                        
+                                        updatedImages[slotIndex] = {
+                                          base64: base64,
+                                          name: file.name,
+                                          size: file.size,
+                                          type: file.type
+                                        };
+                                        
+                                        setFieldValue('additionalImages', {
+                                          images: updatedImages,
+                                          imagesToDel: currentImages.imagesToDel || []
+                                        });
+                                      };
+                                      reader.readAsDataURL(file);
+                                    }
+                                  }}
+                                />
+                                <label
+                                  htmlFor={`image-upload-${slotIndex}`}
+                                  className="btn btn-outline-success btn-sm w-100"
+                                  style={{ cursor: 'pointer' }}
+                                >
+                                  Selecionar Imagem
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                  
+                  <Row className="mt-3">
                     <Col xs={12}>
-                      <Field
-                        as={InputFile}
-                        label="Imagens Adicionais"
-                        name="additionalImages"
-                        accept="image/*"
-                        multiple
-                        placeholder="Clique para selecionar ou arraste imagens adicionais"
-                        error={touched.additionalImages && !!errors.additionalImages}
-                        helperText={
-                          touched.additionalImages && !!errors.additionalImages
-                            ? typeof errors.additionalImages === "string"
-                              ? errors.additionalImages
-                              : "Erro na validação das imagens"
-                            : "Imagens complementares para documentação da inspeção (máx. 5 imagens, 5MB cada)"
-                        }
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          setFieldTouched("additionalImages");
-                          const files = Array.from(e.target.files || []);
-                          setFieldValue("additionalImages", files);
-                        }}
-                      />
+                      <small className="text-muted">
+                        <strong>Instruções:</strong> Você pode adicionar até 3 imagens complementares (opcional). 
+                        Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 2MB por imagem.
+                      </small>
                     </Col>
                   </Row>
-
-                  {/* Preview das imagens selecionadas */}
-                  {values.additionalImages && values.additionalImages.length > 0 && (
-                    <Row className="g-3 mt-3">
-                      <Col xs={12}>
-                        <div className="border-top pt-3" style={{ borderColor: "#e9ecef" }}>
-                          <h6 className="mb-3" style={{ color: "#047a32", fontWeight: "600" }}>
-                            Imagens Selecionadas ({values.additionalImages.length}/5)
-                          </h6>
-                          <Row className="g-3">
-                            {values.additionalImages.map((file: File, index: number) => (
-                              <Col xl={3} lg={4} md={6} sm={6} xs={12} key={index}>
-                                <div
-                                  className="border rounded p-2 p-md-3 bg-white shadow-sm position-relative"
-                                  style={{ borderColor: "#e9ecef" }}
-                                >
-                                  <div className="text-center mb-2">
-                                    <img
-                                      src={URL.createObjectURL(file)}
-                                      alt={`Preview ${index + 1}`}
-                                      style={{
-                                        width: "100%",
-                                        height: "100px",
-                                        objectFit: "cover",
-                                        borderRadius: "4px",
-                                      }}
-                                    />
-                                  </div>
-                                  <div className="text-center">
-                                    <small
-                                      className="text-muted d-block text-truncate"
-                                      title={file.name}
-                                    >
-                                      {file.name}
-                                    </small>
-                                    <small className="text-muted">
-                                      {(file.size / (1024 * 1024)).toFixed(2)} MB
-                                    </small>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    className="btn btn-sm btn-danger position-absolute"
-                                    style={{ top: "8px", right: "8px", padding: "4px 8px" }}
-                                    onClick={() => {
-                                      const updatedFiles = values.additionalImages.filter(
-                                        (_: File, i: number) => i !== index,
-                                      );
-                                      setFieldValue("additionalImages", updatedFiles);
-                                    }}
-                                    title="Remover imagem"
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-                              </Col>
-                            ))}
-                          </Row>
-                        </div>
-                      </Col>
-                    </Row>
-                  )}
                 </Card.Body>
               </Card>
             </Col>
@@ -892,9 +892,10 @@ export function InspectionRegisterForm({
             <Col xs={12}>
               <Card className="shadow-sm" style={{ borderLeft: "4px solid #047a32" }}>
                 <Card.Body>
-                  <Row className="align-items-center">
-                    <Col xs={12} md={8}>
-                      <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 mb-3 mb-md-0">
+                  {/* Status - sempre no topo em mobile */}
+                  <Row className="mb-3">
+                    <Col xs={12}>
+                      <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
                         <div className="text-muted">
                           <small>
                             <strong>Status:</strong>{" "}
@@ -912,11 +913,60 @@ export function InspectionRegisterForm({
                         )}
                       </div>
                     </Col>
-                    <Col xs={12} md={4}>
-                      <div className="d-flex flex-column flex-sm-row gap-2 justify-content-md-end">
+                  </Row>
+                  
+                  {/* Botões - layout responsivo */}
+                  <Row>
+                    <Col xs={12}>
+                      <div className="d-flex flex-row gap-2 justify-content-center justify-content-sm-end align-items-center">
+                        <style>{`
+                          .mobile-action-btn {
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            transition: all 0.2s ease !important;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+                            position: relative !important;
+                            width: 2.5rem !important;
+                            height: 2.5rem !important;
+                            min-width: 2.5rem !important;
+                            min-height: 2.5rem !important;
+                            border-radius: 6px !important;
+                            padding: 0 !important;
+                            font-size: 18px !important;
+                            font-weight: bold !important;
+                            line-height: 1 !important;
+                            text-align: center !important;
+                          }
+                          
+                          .mobile-action-btn:hover:not(:disabled) {
+                            transform: scale(1.05) !important;
+                          }
+                          
+                          .mobile-action-btn:active {
+                            transform: scale(0.95) !important;
+                          }
+                          
+                          @media (max-width: 767px) {
+                            .mobile-action-btn {
+                              width: 2.25rem !important;
+                              height: 2.25rem !important;
+                              min-width: 2.25rem !important;
+                              min-height: 2.25rem !important;
+                              font-size: 16px !important;
+                            }
+                          }
+                        `}</style>
+                        
                         {onBack && (
-                          <Button type="button" styles="secondary" onClick={onBack}>
-                            ← Voltar
+                          <Button
+                            type="button"
+                            styles="secondary"
+                            onClick={onBack}
+                            className="mobile-action-btn"
+                            title="Voltar"
+                          >
+                            ←
                           </Button>
                         )}
                         <Button
@@ -924,16 +974,20 @@ export function InspectionRegisterForm({
                           styles="primary"
                           mode="warning"
                           onClick={() => handleOnCancel(dirty)}
+                          className="mobile-action-btn"
+                          title="Cancelar"
                         >
-                          Cancelar
+                          ×
                         </Button>
                         <Button
                           type="submit"
                           styles="primary"
                           mode="success"
                           disabled={!dirty || !isValid}
+                          className="mobile-action-btn"
+                          title="Salvar"
                         >
-                          <span className="d-none d-sm-inline">💾 </span>Salvar
+                          ✓
                         </Button>
                       </div>
                     </Col>

@@ -10,12 +10,17 @@ interface Props {
   data: IInspection;
   onEdit: () => void;
   onShowLogs?: () => void;
+  onGeneratePdf: () => void;
 }
 
 function getStatusColor(status: string): "success" | "warning" | "helper" | "default" {
   switch (status.toLowerCase()) {
     case "aprovado":
       return "success";
+    case "aprovado com restrição":
+      return "helper"; // laranja
+    case "não conforme":
+      return "warning"; // vermelho
     case "em análise":
     case "em andamento":
       return "helper";
@@ -27,7 +32,7 @@ function getStatusColor(status: string): "success" | "warning" | "helper" | "def
   }
 }
 
-export function InspectionsTable({ data, onEdit, onShowLogs }: Props) {
+export function InspectionsTable({ data, onEdit, onShowLogs, onGeneratePdf }: Props) {
   return (
     <Tr>
       <Td className="d-none d-lg-table-cell">
@@ -61,12 +66,7 @@ export function InspectionsTable({ data, onEdit, onShowLogs }: Props) {
       <Td>
         <div className="d-flex justify-content-center">
           <Tag size="lg" status={getStatusColor(data.inspectionStatus.description)}>
-            <span className="d-none d-sm-inline">{data.inspectionStatus.description}</span>
-            <span className="d-inline d-sm-none">
-              {data.inspectionStatus.description.length > 8 
-                ? data.inspectionStatus.description.substring(0, 8) + '...' 
-                : data.inspectionStatus.description}
-            </span>
+            {data.inspectionStatus.description}
           </Tag>
         </div>
       </Td>
@@ -76,9 +76,13 @@ export function InspectionsTable({ data, onEdit, onShowLogs }: Props) {
       </Td>
 
       <Td>
-        <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-center gap-2">
           <Tooltip title="Editar" place="top-start">
             <ButtonIcon size="sm" icon="edit" onClick={() => onEdit()} />
+          </Tooltip>
+
+          <Tooltip title="Gerar PDF" place="top-start">
+            <ButtonIcon size="sm" icon="picture_as_pdf" onClick={() => onGeneratePdf()} />
           </Tooltip>
 
           {/* <Tooltip title="Visualizar Logs" place="top-start">

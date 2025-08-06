@@ -52,8 +52,8 @@ export function AlertModal({ alert, visible, actionOnCancel, actionOnConfirm }: 
                 </Row>
               )}
 
-              <Row className="justify-content-center text-center py-5">
-                <Col xs={8}>
+              <Row className="justify-content-center text-center py-3 py-md-5">
+                <Col xs={11} sm={10} md={8}>
                   {alert.icon && (
                     <Row className="justify-content-center mb-4">
                       <Col xs="auto">
@@ -76,8 +76,8 @@ export function AlertModal({ alert, visible, actionOnCancel, actionOnConfirm }: 
                     </Subtitle>
                   )}
 
-                  <Row className="justify-content-center">
-                    <Col>
+                  <Row className="justify-content-center g-2">
+                    <Col xs={12} sm={6}>
                       <Button
                         type="button"
                         mode={alert.iconType || "success"}
@@ -91,7 +91,7 @@ export function AlertModal({ alert, visible, actionOnCancel, actionOnConfirm }: 
                       </Button>
                     </Col>
 
-                    <Col>
+                    <Col xs={12} sm={6}>
                       <Button
                         type="button"
                         styles="primary"

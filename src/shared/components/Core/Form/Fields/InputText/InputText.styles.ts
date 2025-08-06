@@ -56,6 +56,10 @@ export const Container = styled.div.withConfig({
           line-height: ${props.theme.line.height.md};
           height: 2rem;
           padding: 0.5rem 1rem;
+
+          @media (max-width: 768px) {
+            font-size: 16px !important;
+          }
         `}
 
         ${(!props.size || props.size === "lg") &&
@@ -95,6 +99,10 @@ export const Container = styled.div.withConfig({
         &::placeholder {
           font-size: ${props.theme.font.size.xxs};
           color: ${props.theme.colors.neutral.low.light};
+
+          @media (max-width: 768px) {
+            font-size: 16px !important;
+          }
         }
 
         &:read-only {

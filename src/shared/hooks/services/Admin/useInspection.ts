@@ -62,11 +62,15 @@ export interface IInspectionDetail {
     id: string;
     description: string;
   };
+  // Attachments/Imagens
+  attachments?: IInspectionAttachment[];
 }
 
 export interface IInspectionAttachment {
   id: string;
-  croquisUrl: string;
+  inspectionId: string;
+  inspectionAttachmentUrl: string;
+  created_at: string;
 }
 
 export interface IInspectionCreateData {
@@ -164,28 +168,8 @@ export function useInspection() {
 
   const fetchInspectionAttachments = useCallback(async (id: string) => {
     try {
-      const { data } = await get<IInspectionAttachment[]>(`/operational/parts-inspection/${id}/attachments`);
-      return data.data || data;
-    } catch (error) {
-      throw error;
-    }
-  }, []);
-
-  const uploadInspectionAttachments = useCallback(async (id: string, files: File[]) => {
-    try {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append(`attachments`, file);
-      });
-
-      const { data } = await post<IInspectionAttachment[]>(
+      const { data } = await get<IInspectionAttachment[]>(
         `/operational/parts-inspection/${id}/attachments`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
       );
       return data.data || data;
     } catch (error) {
@@ -193,13 +177,40 @@ export function useInspection() {
     }
   }, []);
 
-  const deleteInspectionAttachment = useCallback(async (inspectionId: string, attachmentId: string) => {
+  const uploadInspectionAttachments = useCallback(async (id: string, imageData: { images: string[]; imagesToDel: string[] }) => {
     try {
-      await post(`/operational/parts-inspection/${inspectionId}/attachments/${attachmentId}/delete`);
+      console.log("Uploading image data:", imageData);
+      
+      const payload = {
+        images: imageData.images,
+        imagesToDel: imageData.imagesToDel
+      };
+
+      const { data } = await post<IInspectionAttachment[]>(
+        `/operational/parts-inspection/${id}/attachments`,
+        payload,
+        {
+          "Content-Type": "application/json",
+        },
+      );
+      return data.data || data;
     } catch (error) {
       throw error;
     }
   }, []);
+
+  const deleteInspectionAttachment = useCallback(
+    async (inspectionId: string, attachmentId: string) => {
+      try {
+        await post(
+          `/operational/parts-inspection/${inspectionId}/attachments/${attachmentId}/delete`,
+        );
+      } catch (error) {
+        throw error;
+      }
+    },
+    [],
+  );
 
   return {
     loading,

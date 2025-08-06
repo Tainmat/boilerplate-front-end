@@ -14,7 +14,7 @@ import { TITLE_RECOVER_PASSWORD } from "@shared/constants/title.browser";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
-import { post, fakeRequest } from "@shared/services/api/api.service";
+import { post } from "@shared/services/api/api.service";
 import { Field, Form, Formik } from "formik";
 import { useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
@@ -35,27 +35,26 @@ export function RecoverPassword() {
     try {
       showLoader();
 
-      /* const response = await post<any>(URL_RECOVER_PASSWORD, formValues); */
-      const { data } = await fakeRequest(2000, formValues);
+      const payload = {
+        email: formValues.emailUsuario,
+      };
 
-      /* if (response.data) {
+      const response = await post<any>("/auth/forgot-password", payload);
+
+      if (response.data) {
         addToast({
           type: "success",
-          title: "Sucesso",
-          description: response.message,
+          title: "Sucesso!",
+          description: response.message || "E-mail de recuperação enviado com sucesso!",
         });
 
         navigate(ROUTE_LOGIN);
       } else {
         addToast({
           type: "warning",
-          title: "Oops",
-          description: response.message_description![0],
+          title: "Oops!",
+          description: response.message || "Erro ao enviar e-mail de recuperação.",
         });
-      } */
-
-      if (data) {
-        navigate(ROUTE_LOGIN);
       }
     } catch (err) {
       handleApiRejection();
@@ -71,6 +70,14 @@ export function RecoverPassword() {
           <Row className="mb-2">
             <Col>
               <S.Title>Recuperar Senha</S.Title>
+            </Col>
+          </Row>
+
+          <Row className="mb-3">
+            <Col>
+              <p className="text-muted text-center mb-0" style={{ fontSize: '0.9rem' }}>
+                Digite seu e-mail abaixo e enviaremos instruções para redefinir sua senha.
+              </p>
             </Col>
           </Row>
 

@@ -31,10 +31,37 @@ export const Dialog = styled.div`
   margin-right: auto;
 
   min-height: calc(100% - (1.75rem * 2));
-  width: 810px;
+  width: 100%;
+  max-width: 810px;
+  padding: 0 1rem;
 
   position: relative;
   z-index: 1099;
+
+  @media (max-width: 1023px) {
+    /* Drawer mode para tablets e mobile */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    align-items: flex-end;
+    min-height: auto;
+    animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
 `;
 
 export const Content = styled.div`
@@ -48,6 +75,27 @@ export const Content = styled.div`
     padding: 2.5rem;
     width: 100%;
     position: relative;
+
+    @media (max-width: 1023px) {
+      /* Drawer style */
+      background-color: ${props.theme.colors.neutral.high.pure};
+      border-radius: ${props.theme.border.radius.lg} ${props.theme.border.radius.lg} 0 0;
+      padding: 1.5rem 1rem 2rem;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+      min-height: auto;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+      padding: 1.25rem 1rem 1.5rem;
+      border-radius: ${props.theme.border.radius.md} ${props.theme.border.radius.md} 0 0;
+    }
+
+    @media (max-width: 480px) {
+      padding: 1rem 0.75rem 1.25rem;
+      border-radius: ${props.theme.border.radius.sm} ${props.theme.border.radius.sm} 0 0;
+    }
   `}
 `;
 
@@ -55,6 +103,21 @@ export const CloseButton = styled.div`
   position: absolute;
   top: 2rem;
   right: 2rem;
+
+  @media (max-width: 1023px) {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
 `;
 
 export const AlertIcon = styled.span<Props>`
@@ -68,6 +131,18 @@ export const AlertIcon = styled.span<Props>`
 
     height: 4rem;
     width: 4rem;
+
+    @media (max-width: 768px) {
+      height: 3rem;
+      width: 3rem;
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      height: 2.5rem;
+      width: 2.5rem;
+      font-size: 1.25rem;
+    }
 
     ${props.type === "success" &&
     css`
@@ -95,5 +170,22 @@ export const AlertIcon = styled.span<Props>`
         color: ${props.theme.colors.feedback.warning.medium};
       }
     `}
+  `}
+`;
+
+export const DrawerHandle = styled.div`
+  ${(props) => css`
+    display: none;
+
+    @media (max-width: 1023px) {
+      display: block;
+      width: 2.5rem;
+      height: 0.25rem;
+      background-color: ${rgba(props.theme.colors.neutral.low.pure, 0.3)};
+      border-radius: ${props.theme.border.radius.pill};
+      margin: 0 auto 1rem;
+      position: relative;
+      top: -0.5rem;
+    }
   `}
 `;

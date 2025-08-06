@@ -13,10 +13,7 @@ import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-
 import { ROUTE_LIST_EQUIPMENTS } from "@/modules/Admin/Equipments/routes/Equipment.paths";
-import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 
 import { EquipmentRegisterForm } from "./components/RegisterForm";
 import { IEquipmentRegisterForm } from "./components/RegisterForm/RegisterForm.form";
@@ -169,14 +166,16 @@ export function CreateEquipment() {
   }, [setPageBreadcrumb, uuid, navigate, addToast]);
 
   async function handleOnSubmit(formValues: IEquipmentRegisterForm) {
-    const payload = {
-      ...formValues,
-      totalInspectionPoints: Number(formValues.totalInspectionPoints),
-      isActive: formValues.isActive === "true",
-    };
-
     try {
       showLoader();
+
+      const payload = {
+        name: formValues.name,
+        description: formValues.description,
+        totalInspectionPoints: Number(formValues.totalInspectionPoints),
+        isActive: formValues.isActive === "true",
+        croqui: formValues.coverUrl || "", // Já vem como base64 do formulário
+      };
 
       if (uuid) {
         const { data, message } = await put<IEquipment>(

@@ -6,7 +6,7 @@ export interface IEquipmentRegisterForm {
   description: string;
   totalInspectionPoints: number | string;
   isActive: "true" | "false";
-  coverUrl: string;
+  coverUrl: string | File;
 }
 
 export const equipmentValidationSchema = Yup.object().shape({

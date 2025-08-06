@@ -71,6 +71,10 @@ export const Container = styled.div.withConfig({
         &::placeholder {
           font-size: ${props.theme.font.size.xxs};
           color: ${props.theme.colors.neutral.low.light};
+
+          @media (max-width: 768px) {
+            font-size: 16px !important;
+          }
         }
 
         &:read-only {

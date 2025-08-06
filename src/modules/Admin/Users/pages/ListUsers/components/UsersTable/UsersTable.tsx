@@ -61,8 +61,8 @@ export function UsersTable({
 
         <Td>
           <div className="d-flex justify-content-center">
-            <Tag size="lg" status={data.status ? "success" : "warning"}>
-              {data.status ? "Ativo" : "Inativo"}
+            <Tag size="lg" status={data.status === "active" ? "success" : "warning"}>
+              {data.status === "active" ? "Ativo" : "Inativo"}
             </Tag>
           </div>
         </Td>

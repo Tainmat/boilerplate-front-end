@@ -13,11 +13,10 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
-import { useInspection, IInspectionCreateData, IInspectionAttachment } from "@shared/hooks/services/Admin/useInspection";
-import { filesToBase64 } from "@shared/utils/fileToBase64";
+import { useInspection, IInspectionCreateData } from "@shared/hooks/services/Admin/useInspection";
 
 import { InspectionRegisterForm } from "./components/RegisterForm";
-import { IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
+import { IInspectionRegisterForm, IImageData } from "./components/RegisterForm/RegisterForm.form";
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
 
 export function CreateInspection() {
@@ -27,19 +26,15 @@ export function CreateInspection() {
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { uuid } = useParams();
   const {
-    loading,
-    inspection: inspectionData,
     fetchInspection,
     createInspection,
     updateInspection,
-    fetchInspectionAttachments,
     uploadInspectionAttachments,
   } = useInspection();
 
   const [inspection, setInspection] = useState<IInspectionRegisterForm | null>(null);
   const [currentStep, setCurrentStep] = useState<"equipment" | "form">("equipment");
   const [selectedEquipment, setSelectedEquipment] = useState<IEquipment | null>(null);
-  const [existingAttachments, setExistingAttachments] = useState<IInspectionAttachment[]>([]);
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -61,6 +56,148 @@ export function CreateInspection() {
       try {
         showLoader();
         const data = await fetchInspection(id);
+
+        // Função para converter URL em base64 usando Canvas (evita problemas de CORS)
+        const convertUrlToBase64 = async (url: string): Promise<string> => {
+          try {
+            console.log('Tentando carregar imagem de:', url);
+            
+            // Primeira tentativa: usar fetch direto
+            try {
+              const response = await fetch(url, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'include'
+              });
+              
+              if (response.ok) {
+                const blob = await response.blob();
+                console.log('Blob recebido via fetch:', blob.type, blob.size);
+                
+                return new Promise((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const result = reader.result as string;
+                    console.log('Base64 gerado via fetch:', result ? 'Sucesso' : 'Falhou');
+                    resolve(result);
+                  };
+                  reader.onerror = reject;
+                  reader.readAsDataURL(blob);
+                });
+              }
+            } catch (fetchError) {
+              console.log('Fetch falhou, tentando abordagem alternativa:', fetchError);
+            }
+            
+            // Segunda tentativa: usar HTMLImageElement + Canvas (funciona melhor com CORS)
+            return new Promise((resolve, reject) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous'; // Importante para CORS
+              
+              img.onload = () => {
+                try {
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  
+                  if (!ctx) {
+                    reject(new Error('Não foi possível obter contexto do canvas'));
+                    return;
+                  }
+                  
+                  canvas.width = img.width;
+                  canvas.height = img.height;
+                  
+                  ctx.drawImage(img, 0, 0);
+                  
+                  const base64 = canvas.toDataURL('image/png');
+                  console.log('Base64 gerado via canvas:', base64 ? 'Sucesso' : 'Falhou');
+                  resolve(base64);
+                } catch (canvasError) {
+                  console.error('Erro no canvas:', canvasError);
+                  reject(canvasError);
+                }
+              };
+              
+              img.onerror = (error) => {
+                console.error('Erro ao carregar imagem:', error);
+                reject(error);
+              };
+              
+              img.src = url;
+            });
+            
+          } catch (error) {
+            console.error('Erro ao converter URL para base64:', error);
+            return '';
+          }
+        };
+
+        // Processar imagens dos attachments existentes
+        const existingImages: (IImageData | null)[] = [null, null, null];
+        
+        console.log('Dados recebidos da API:', data);
+        console.log('Attachments encontrados:', data.attachments);
+        
+        if (data.attachments && data.attachments.length > 0) {
+          console.log(`Processando ${data.attachments.length} attachments...`);
+          
+          // Converter URLs para base64 de forma assíncrona
+          const imagePromises = data.attachments.slice(0, 3).map(async (attachment: any, index: number) => {
+            console.log(`Processando attachment ${index}:`, attachment);
+            
+            if (attachment.inspectionAttachmentUrl) {
+              try {
+                // O inspectionAttachmentUrl retorna um path do servidor como:
+                // "/var/www/jometto.com.br/qas-usincheck/assets/public/inspections/..."
+                // Precisamos extrair apenas a parte relevante e construir a URL correta
+                
+                let imageUrl: string;
+                
+                if (attachment.inspectionAttachmentUrl.startsWith('http')) {
+                  // Se já é uma URL completa, usar diretamente
+                  imageUrl = attachment.inspectionAttachmentUrl;
+                } else if (attachment.inspectionAttachmentUrl.includes('/assets/public/')) {
+                  // Extrair apenas a parte após /assets/public/
+                  const assetPath = attachment.inspectionAttachmentUrl.split('/assets/public/')[1];
+                  imageUrl = `https://qas-usincheck.jometto.com.br/assets/public/${assetPath}`;
+                } else {
+                  // Fallback: usar o VITE_API_URL
+                  imageUrl = `${import.meta.env.VITE_API_URL}${attachment.inspectionAttachmentUrl}`;
+                }
+                
+                console.log(`URL original: ${attachment.inspectionAttachmentUrl}`);
+                console.log(`URL construída para attachment ${index}:`, imageUrl);
+                
+                const base64 = await convertUrlToBase64(imageUrl);
+                
+                if (base64) {
+                  const imageData = {
+                    id: attachment.id,
+                    base64: base64,
+                    name: `attachment-${attachment.id}.png`,
+                    size: 0, // Tamanho não disponível do servidor
+                    type: base64.includes('data:image/') ? base64.split(';')[0].split(':')[1] : 'image/png'
+                  };
+                  
+                  console.log(`Imagem ${index} processada com sucesso:`, imageData);
+                  existingImages[index] = imageData;
+                } else {
+                  console.warn(`Base64 vazio para attachment ${index}`);
+                }
+              } catch (error) {
+                console.error(`Erro ao carregar imagem ${attachment.id}:`, error);
+              }
+            } else {
+              console.warn(`URL de attachment ${index} não encontrada:`, attachment);
+            }
+          });
+
+          // Aguardar o carregamento de todas as imagens
+          await Promise.all(imagePromises);
+          console.log('Imagens processadas:', existingImages);
+        } else {
+          console.log('Nenhum attachment encontrado');
+        }
 
         // Converter dados da API para o formato do formulário
         const formData: IInspectionRegisterForm = {
@@ -101,25 +238,16 @@ export function CreateInspection() {
                     : data.position6
                       ? "6"
                       : "1",
-          // Inicializar conclusões dinâmicas com dados existentes
-          inspectionPointsConclusions: {
-            point1: data.flankAndBottomConclusion || "",
-            point2: data.keywayChannelsConclusion || "",
-            ...(data.partType?.totalInspectionPoints
-              ? Array.from({ length: data.partType.totalInspectionPoints }, (_, i) => i + 1)
-                  .slice(2) // Pular os 2 primeiros que já mapeamos
-                  .reduce(
-                    (acc, pointNum) => {
-                      acc[`point${pointNum}`] = "";
-                      return acc;
-                    },
-                    {} as { [key: string]: string },
-                  )
-              : {}),
-          },
-          additionalImages: [], // Imagens não podem ser carregadas do backend
+          // Estrutura de imagens adicionais com dados existentes
+          additionalImages: {
+            images: existingImages,
+            imagesToDel: []
+          }
         };
 
+        console.log('Dados do formulário sendo definidos:', formData);
+        console.log('Imagens adicionais no formulário:', formData.additionalImages);
+        
         setInspection(formData);
 
         // Se há dados do part type, usar como equipamento selecionado
@@ -135,15 +263,6 @@ export function CreateInspection() {
             updated_at: new Date().toISOString(),
           });
         }
-
-        // Carregar anexos existentes
-        try {
-          const attachments = await fetchInspectionAttachments(id);
-          setExistingAttachments(attachments);
-        } catch (error) {
-          console.warn("Não foi possível carregar os anexos:", error);
-          setExistingAttachments([]);
-        }
       } catch (error) {
         handleApiRejection();
         navigate(-1);
@@ -155,7 +274,6 @@ export function CreateInspection() {
     setPageBreadcrumb,
     uuid,
     navigate,
-    addToast,
     showLoader,
     hideLoader,
     fetchInspection,
@@ -192,18 +310,11 @@ export function CreateInspection() {
       /* generalConsiderations: "", */
       // Posição de inspeção selecionada
       selectedPosition: "1",
-      // Conclusões dinâmicas dos pontos de inspeção
-      inspectionPointsConclusions: equipment.totalInspectionPoints
-        ? Array.from({ length: equipment.totalInspectionPoints }, (_, i) => i + 1).reduce(
-            (acc, pointNum) => {
-              acc[`point${pointNum}`] = "";
-              return acc;
-            },
-            {} as { [key: string]: string },
-          )
-        : {},
-      // Imagens adicionais
-      additionalImages: [],
+      // Nova estrutura de imagens adicionais
+      additionalImages: {
+        images: [null, null, null], // 3 slots vazios
+        imagesToDel: []
+      }
     });
     setCurrentStep("form");
   }
@@ -218,11 +329,27 @@ export function CreateInspection() {
     try {
       showLoader();
 
-      // Converter imagens para base64 (mantido para possível uso futuro)
-      const additionalImagesBase64 =
-        formValues.additionalImages && formValues.additionalImages.length > 0
-          ? await filesToBase64(formValues.additionalImages)
-          : [];
+      // Preparar estrutura completa de imagens para envio em base64
+      const imageDataToUpload = {
+        images: [] as string[],
+        imagesToDel: [] as string[]
+      };
+
+      // Adicionar imagens atuais em base64
+      if (formValues.additionalImages?.images) {
+        formValues.additionalImages.images.forEach((imageData) => {
+          if (imageData && imageData.base64) {
+            imageDataToUpload.images.push(imageData.base64);
+          }
+        });
+      }
+
+      // Adicionar imagens para exclusão (se houver IDs)
+      if (formValues.additionalImages?.imagesToDel) {
+        formValues.additionalImages.imagesToDel.forEach((imageId) => {
+          imageDataToUpload.imagesToDel.push(imageId);
+        });
+      }
 
       // Converter dados do formulário para o formato da API
       const apiData: IInspectionCreateData = {
@@ -257,15 +384,10 @@ export function CreateInspection() {
         position4: formValues.selectedPosition === "4" ? "Posição 4 selecionada" : "",
         position5: formValues.selectedPosition === "5" ? "Posição 5 selecionada" : "",
         position6: formValues.selectedPosition === "6" ? "Posição 6 selecionada" : "",
-        // Mapear conclusões dinâmicas para campos da API
-        flankAndBottomConclusion: formValues.inspectionPointsConclusions?.point1 || "",
-        keywayChannelsConclusion: formValues.inspectionPointsConclusions?.point2 || "",
-        additionalObservations:
-          Object.values(formValues.inspectionPointsConclusions || {})
-            .slice(2)
-            .filter((conclusion) => conclusion.trim())
-            .join("\n\n") || "",
-        // additionalImagesBase64: additionalImagesBase64, // Enviado separadamente via uploadInspectionAttachments
+        // Campos de conclusão podem ser vazios já que foram removidos do formulário
+        flankAndBottomConclusion: "",
+        keywayChannelsConclusion: "",
+        additionalObservations: "",
       };
 
 
@@ -275,9 +397,9 @@ export function CreateInspection() {
         // Modo edição - PUT
         await updateInspection(uuid, apiData);
         
-        // Se há imagens para anexar, enviar separadamente
-        if (formValues.additionalImages && formValues.additionalImages.length > 0) {
-          await uploadInspectionAttachments(uuid, formValues.additionalImages);
+        // Se há imagens para anexar ou excluir, enviar separadamente
+        if (imageDataToUpload.images.length > 0 || imageDataToUpload.imagesToDel.length > 0) {
+          await uploadInspectionAttachments(uuid, imageDataToUpload);
         }
         
         addToast({
@@ -291,8 +413,8 @@ export function CreateInspection() {
         inspectionId = createdInspection?.id || createdInspection;
         
         // Se há imagens para anexar e temos o ID da inspeção, enviar attachments
-        if (formValues.additionalImages && formValues.additionalImages.length > 0 && inspectionId) {
-          await uploadInspectionAttachments(inspectionId, formValues.additionalImages);
+        if (imageDataToUpload.images.length > 0 && inspectionId) {
+          await uploadInspectionAttachments(inspectionId, imageDataToUpload);
         }
         
         addToast({

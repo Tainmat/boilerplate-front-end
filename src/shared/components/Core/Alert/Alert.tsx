@@ -4,6 +4,7 @@ import {
   CloseButton,
   Content,
   Dialog,
+  DrawerHandle,
 } from "@shared/components/Core/Alert/Alert.styles";
 import { Button } from "@shared/components/Core/Buttons/Button";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
@@ -56,6 +57,7 @@ export function Alert() {
     <Backdrop>
       <Dialog>
         <Content>
+          <DrawerHandle />
           <CloseButton>
             <ButtonIcon size="md" icon="close" onClick={removeAlert} />
           </CloseButton>
@@ -72,9 +74,9 @@ export function Alert() {
             </Row>
           )}
 
-          <Row className="justify-content-center text-center py-5">
-            <Col xs={8}>
-              <Row className="justify-content-center mb-4">
+          <Row className="justify-content-center text-center py-2 py-md-5">
+            <Col xs={12} sm={10} md={8}>
+              <Row className="justify-content-center mb-2 mb-md-4">
                 <Col xs="auto">
                   <AlertIcon type={alert.iconType}>
                     <span className="material-icons">{handleIconType()}</span>
@@ -82,23 +84,24 @@ export function Alert() {
                 </Col>
               </Row>
 
-              <Heading size="sm">{alert.title}</Heading>
+              <Heading size="sm" className="mb-2 mb-md-3">{alert.title}</Heading>
 
               {alert.subtitle && (
-                <Paragraph size="sm" className="mt-2">
+                <Paragraph size="sm" className="mt-1 mt-md-2">
                   {alert.subtitle}
                 </Paragraph>
               )}
 
-              <Subtitle size="lg" className="mt-5 mb-4">
+              <Subtitle size="sm" className="mt-2 mt-md-5 mb-3 mb-md-4">
                 {alert.description}
               </Subtitle>
 
-              <Row className="justify-content-center">
-                <Col xs="auto">
+              <Row className="justify-content-center g-2">
+                <Col xs={12} sm={6} md="auto">
                   <Button
                     type="button"
                     styles="tertiary"
+                    display="block"
                     onClick={() => {
                       alert.onCancel && alert.onCancel();
                       removeAlert();
@@ -108,11 +111,12 @@ export function Alert() {
                   </Button>
                 </Col>
 
-                <Col xs="auto">
+                <Col xs={12} sm={6} md="auto">
                   <Button
                     type="button"
                     styles="primary"
                     mode={alert.buttonType}
+                    display="block"
                     onClick={() => {
                       alert.onConfirm && alert.onConfirm();
 
