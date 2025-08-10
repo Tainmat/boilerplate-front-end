@@ -23,7 +23,7 @@ interface INavigation {
 export const nav: INavigation[] = [
   {
     icon: "show_chart",
-    label: "Dashboard",
+    label: "Página Inicial",
     route: ROUTE_DASHBOARD,
     mobileVisible: true,
     allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_CUSTOMER],

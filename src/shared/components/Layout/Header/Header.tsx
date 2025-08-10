@@ -25,12 +25,12 @@ export function Header() {
   };
 
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
-  
+
   // Function to handle avatar click
   const handleAvatarClick = () => {
     setMenuIsOpen(!menuIsOpen);
   };
-  
+
   // Function to close dropdown
   const handleCloseDropdown = () => {
     setMenuIsOpen(false);
@@ -43,16 +43,12 @@ export function Header() {
       <S.Container $sideMenuIsOpen={hover}>
         <div className="col1">
           <S.MenuButton onClick={handleMenuClick}>
-            <Icon 
-              icon={hover ? "close" : "menu"} 
-              mode="light" 
-              size="sm" 
-            />
+            <Icon icon={hover ? "close" : "menu"} mode="light" size="sm" />
           </S.MenuButton>
 
           <div className="username">
             <Paragraph size="lg" className="hello">
-              Olá, {isSmartphone ? user?.userName?.split(' ')[0] : user?.userName}!
+              Olá, {isSmartphone ? user?.socialName?.split(" ")[0] : user?.socialName}!
             </Paragraph>
             <span>{String.fromCodePoint(0x1f44b)}</span>
           </div>
