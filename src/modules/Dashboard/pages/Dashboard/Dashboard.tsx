@@ -6,7 +6,6 @@ import { Heading } from "@shared/components/Core/Typography/Heading";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Subtitle } from "@shared/components/Core/Typography/Subtitle";
 import { Icon } from "@shared/components/Core/Icons/Icon";
-import { Button } from "@shared/components/Core/Buttons/Button";
 import { Select } from "@shared/components/Core/Form/Fields/Select";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { Table, Thead, Tbody, Tr, Th, Td } from "@shared/components/Core/Table";
@@ -16,7 +15,8 @@ import { Skeleton } from "@shared/components/Core/Skeleton";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 /* import { customers } from "@shared/hooks/services/Admin/useCustomers"; */
-import { useInspections } from "@shared/hooks/services/Admin/useInspections";
+import { useDashboard } from "@shared/hooks/services/Dashboard/useDashboard";
+import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -77,22 +77,23 @@ interface DashboardData {
     reprovadas: number[];
   };
   ultimasInspecoes: Array<{
-    id: number;
-    data: string;
-    tipo: string;
-    status: string;
-    responsavel: string;
-    observacoes: string;
-    prioridade: string;
+    id: string;
+    reportNumber: string;
+    reportStartDate: string;
+    customer: { fantasyName: string };
+    partType: { name: string };
+    inspectionStatus: { description: string };
+    inspectorUser: { name: string };
   }>;
 }
 
 // Cores para os gráficos
 const chartColors = {
-  aprovado: "rgba(75, 192, 75, 0.8)",
-  reprovado: "rgba(255, 99, 132, 0.8)",
-  emAnalise: "rgba(54, 162, 235, 0.8)",
-  pendente: "rgba(255, 206, 86, 0.8)",
+  aprovado: "rgba(75, 192, 75, 0.8)", // Verde
+  reprovado: "rgba(220, 53, 69, 0.8)", // Vermelho (helper)
+  emAnalise: "rgba(54, 162, 235, 0.8)", // Azul
+  pendente: "rgba(255, 206, 86, 0.8)", // Amarelo
+  aprovadasComRestricao: "rgba(255, 193, 7, 0.8)", // Laranja (warning)
   tipos: [
     "rgba(75, 192, 192, 0.8)",
     "rgba(153, 102, 255, 0.8)",
@@ -107,9 +108,10 @@ export function Dashboard() {
   const { isSmartphone } = useDeviceDetection();
 
   // Estados
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const [dateRange, setDateRange] = useState<string>("last12months");
+  const { data: dashboardApiData, loading, refetch } = useDashboard(dateRange);
+  const { result: statusOptions } = usePartInspectionStatusDropdown();
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(5);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(true);
@@ -123,99 +125,89 @@ export function Dashboard() {
 
   // Função para processar os dados das inspeções
   const processInspectionData = useCallback(
-    (dateRangeFilter: string): DashboardData => {
-      // TODO: Integrar com dados reais quando disponível
-      // Temporariamente usando array vazio até integração
-      let filteredInspections: any[] = [];
-
-      // Aplicar filtro de data
-      const today = new Date();
-      let startDate = new Date();
-
-      switch (dateRangeFilter) {
-        case "last30days":
-          startDate.setDate(today.getDate() - 30);
-          break;
-        case "last90days":
-          startDate.setDate(today.getDate() - 90);
-          break;
-        case "last6months":
-          startDate.setMonth(today.getMonth() - 6);
-          break;
-        case "last12months":
-        default:
-          startDate.setMonth(today.getMonth() - 12);
-          break;
+    (): DashboardData => {
+      if (!dashboardApiData) {
+        return {
+          totalInspecoes: 0,
+          inspecoesAprovadas: 0,
+          inspecoesReprovadas: 0,
+          taxaAprovacao: 0,
+          porStatus: {
+            labels: ["Aprovadas", "Reprovadas", "Em Análise", "Pendentes"],
+            data: [0, 0, 0, 0],
+          },
+          evolucaoTemporal: {
+            labels: Array.from({ length: 12 }, (_, i) => {
+              const date = new Date();
+              date.setMonth(date.getMonth() - i);
+              return format(date, "MMM/yy", { locale: ptBR });
+            }).reverse(),
+            aprovadas: Array(12).fill(0),
+            reprovadas: Array(12).fill(0),
+            emAnalise: Array(12).fill(0),
+            pendentes: Array(12).fill(0),
+          },
+          porTipo: {
+            labels: [],
+            data: [],
+          },
+          comparativoAprovacoes: {
+            labels: Array.from({ length: 12 }, (_, i) => {
+              const date = new Date();
+              date.setMonth(date.getMonth() - i);
+              return format(date, "MMM/yy", { locale: ptBR });
+            }).reverse(),
+            aprovadas: Array(12).fill(0),
+            reprovadas: Array(12).fill(0),
+          },
+          ultimasInspecoes: [],
+        };
       }
 
-      // TODO: Implementar filtro quando dados reais estiverem disponíveis
-      // filteredInspections = filteredInspections.filter(
-      //   (inspection) => new Date(inspection.reportStartDate) >= startDate,
-      // );
+      // Extrair dados dos cards totalizadores
+      const totalCard = dashboardApiData.totalizingCards.find(card => card.title.includes("Total"));
+      const approvedCard = dashboardApiData.totalizingCards.find(card => card.title === "Inspeções Aprovadas");
+      const approvedWithRestrictionCard = dashboardApiData.totalizingCards.find(card => card.title === "Com Restrições");
+      const inAnalysisCard = dashboardApiData.totalizingCards.find(card => card.title === "Em Análise");
+      const nonConformingCard = dashboardApiData.totalizingCards.find(card => card.title === "Não Conforme");
 
-      // Calcular métricas - valores padrão até integração
-      const aprovadas = 0;
-      const reprovadas = 0;
-      const emAnalise = 0;
-      const pendentes = 0;
-      const total = 0;
+      const totalInspecoes = totalCard?.value || 0;
+      const aprovadas = approvedCard?.value || 0;
+      const aprovadasComRestricao = approvedWithRestrictionCard?.value || 0;
+      const emAnalise = inAnalysisCard?.value || 0;
+      const naoConforme = nonConformingCard?.value || 0;
+      
+      // Para compatibilidade com os gráficos existentes
+      const reprovadas = naoConforme;
 
-      // Dados por status para gráfico de pizza
-      const statusLabels = ["Aprovadas", "Reprovadas", "Em Análise", "Pendentes"];
-      const statusData = [aprovadas, reprovadas, emAnalise, pendentes];
+      // Dados por status para gráfico de pizza usando os status da API
+      const statusLabels = ["Aprovadas", "Aprovadas c/ Restrição", "Em Análise", "Não Conforme"];
+      const statusData = [aprovadas, aprovadasComRestricao, emAnalise, naoConforme];
 
-      // Dados para evolução temporal
-      // Agrupar por mês
-      const lastMonths = Array.from({ length: 12 }, (_, i) => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        return date;
-      }).reverse();
+      // Dados por tipo de inspeção (usando dados de partTypes)
+      const tiposInspecao = dashboardApiData.partTypes?.map(pt => pt.partTypeName) || [];
+      const dadosPorTipo = dashboardApiData.partTypes?.map(pt => pt.amount) || [];
 
-      const monthLabels = lastMonths.map((date) => format(date, "MMM/yy", { locale: ptBR }));
-
-      const approvedByMonth = Array(12).fill(0);
-      const rejectedByMonth = Array(12).fill(0);
-      const inAnalysisByMonth = Array(12).fill(0);
-      const pendingByMonth = Array(12).fill(0);
-
-      // TODO: Implementar agrupamento por mês quando dados reais estiverem disponíveis
-      // filteredInspections.forEach((inspection) => {
-      //   const inspectionDate = new Date(inspection.reportStartDate);
-      //   ...
-      // });
-
-      // Dados por tipo de inspeção - valores padrão
-      const tiposInspecao: string[] = [];
-      const dadosPorTipo: number[] = [];
-
-      // Comparativo de aprovações vs reprovações ao longo do tempo
-      const comparativoLabels = monthLabels;
-      const comparativoAprovadas = approvedByMonth;
-      const comparativoReprovadas = rejectedByMonth;
-
-      // Últimas inspeções - array vazio até integração
-      const ultimasInspecoes: Array<{
-        id: number;
-        data: string;
-        tipo: string;
-        status: string;
-        responsavel: string;
-        observacoes: string;
-        prioridade: string;
-      }> = [];
+      // Dados da evolução temporal
+      const evolutionLabels = dashboardApiData.temporalEvolution.map(te => 
+        format(new Date(te.year, te.month - 1), "MMM/yy", { locale: ptBR })
+      );
+      const approvedByMonth = dashboardApiData.temporalEvolution.map(te => te.total_aprovado);
+      const rejectedByMonth = dashboardApiData.temporalEvolution.map(te => te.nao_conforme);
+      const inAnalysisByMonth = dashboardApiData.temporalEvolution.map(te => te.em_analise);
+      const pendingByMonth = dashboardApiData.temporalEvolution.map(te => te.aprovado_com_restricao);
 
       return {
-        totalInspecoes: total,
+        totalInspecoes,
         inspecoesAprovadas: aprovadas,
         inspecoesReprovadas: reprovadas,
-        taxaAprovacao: total > 0 ? (aprovadas / total) * 100 : 0,
+        taxaAprovacao: approvedCard?.percentage || 0,
         porStatus: {
           labels: statusLabels,
           data: statusData,
         },
         evolucaoTemporal: {
-          labels: monthLabels,
+          labels: evolutionLabels,
           aprovadas: approvedByMonth,
           reprovadas: rejectedByMonth,
           emAnalise: inAnalysisByMonth,
@@ -226,36 +218,25 @@ export function Dashboard() {
           data: dadosPorTipo,
         },
         comparativoAprovacoes: {
-          labels: comparativoLabels,
-          aprovadas: comparativoAprovadas,
-          reprovadas: comparativoReprovadas,
+          labels: evolutionLabels,
+          aprovadas: approvedByMonth,
+          reprovadas: rejectedByMonth,
         },
-        ultimasInspecoes,
+        ultimasInspecoes: dashboardApiData.latestInspections || [],
       };
     },
-    [],
+    [dashboardApiData, statusOptions],
   );
 
-  // Carregar dados da dashboard
-  const loadDashboardData = useCallback(async () => {
-    setLoading(true);
-    try {
-      // TODO: Aguardar implementação da integração real com a API
-      // Processar dados temporários
-      const data = processInspectionData(dateRange);
+
+  // Atualizar dados processados quando API data mudar
+  useEffect(() => {
+    if (dashboardApiData) {
+      const data = processInspectionData();
       setDashboardData(data);
       setLastUpdated(new Date());
-    } catch (error) {
-      console.error("Erro ao carregar dados da dashboard:", error);
-    } finally {
-      setLoading(false);
     }
-  }, [dateRange, processInspectionData]);
-
-  // Carregar dados quando o período mudar
-  useEffect(() => {
-    loadDashboardData();
-  }, [dateRange, loadDashboardData]);
+  }, [dashboardApiData, processInspectionData]);
 
   // Auto-refresh a cada 5 minutos
   useEffect(() => {
@@ -264,7 +245,7 @@ export function Dashboard() {
     if (autoRefreshEnabled) {
       intervalId = setInterval(
         () => {
-          loadDashboardData();
+          refetch(dateRange);
         },
         5 * 60 * 1000,
       ); // 5 minutos
@@ -273,7 +254,7 @@ export function Dashboard() {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [autoRefreshEnabled, loadDashboardData]);
+  }, [autoRefreshEnabled, refetch, dateRange]);
 
   // Configurações dos gráficos
   const pieChartOptions = {
@@ -292,40 +273,6 @@ export function Dashboard() {
     },
   };
 
-  const lineChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          color: "#000000",
-          font: {
-            size: isSmartphone ? 10 : 12,
-          },
-        },
-      },
-      x: {
-        ticks: {
-          color: "#000000",
-          font: {
-            size: isSmartphone ? 10 : 12,
-          },
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        position: "top" as const,
-        labels: {
-          color: "#000000",
-          font: {
-            size: isSmartphone ? 10 : 12,
-          },
-        },
-      },
-    },
-  };
 
   const barChartOptions = {
     responsive: true,
@@ -400,9 +347,9 @@ export function Dashboard() {
             data: dashboardData.porStatus.data,
             backgroundColor: [
               chartColors.aprovado,
-              chartColors.reprovado,
+              chartColors.aprovadasComRestricao,
               chartColors.emAnalise,
-              chartColors.pendente,
+              chartColors.reprovado,
             ],
             borderWidth: 1,
           },
@@ -410,43 +357,8 @@ export function Dashboard() {
       }
     : null;
 
-  const lineChartData = dashboardData
-    ? {
-        labels: dashboardData.evolucaoTemporal.labels,
-        datasets: [
-          {
-            label: "Aprovadas",
-            data: dashboardData.evolucaoTemporal.aprovadas,
-            borderColor: chartColors.aprovado,
-            backgroundColor: "rgba(75, 192, 75, 0.1)",
-            tension: 0.3,
-          },
-          {
-            label: "Reprovadas",
-            data: dashboardData.evolucaoTemporal.reprovadas,
-            borderColor: chartColors.reprovado,
-            backgroundColor: "rgba(255, 99, 132, 0.1)",
-            tension: 0.3,
-          },
-          {
-            label: "Em Análise",
-            data: dashboardData.evolucaoTemporal.emAnalise,
-            borderColor: chartColors.emAnalise,
-            backgroundColor: "rgba(54, 162, 235, 0.1)",
-            tension: 0.3,
-          },
-          {
-            label: "Pendentes",
-            data: dashboardData.evolucaoTemporal.pendentes,
-            borderColor: chartColors.pendente,
-            backgroundColor: "rgba(255, 206, 86, 0.1)",
-            tension: 0.3,
-          },
-        ],
-      }
-    : null;
 
-  const barChartData = dashboardData
+  const barChartData = dashboardData && dashboardData.porTipo.labels.length > 0
     ? {
         labels: dashboardData.porTipo.labels,
         datasets: [
@@ -473,7 +385,7 @@ export function Dashboard() {
           },
           {
             fill: true,
-            label: "Reprovadas",
+            label: "Não Conforme",
             data: dashboardData.comparativoAprovacoes.reprovadas,
             borderColor: chartColors.reprovado,
             backgroundColor: "rgba(255, 99, 132, 0.2)",
@@ -490,31 +402,20 @@ export function Dashboard() {
 
   // Função para obter cor do status
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "concluída":
-        return "success";
-      case "cancelada":
-        return "warning";
-      case "em andamento":
-        return "helper";
+    switch (status) {
+      case "Aprovado":
+        return "success"; // Verde
+      case "Aprovado com restrição":
+        return "helper"; // Vermelho
+      case "Em análise":
+        return "neutral"; // Azul
+      case "Não conforme":
+        return "warning"; // Laranja
       default:
-        return "default";
+        return "default"; // Cinza para outros casos
     }
   };
 
-  // Função para obter cor da prioridade
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case "crítica":
-        return "warning";
-      case "alta":
-        return "helper";
-      case "média":
-        return "default";
-      default:
-        return "success";
-    }
-  };
 
   return (
     <AnimatedPage>
@@ -580,96 +481,40 @@ export function Dashboard() {
           </Row>
 
           {/* Cards de Métricas */}
-          <Row className="mb-4">
-            {/* Total de Inspeções */}
-            <Col lg={3} md={6} sm={6} xs={12} className="mb-3 mb-lg-0">
-              <Card className="h-100 shadow-sm">
-                <Card.Body>
-                  {loading ? (
-                    <Skeleton />
-                  ) : (
-                    <>
-                      <Subtitle size="xs" color="primary">
-                        Total de Inspeções
-                      </Subtitle>
-                      <Heading size="md">{dashboardData?.totalInspecoes || 0}</Heading>
-                      <div className="mt-2">
-                        <Icon icon="assignment" size="md" mode="primary" />
-                      </div>
-                    </>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Inspeções Aprovadas */}
-            <Col lg={3} md={6} sm={6} xs={12} className="mb-3 mb-lg-0">
-              <Card className="h-100 shadow-sm">
-                <Card.Body>
-                  {loading ? (
-                    <Skeleton />
-                  ) : (
-                    <>
-                      <Subtitle size="xs" color="primary">
-                        Inspeções Aprovadas
-                      </Subtitle>
-                      <Heading size="md">{dashboardData?.inspecoesAprovadas || 0}</Heading>
-                      <div className="mt-2">
-                        <Icon icon="check_circle" size="md" mode="success" />
-                      </div>
-                    </>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Inspeções Reprovadas */}
-            <Col lg={3} md={6} sm={6} xs={12} className="mb-3 mb-lg-0">
-              <Card className="h-100 shadow-sm">
-                <Card.Body>
-                  {loading ? (
-                    <Skeleton />
-                  ) : (
-                    <>
-                      <Subtitle size="xs" color="primary">
-                        Inspeções Reprovadas
-                      </Subtitle>
-                      <Heading size="md">{dashboardData?.inspecoesReprovadas || 0}</Heading>
-                      <div className="mt-2">
-                        <Icon icon="cancel" size="md" mode="warning" />
-                      </div>
-                    </>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Taxa de Aprovação */}
-            <Col lg={3} md={6} sm={6} xs={12} className="mb-3 mb-lg-0">
-              <Card className="h-100 shadow-sm">
-                <Card.Body>
-                  {loading ? (
-                    <Skeleton />
-                  ) : (
-                    <>
-                      <Subtitle size="xs" color="primary">
-                        Taxa de Aprovação
-                      </Subtitle>
-                      <Heading size="md">{dashboardData?.taxaAprovacao.toFixed(1) || 0}%</Heading>
-                      <div className="mt-2">
-                        <Icon
-                          icon="trending_up"
-                          size="md"
-                          mode={
-                            dashboardData && dashboardData.taxaAprovacao > 70 ? "success" : "helper"
-                          }
-                        />
-                      </div>
-                    </>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
+          <Row className="mb-4 g-3 d-flex justify-content-center">
+            {dashboardApiData?.totalizingCards.map((card, index) => (
+              <Col 
+                key={index} 
+                className="d-flex justify-content-center"
+                style={{ 
+                  flex: '1 1 0',
+                  minWidth: isSmartphone ? '100%' : '200px',
+                  maxWidth: isSmartphone ? '100%' : '240px'
+                }}
+              >
+                <Card className="w-100 shadow-sm" style={{ minHeight: '140px' }}>
+                  <Card.Body className="d-flex flex-column justify-content-between text-center">
+                    {loading ? (
+                      <Skeleton />
+                    ) : (
+                      <>
+                        <Subtitle size="xs" color="primary" className="mb-2">
+                          {card.title}
+                        </Subtitle>
+                        <div className="mb-2">
+                          <Heading size="md">
+                            {card.title === "Taxa de Aprovação" ? `${card.value}%` : card.value}
+                          </Heading>
+                        </div>
+                        <div className="d-flex justify-content-center">
+                          <Icon icon={card.icon} size="md" mode={card.status} />
+                        </div>
+                      </>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
           </Row>
 
           {/* Gráficos - Primeira Linha */}
@@ -725,36 +570,12 @@ export function Dashboard() {
 
           {/* Gráficos - Segunda Linha */}
           <Row className="mb-4">
-            {/* Gráfico de Linha - Evolução Temporal */}
-            <Col lg={6} md={12} className="mb-4 mb-lg-0">
-              <Card className="h-100 shadow-sm">
-                <Card.Body>
-                  <Subtitle size="xs" className="mb-3">
-                    Evolução Temporal
-                  </Subtitle>
-                  {loading ? (
-                    <div style={{ height: "300px" }}>
-                      <Skeleton />
-                    </div>
-                  ) : lineChartData ? (
-                    <div style={{ height: "300px" }}>
-                      <Line data={lineChartData} options={lineChartOptions} />
-                    </div>
-                  ) : (
-                    <div className="d-flex justify-content-center align-items-center h-100">
-                      <Paragraph size="sm">Sem dados disponíveis</Paragraph>
-                    </div>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-
             {/* Gráfico de Área - Comparativo */}
-            <Col lg={6} md={12}>
+            <Col lg={12} md={12}>
               <Card className="h-100 shadow-sm">
                 <Card.Body>
                   <Subtitle size="xs" className="mb-3">
-                    Comparativo: Aprovadas vs. Reprovadas
+                    Comparativo: Aprovadas vs. Não Conforme
                   </Subtitle>
                   {loading ? (
                     <div style={{ height: "300px" }}>
@@ -788,22 +609,24 @@ export function Dashboard() {
                       <Thead>
                         <Tr>
                           <Th>
+                            <Heading size="xs">Nº Relatório</Heading>
+                          </Th>
+                          <Th hideOnMobile={isSmartphone}>
                             <Heading size="xs">Data</Heading>
                           </Th>
                           <Th hideOnMobile={isSmartphone}>
-                            <Heading size="xs">Tipo</Heading>
+                            <Heading size="xs">Cliente</Heading>
                           </Th>
                           <Th>
-                            <Heading size="xs">Status</Heading>
+                            <Heading size="xs">Tipo Peça</Heading>
                           </Th>
-                          <Th hideOnMobile={true}>
-                            <Heading size="xs">Prioridade</Heading>
+                          <Th>
+                            <div className="d-flex justify-content-center">
+                              <Heading size="xs">Status</Heading>
+                            </div>
                           </Th>
                           <Th hideOnMobile={isSmartphone}>
-                            <Heading size="xs">Responsável</Heading>
-                          </Th>
-                          <Th hideOnMobile={true}>
-                            <Heading size="xs">Observações</Heading>
+                            <Heading size="xs">Inspetor</Heading>
                           </Th>
                         </Tr>
                       </Thead>
@@ -822,33 +645,28 @@ export function Dashboard() {
                           currentItems.map((inspecao, index) => (
                             <Tr key={index} expandable={isSmartphone}>
                               <Td>
-                                <Paragraph size="sm">{inspecao.data}</Paragraph>
+                                <Paragraph size="sm">{inspecao.reportNumber}</Paragraph>
                               </Td>
                               <Td hideOnMobile={isSmartphone}>
-                                <Paragraph size="sm">{inspecao.tipo}</Paragraph>
+                                <Paragraph size="sm">
+                                  {new Date(inspecao.reportStartDate).toLocaleDateString('pt-BR')}
+                                </Paragraph>
+                              </Td>
+                              <Td hideOnMobile={isSmartphone}>
+                                <Paragraph size="sm">{inspecao.customer.fantasyName}</Paragraph>
+                              </Td>
+                              <Td>
+                                <Paragraph size="sm">{inspecao.partType.name}</Paragraph>
                               </Td>
                               <Td>
                                 <div className="d-flex justify-content-center">
-                                  <Tag size="lg" status={getStatusColor(inspecao.status)}>
-                                    {inspecao.status}
-                                  </Tag>
-                                </div>
-                              </Td>
-                              <Td hideOnMobile={true}>
-                                <div className="d-flex justify-content-center">
-                                  <Tag size="lg" status={getPriorityColor(inspecao.prioridade)}>
-                                    {inspecao.prioridade}
+                                  <Tag size="lg" status={getStatusColor(inspecao.inspectionStatus.description)}>
+                                    {inspecao.inspectionStatus.description}
                                   </Tag>
                                 </div>
                               </Td>
                               <Td hideOnMobile={isSmartphone}>
-                                <Paragraph size="sm">{inspecao.responsavel}</Paragraph>
-                              </Td>
-                              <Td hideOnMobile={true}>
-                                <Paragraph size="sm">
-                                  {inspecao.observacoes.substring(0, 50)}
-                                  {inspecao.observacoes.length > 50 ? "..." : ""}
-                                </Paragraph>
+                                <Paragraph size="sm">{inspecao.inspectorUser.name}</Paragraph>
                               </Td>
                             </Tr>
                           ))
