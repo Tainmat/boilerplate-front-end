@@ -2,7 +2,6 @@ import { Button } from "@shared/components/Core/Buttons/Button";
 import { Card } from "react-bootstrap";
 import { Checkbox } from "@shared/components/Core/Form/Fields/Checkbox";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
-import { Radio } from "@shared/components/Core/Form/Fields/Radio";
 import { Select } from "@shared/components/Core/Form/Fields/Select";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { Skeleton } from "@shared/components/Core/Skeleton";
@@ -81,7 +80,26 @@ export function InspectionRegisterForm({
       validationSchema={inspectionValidationSchema}
       onSubmit={onSubmit}
     >
-      {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => (
+      {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => {
+        const handlePositionChange = (position: number, checked: boolean) => {
+          setFieldTouched("selectedPositions");
+          const currentPositions = values.selectedPositions || [];
+          let newPositions: number[];
+          
+          if (checked) {
+            // Adiciona a posição se não estiver selecionada
+            newPositions = [...currentPositions, position].sort((a, b) => a - b);
+          } else {
+            // Remove a posição se estiver selecionada
+            newPositions = currentPositions.filter(p => p !== position);
+          }
+          
+          setFieldValue("selectedPositions", newPositions);
+          // Atualiza o campo positionNumber para o backend no formato "1,2,4,6"
+          setFieldValue("positionNumber", newPositions.join(","));
+        };
+
+        return (
         <Form>
           {selectedEquipment && (
             <Row className="mb-4">
@@ -546,37 +564,37 @@ export function InspectionRegisterForm({
                       4. Posição de Inspeção
                     </Heading>
                     <small className="text-muted">
-                      Selecione a posição específica para inspeção
+                      Selecione uma ou mais posições para inspeção
                     </small>
                   </div>
                   <div
-                    className={`${touched.selectedPosition && !!errors.selectedPosition ? "border border-danger rounded p-3" : ""}`}
+                    className={`${touched.selectedPositions && !!errors.selectedPositions ? "border border-danger rounded p-3" : ""}`}
                   >
                     <Row className="g-3">
-                      {[1, 2, 3, 4, 5, 6].map((position) => (
-                        <Col xl={4} lg={6} md={6} sm={6} key={position}>
-                          <div
-                            className="border rounded p-2 p-md-3 bg-white shadow-sm d-flex align-items-center"
-                            style={{ borderColor: "#e9ecef" }}
-                          >
-                            <Field
-                              as={Radio}
-                              label={`Posição ${position}`}
-                              name="selectedPosition"
-                              value={position.toString()}
-                              checked={values.selectedPosition === position.toString()}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                setFieldTouched("selectedPosition");
-                                setFieldValue("selectedPosition", e.target.value);
-                              }}
-                            />
-                          </div>
-                        </Col>
-                      ))}
+                      {[1, 2, 3, 4, 5, 6].map((position) => {
+                        const isSelected = values.selectedPositions?.includes(position) || false;
+                        return (
+                          <Col xl={4} lg={6} md={6} sm={6} key={position}>
+                            <div
+                              className="border rounded p-2 p-md-3 bg-white shadow-sm d-flex align-items-center"
+                              style={{ borderColor: "#e9ecef" }}
+                            >
+                              <Checkbox
+                                label={`Posição ${position}`}
+                                name={`position_${position}`}
+                                checked={isSelected}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                  handlePositionChange(position, e.target.checked);
+                                }}
+                              />
+                            </div>
+                          </Col>
+                        );
+                      })}
                     </Row>
-                    {touched.selectedPosition && !!errors.selectedPosition && (
+                    {touched.selectedPositions && !!errors.selectedPositions && (
                       <div className="text-danger mt-2">
-                        <small>{errors.selectedPosition}</small>
+                        <small>{errors.selectedPositions}</small>
                       </div>
                     )}
                   </div>
@@ -997,7 +1015,8 @@ export function InspectionRegisterForm({
             </Col>
           </Row>
         </Form>
-      )}
+        );
+      }}
     </Formik>
   );
 }

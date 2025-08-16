@@ -1,5 +1,7 @@
 export { InspectionSearchForm } from "./InspectionSearchForm";
+export type { 
+  IInspectionSearchForm
+} from "./InspectionSearchForm.form";
 export { 
-  IInspectionSearchForm, 
   initialInspectionSearchValues 
 } from "./InspectionSearchForm.form";

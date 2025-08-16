@@ -210,7 +210,7 @@ export function CreateInspection() {
           revisionNumber: data.revisionNumber || "00",
           sheetNumber: data.sheetNumber || "1/1",
           componentId: data.componentId || "",
-          positionNumber: data.positionNumber || 1,
+          positionNumber: data.positionNumber || "",
           inspectionLocation: data.inspectionLocation || "",
           mdaInformation: data.mdaInformation || "",
           isVI: data.isVI || false,
@@ -224,20 +224,23 @@ export function CreateInspection() {
           isSandingBrushSandblasting: data.isSandingBrushSandblasting || false,
           isCleaningChemistry: data.isCleaningChemistry || false,
           instruments: data.instruments || "",
-          // Determinar qual posição foi preenchida
-          selectedPosition: data.position1
-            ? "1"
-            : data.position2
-              ? "2"
-              : data.position3
-                ? "3"
-                : data.position4
-                  ? "4"
-                  : data.position5
-                    ? "5"
-                    : data.position6
-                      ? "6"
-                      : "1",
+          // Determinar quais posições foram preenchidas
+          selectedPositions: (() => {
+            if (data.positionNumber && typeof data.positionNumber === 'string') {
+              // Se positionNumber é uma string no formato "1,2,4,6", fazer parse
+              return data.positionNumber.split(',').map((num: string) => parseInt(num.trim())).filter((num: number) => !isNaN(num));
+            } else {
+              // Legacy: verificar posições individuais
+              const positions = [];
+              if (data.position1) positions.push(1);
+              if (data.position2) positions.push(2);
+              if (data.position3) positions.push(3);
+              if (data.position4) positions.push(4);
+              if (data.position5) positions.push(5);
+              if (data.position6) positions.push(6);
+              return positions.length > 0 ? positions : [1];
+            }
+          })(),
           // Estrutura de imagens adicionais com dados existentes
           additionalImages: {
             images: existingImages,
@@ -293,7 +296,7 @@ export function CreateInspection() {
       revisionNumber: "00",
       sheetNumber: "1/1",
       componentId: "",
-      positionNumber: 1,
+      positionNumber: "",
       inspectionLocation: "",
       mdaInformation: "",
       isVI: false,
@@ -308,8 +311,8 @@ export function CreateInspection() {
       isCleaningChemistry: false,
       instruments: "",
       /* generalConsiderations: "", */
-      // Posição de inspeção selecionada
-      selectedPosition: "1",
+      // Posições de inspeção selecionadas
+      selectedPositions: [],
       // Nova estrutura de imagens adicionais
       additionalImages: {
         images: [null, null, null], // 3 slots vazios
@@ -362,7 +365,7 @@ export function CreateInspection() {
         revisionNumber: formValues.revisionNumber,
         sheetNumber: formValues.sheetNumber,
         componentId: formValues.componentId,
-        positionNumber: parseInt(formValues.selectedPosition) || 1,
+        positionNumber: formValues.positionNumber || "",
         inspectionLocation: formValues.inspectionLocation,
         mdaInformation: formValues.mdaInformation,
         isVI: formValues.isVI,
@@ -377,13 +380,13 @@ export function CreateInspection() {
         isCleaningChemistry: formValues.isCleaningChemistry,
         instruments: formValues.instruments,
         /* generalConsiderations: formValues.generalConsiderations, */
-        // Converter selectedPosition para as posições individuais
-        position1: formValues.selectedPosition === "1" ? "Posição 1 selecionada" : "",
-        position2: formValues.selectedPosition === "2" ? "Posição 2 selecionada" : "",
-        position3: formValues.selectedPosition === "3" ? "Posição 3 selecionada" : "",
-        position4: formValues.selectedPosition === "4" ? "Posição 4 selecionada" : "",
-        position5: formValues.selectedPosition === "5" ? "Posição 5 selecionada" : "",
-        position6: formValues.selectedPosition === "6" ? "Posição 6 selecionada" : "",
+        // Converter selectedPositions para as posições individuais e positionNumber
+        position1: formValues.selectedPositions?.includes(1) ? "Posição 1 selecionada" : "",
+        position2: formValues.selectedPositions?.includes(2) ? "Posição 2 selecionada" : "",
+        position3: formValues.selectedPositions?.includes(3) ? "Posição 3 selecionada" : "",
+        position4: formValues.selectedPositions?.includes(4) ? "Posição 4 selecionada" : "",
+        position5: formValues.selectedPositions?.includes(5) ? "Posição 5 selecionada" : "",
+        position6: formValues.selectedPositions?.includes(6) ? "Posição 6 selecionada" : "",
         // Campos de conclusão podem ser vazios já que foram removidos do formulário
         flankAndBottomConclusion: "",
         keywayChannelsConclusion: "",

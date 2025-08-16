@@ -23,7 +23,7 @@ export interface IInspectionRegisterForm {
   revisionNumber: string;
   sheetNumber: string;
   componentId: string;
-  positionNumber: number;
+  positionNumber: string;
   inspectionLocation: string;
   mdaInformation: string;
   isVI: boolean;
@@ -38,8 +38,8 @@ export interface IInspectionRegisterForm {
   isCleaningChemistry: boolean;
   instruments: string;
   /*   generalConsiderations: string; */
-  // Posição de inspeção selecionada
-  selectedPosition: string;
+  // Posições de inspeção selecionadas (múltiplas)
+  selectedPositions: number[];
   // Nova estrutura de imagens adicionais
   additionalImages?: IAdditionalImages;
 }
@@ -62,9 +62,8 @@ export const inspectionValidationSchema = Yup.object().shape({
   componentId: Yup.string()
     .required("O campo é obrigatório!")
     .max(100, "O campo deve conter no máximo 100 caracteres!"),
-  positionNumber: Yup.number()
-    .required("O campo é obrigatório!")
-    .min(1, "A posição deve ser maior que 0"),
+  positionNumber: Yup.string()
+    .required("O campo é obrigatório!"),
   inspectionLocation: Yup.string()
     .max(100, "O campo deve conter no máximo 100 caracteres!"),
   mdaInformation: Yup.string()
@@ -84,8 +83,11 @@ export const inspectionValidationSchema = Yup.object().shape({
     .required("O campo é obrigatório!")
     .max(500, "O campo deve conter no máximo 500 caracteres!"),
   generalConsiderations: Yup.string().max(600, "O campo deve conter no máximo 600 caracteres!"),
-  // Posição de inspeção selecionada
-  selectedPosition: Yup.string().required("Selecione uma posição de inspeção!"),
+  // Posições de inspeção selecionadas
+  selectedPositions: Yup.array()
+    .of(Yup.number().positive("Posição deve ser um número positivo"))
+    .min(1, "Selecione pelo menos uma posição de inspeção!")
+    .required("Selecione pelo menos uma posição de inspeção!"),
   // Nova estrutura de imagens adicionais
   additionalImages: Yup.object().shape({
     images: Yup.array()

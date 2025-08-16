@@ -83,7 +83,7 @@ export interface IInspectionCreateData {
   revisionNumber: string;
   sheetNumber: string;
   componentId: string;
-  positionNumber: number;
+  positionNumber: string;
   inspectionLocation: string;
   mdaInformation: string;
   isVI: boolean;
