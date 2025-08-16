@@ -48,9 +48,13 @@ export function CreateUsers() {
     if (uuid) {
       get<IUsers>(`${"/parametrizations/profile-management/users"}/${uuid}`)
         .then((data) => {
+          console.log('Dados recebidos da API:', data);
           if (data.data) {
             const response = data.data.data;
-            setUser({
+            console.log('Response data:', response);
+            console.log('Signature do backend:', response.signature);
+            
+            const userData: IUserRegisterForm = {
               id: response.id,
               name: response.name,
               socialName: response.socialName,
@@ -58,8 +62,12 @@ export function CreateUsers() {
               birthDate: response.birthDate,
               email: response.email,
               profileId: response.profileId,
-              isActive: response.isActive ? "true" : "false",
-            });
+              isActive: response.isActive ? "true" as const : "false" as const,
+              signature: response.signature || "",
+            };
+            
+            console.log('Chamando setUser com:', userData);
+            setUser(userData);
           } else {
             addToast({
               type: "helper",
@@ -88,6 +96,7 @@ export function CreateUsers() {
         email: "",
         profileId: "",
         isActive: "false",
+        signature: "",
       });
     }
   }, [setPageBreadcrumb, uuid, navigate, addToast]);

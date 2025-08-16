@@ -89,12 +89,12 @@ export function useInspections() {
       setResult(null);
 
       const queryParams = removeEmptyEntries({
-        searchingBy: params?.searchIn,
-        search: params?.value,
+        searchingBy: params?.searchingBy,
+        search: params?.search,
         records: params?.items,
         page: params?.page,
         order: params?.order,
-        status: params?.status,
+        inspectionStatusId: params?.inspectionStatusId,
       });
 
       const { data } = await get<IInspection>("/operational/parts-inspection", queryParams);

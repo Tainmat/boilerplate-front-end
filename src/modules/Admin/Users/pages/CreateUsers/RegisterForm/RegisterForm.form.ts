@@ -10,6 +10,7 @@ export interface IUserRegisterForm {
   email: string;
   profileId: string;
   isActive: "true" | "false";
+  signature: string | File;
 }
 
 export const usersValidationSchema = Yup.object().shape({
@@ -32,4 +33,5 @@ export const usersValidationSchema = Yup.object().shape({
     .max(100, "O campo deve conter no máximo 100 caracteres!")
     .required("O campo é obrigatório"),
   isActive: Yup.string().required("O campo é obrigatório!").oneOf(["false", "true"]),
+  signature: Yup.mixed().optional(),
 });

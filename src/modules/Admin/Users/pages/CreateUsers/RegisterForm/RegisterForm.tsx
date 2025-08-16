@@ -5,6 +5,7 @@ import {
 import { Button } from "@shared/components/Core/Buttons/Button";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
 import { InputDatePicker } from "@shared/components/Core/Form/Fields/InputDatePicker";
+import { InputFile } from "@shared/components/Core/Form/Fields/InputFile";
 import { Select } from "@shared/components/Core/Form/Fields/Select";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { Skeleton } from "@shared/components/Core/Skeleton";
@@ -20,6 +21,8 @@ interface Props {
 }
 
 export function UserRegisterForm({ initialValues, onSubmit }: Props) {
+  console.log('UserRegisterForm - initialValues recebido:', initialValues);
+  
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
   const { result: profilesOptions } = useProfileNotAssociatedDropdown();
@@ -56,7 +59,10 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
       validationSchema={usersValidationSchema}
       onSubmit={onSubmit}
     >
-      {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched }) => (
+      {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => {
+        console.log('RegisterForm - signature value:', values.signature);
+        console.log('RegisterForm - initialValues:', initialValues);
+        return (
         <Form>
           <Row className="mb-4">
             <Col xl={5}>
@@ -164,6 +170,37 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                 helperText={touched.password && !!errors.password ? errors.password : ""}
               />
             </Col>
+
+            <Col xl={7}>
+              <Field
+                as={InputFile}
+                label="Assinatura"
+                name="signature"
+                placeholder="Clique para selecionar ou arraste a assinatura do usuário"
+                type="file"
+                accept="image/*"
+                value={values.signature || ""}
+                error={touched.signature && !!errors.signature}
+                helperText={touched.signature && !!errors.signature ? errors.signature : ""}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      const base64 = event.target?.result as string;
+                      setFieldValue("signature", base64);
+                    };
+                    reader.readAsDataURL(file);
+                  } else {
+                    setFieldValue("signature", "");
+                  }
+                }}
+                onRemove={() => {
+                  setFieldValue("signature", "");
+                  setFieldTouched("signature", true);
+                }}
+              />
+            </Col>
           </Row>
 
           <Row className="justify-content-end">
@@ -194,7 +231,8 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
             </Col>
           </Row>
         </Form>
-      )}
+        );
+      }}
     </Formik>
   );
 }

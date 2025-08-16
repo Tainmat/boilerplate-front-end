@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { v4 } from "uuid";
 import { Container, DropZone, ImagePreview } from "@shared/components/Core/Form/Fields/InputFile/InputFile.styles";
 import { HelperText } from "@shared/components/Core/Form/HelperText";
@@ -21,7 +21,9 @@ interface Props {
   multiple?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onRemove?: () => void;
   placeholder?: string;
+  value?: string;
 }
 
 export function InputFile({
@@ -39,13 +41,55 @@ export function InputFile({
   multiple = false,
   onChange,
   onBlur,
+  onRemove,
   placeholder = "Clique para selecionar ou arraste uma imagem",
+  value,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [fileCount, setFileCount] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
+
+  const buildImageUrl = (imagePath: string): string => {
+    console.log('BuildImageUrl - input:', imagePath);
+    
+    // Se já é uma URL completa ou base64, usar diretamente
+    if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
+      return imagePath;
+    }
+    
+    // Se contém o caminho completo do servidor, extrair apenas a parte relevante
+    if (imagePath.includes('/assets/public/')) {
+      const assetPath = imagePath.split('/assets/public/')[1];
+      const url = `https://qas-usincheck.jometto.com.br/assets/public/${assetPath}`;
+      console.log('URL construída:', url);
+      return url;
+    }
+    
+    // Fallback para outros casos
+    const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    const url = `https://qas-usincheck.jometto.com.br${cleanPath}`;
+    console.log('URL fallback:', url);
+    return url;
+  };
+
+  useEffect(() => {
+    console.log(`InputFile [${name}] - value recebido:`, value);
+    
+    if (value && value.trim() !== "") {
+      const imageUrl = buildImageUrl(value);
+      setImagePreview(imageUrl);
+      setFileName("Imagem carregada");
+      setFileCount(1);
+    } else {
+      console.log(`InputFile [${name}] - value vazio, limpando preview`);
+      setImagePreview(null);
+      setFileName("");
+      setFileCount(0);
+    }
+  }, [value, name]);
+
 
   const handleFileSelect = useCallback((files: FileList | File) => {
     if (multiple && files instanceof FileList) {
@@ -154,6 +198,7 @@ export function InputFile({
       const event = new Event('change', { bubbles: true });
       inputRef.current.dispatchEvent(event);
     }
+    onRemove?.();
   };
 
   return (
@@ -198,7 +243,13 @@ export function InputFile({
 
         {imagePreview ? (
           <ImagePreview>
-            <img src={imagePreview} alt="Preview" />
+            <img 
+              src={imagePreview} 
+              alt="Preview" 
+              onLoad={() => {
+                console.log(`InputFile [${name}] - Imagem carregada com sucesso:`, imagePreview);
+              }}
+            />
             <div className="overlay">
               <div className="file-info">
                 <Icon icon="image" size="sm" />

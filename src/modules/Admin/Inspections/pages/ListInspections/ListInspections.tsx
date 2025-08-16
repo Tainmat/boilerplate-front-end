@@ -9,15 +9,13 @@ import { ItemsPerPage } from "@shared/components/Core/Table/ItemsPerPage";
 import { LoadingLines } from "@shared/components/Core/Table/LoadingLines";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
-import { SearchForm } from "@shared/components/Rules/SearchForm";
-import {
-  initialValuesSchema,
-  IParamsSearchForm,
-} from "@shared/components/Rules/SearchForm/SearchForm.form";
+import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
+import { IInspectionSearchForm, initialInspectionSearchValues } from "./components/InspectionSearchForm/InspectionSearchForm.form";
 import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
 import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
+import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useToastContext } from "@shared/contexts/Toast";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { getAuthorizationToken } from "@shared/services/api/token";
@@ -43,6 +41,7 @@ export function ListInspections() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { result, params, setParams } = useInspections();
+  const { result: inspectionStatusOptions, loading: loadingStatuses } = usePartInspectionStatusDropdown();
 
   const [loaded, setLoaded] = useState(false);
 
@@ -52,18 +51,21 @@ export function ListInspections() {
       label: "Número do Relatório",
     },
     {
-      value: "customer",
-      label: "Cliente",
+      value: "componentId",
+      label: "Código do Equipamento",
     },
     {
-      value: "partType",
-      label: "Tipo de Peça",
-    },
-    {
-      value: "inspectorUser",
-      label: "Inspetor",
+      value: "corporateName",
+      label: "Nome do Cliente",
     },
   ];
+
+  // Preparar opções de status com "Todos" como primeira opção
+  const statusOptionsWithAll = [
+    { value: "", label: "Todos" },
+    ...inspectionStatusOptions
+  ];
+
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -97,7 +99,7 @@ export function ListInspections() {
         params = JSON.parse(window.atob(String(searchParams.get("q"))));
       } else {
         params = {
-          ...initialValuesSchema,
+          ...initialInspectionSearchValues,
           items: DEFAULT_ITEMS_PER_PAGE,
           page: 1,
           order: "reportNumber",
@@ -108,16 +110,20 @@ export function ListInspections() {
     }
   }, [params, loaded, searchParams, handleSearchParams]);
 
-  function handleOnSearch(data: IParamsSearchForm) {
+  function handleOnSearch(data: IInspectionSearchForm) {
     if (params) {
-      const { search, searchingBy, status } = data;
+      const { 
+        search, 
+        searchingBy, 
+        inspectionStatusId
+      } = data;
 
       const newParams = {
         ...params,
         page: 1,
         searchingBy,
         search,
-        status,
+        inspectionStatusId,
       };
 
       handleSearchParams(newParams);
@@ -197,14 +203,15 @@ export function ListInspections() {
         <Container fluid>
           <Row className="mb-4">
             <Col>
-              <SearchForm
-                options={SEARCH_OPTIONS}
+              <InspectionSearchForm
+                searchOptions={SEARCH_OPTIONS}
+                statusOptions={statusOptionsWithAll}
                 defaultValues={
                   params
                     ? {
-                        status: params.status,
-                        searchingBy: params.searchIn,
-                        search: params.value,
+                        searchingBy: params.searchingBy,
+                        search: params.search,
+                        inspectionStatusId: params.inspectionStatusId,
                       }
                     : null
                 }

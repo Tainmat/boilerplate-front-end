@@ -1,0 +1,154 @@
+import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
+import { InputSearch } from "@shared/components/Core/Form/Fields/Search/Input";
+import { SelectSearch } from "@shared/components/Core/Form/Fields/Search/Select";
+import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
+import { Skeleton } from "@shared/components/Core/Skeleton";
+import { Tooltip } from "@shared/components/Core/Tooltip";
+import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
+import { Field, Form, Formik } from "formik";
+import { useEffect, useState } from "react";
+import { Col, Row } from "react-bootstrap";
+import { 
+  initialInspectionSearchValues, 
+  IInspectionSearchForm 
+} from "./InspectionSearchForm.form";
+
+interface Props {
+  searchOptions: IOption[];
+  statusOptions?: IOption[];
+  defaultValues?: IInspectionSearchForm | null;
+  onSubmit?: (data: IInspectionSearchForm) => void;
+  onAdd?: () => void;
+}
+
+export function InspectionSearchForm({ 
+  searchOptions, 
+  statusOptions = [],
+  defaultValues, 
+  onSubmit, 
+  onAdd 
+}: Props) {
+  const { isDesktop, isSmartphone, isTablet, isNotebook } = useDeviceDetection();
+  const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
+
+  useEffect(() => {
+    if (initialValues === null) {
+      if (defaultValues) {
+        setInitialValues(defaultValues);
+      } else if (searchOptions.length === 1) {
+        setInitialValues({ 
+          ...initialInspectionSearchValues, 
+          searchingBy: searchOptions[0].value 
+        });
+      } else {
+        setInitialValues(initialInspectionSearchValues);
+      }
+    }
+  }, [defaultValues, searchOptions, initialValues]);
+
+  return (
+    <Row>
+      <Col>
+        {initialValues ? (
+          <Formik 
+            initialValues={initialValues} 
+            onSubmit={(values) => onSubmit && onSubmit(values)}
+          >
+            {({ values, setFieldValue, submitForm }) => (
+              <Form>
+                <Row className="align-items-end">
+                  <Col xs={12} md={3}>
+                    <Field
+                      as={SelectSearch}
+                      placeholder="Pesquisar por"
+                      name="searchingBy"
+                      value={values.searchingBy}
+                      options={searchOptions}
+                      readOnly={searchOptions.length === 1}
+                      onChange={(option: IOption) => {
+                        setFieldValue("searchingBy", option.value);
+                        setFieldValue("search", "");
+                      }}
+                      onReset={() => {
+                        setFieldValue("searchingBy", "");
+                        setFieldValue("search", "");
+                      }}
+                    />
+                  </Col>
+
+                  <Col xs={12} md={4}>
+                    <Field
+                      as={InputSearch}
+                      placeholder="Pesquisar"
+                      name="search"
+                      type="text"
+                      submitForm
+                      disabled={!values.searchingBy}
+                      onReset={() => {
+                        setFieldValue("search", "");
+                        submitForm();
+                      }}
+                    />
+                  </Col>
+
+                  {statusOptions.length > 0 && (
+                    <Col xs={12} md={3}>
+                      <Field
+                        as={SelectSearch}
+                        name="inspectionStatusId"
+                        placeholder="Status da Inspeção"
+                        value={values.inspectionStatusId}
+                        options={statusOptions}
+                        onChange={({ value }: IOption) => {
+                          setFieldValue("inspectionStatusId", value);
+                          submitForm();
+                        }}
+                        onReset={() => {
+                          setFieldValue("inspectionStatusId", "");
+                        }}
+                      />
+                    </Col>
+                  )}
+
+                  <Col xs={12} md={2} className="d-flex justify-content-end">
+                    <div className="d-flex gap-2">
+                      <Tooltip title="Buscar" place="top-start">
+                        <ButtonIcon type="submit" size="lg" icon="search" mode="helper" />
+                      </Tooltip>
+                      {onAdd && (
+                        <Tooltip title="Adicionar" place="top-start">
+                          <ButtonIcon
+                            type="button"
+                            size="lg"
+                            mode="success"
+                            icon="add"
+                            onClick={() => onAdd()}
+                          />
+                        </Tooltip>
+                      )}
+                    </div>
+                  </Col>
+                </Row>
+              </Form>
+            )}
+          </Formik>
+        ) : (
+          <Row className="mb-2">
+            <Col xs={12} md={3} className="mb-3">
+              <Skeleton size="lg" />
+            </Col>
+            <Col xs={12} md={4} className="mb-3">
+              <Skeleton size="lg" />
+            </Col>
+            <Col xs={12} md={2} className="mb-3">
+              <Skeleton size="lg" />
+            </Col>
+            <Col xs={12} md={3} className="mb-3">
+              <Skeleton size="lg" />
+            </Col>
+          </Row>
+        )}
+      </Col>
+    </Row>
+  );
+}

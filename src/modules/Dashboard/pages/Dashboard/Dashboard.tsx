@@ -119,115 +119,120 @@ export function Dashboard() {
 
   // Configurar breadcrumb
   useEffect(() => {
-    setPageBreadcrumb([{ text: "Dashboard" }]);
+    setPageBreadcrumb([{ text: "Página Inicial" }]);
   }, [setPageBreadcrumb]);
 
-
   // Função para processar os dados das inspeções
-  const processInspectionData = useCallback(
-    (): DashboardData => {
-      if (!dashboardApiData) {
-        return {
-          totalInspecoes: 0,
-          inspecoesAprovadas: 0,
-          inspecoesReprovadas: 0,
-          taxaAprovacao: 0,
-          porStatus: {
-            labels: ["Aprovadas", "Reprovadas", "Em Análise", "Pendentes"],
-            data: [0, 0, 0, 0],
-          },
-          evolucaoTemporal: {
-            labels: Array.from({ length: 12 }, (_, i) => {
-              const date = new Date();
-              date.setMonth(date.getMonth() - i);
-              return format(date, "MMM/yy", { locale: ptBR });
-            }).reverse(),
-            aprovadas: Array(12).fill(0),
-            reprovadas: Array(12).fill(0),
-            emAnalise: Array(12).fill(0),
-            pendentes: Array(12).fill(0),
-          },
-          porTipo: {
-            labels: [],
-            data: [],
-          },
-          comparativoAprovacoes: {
-            labels: Array.from({ length: 12 }, (_, i) => {
-              const date = new Date();
-              date.setMonth(date.getMonth() - i);
-              return format(date, "MMM/yy", { locale: ptBR });
-            }).reverse(),
-            aprovadas: Array(12).fill(0),
-            reprovadas: Array(12).fill(0),
-          },
-          ultimasInspecoes: [],
-        };
-      }
-
-      // Extrair dados dos cards totalizadores
-      const totalCard = dashboardApiData.totalizingCards.find(card => card.title.includes("Total"));
-      const approvedCard = dashboardApiData.totalizingCards.find(card => card.title === "Inspeções Aprovadas");
-      const approvedWithRestrictionCard = dashboardApiData.totalizingCards.find(card => card.title === "Com Restrições");
-      const inAnalysisCard = dashboardApiData.totalizingCards.find(card => card.title === "Em Análise");
-      const nonConformingCard = dashboardApiData.totalizingCards.find(card => card.title === "Não Conforme");
-
-      const totalInspecoes = totalCard?.value || 0;
-      const aprovadas = approvedCard?.value || 0;
-      const aprovadasComRestricao = approvedWithRestrictionCard?.value || 0;
-      const emAnalise = inAnalysisCard?.value || 0;
-      const naoConforme = nonConformingCard?.value || 0;
-      
-      // Para compatibilidade com os gráficos existentes
-      const reprovadas = naoConforme;
-
-      // Dados por status para gráfico de pizza usando os status da API
-      const statusLabels = ["Aprovadas", "Aprovadas c/ Restrição", "Em Análise", "Não Conforme"];
-      const statusData = [aprovadas, aprovadasComRestricao, emAnalise, naoConforme];
-
-      // Dados por tipo de inspeção (usando dados de partTypes)
-      const tiposInspecao = dashboardApiData.partTypes?.map(pt => pt.partTypeName) || [];
-      const dadosPorTipo = dashboardApiData.partTypes?.map(pt => pt.amount) || [];
-
-      // Dados da evolução temporal
-      const evolutionLabels = dashboardApiData.temporalEvolution.map(te => 
-        format(new Date(te.year, te.month - 1), "MMM/yy", { locale: ptBR })
-      );
-      const approvedByMonth = dashboardApiData.temporalEvolution.map(te => te.total_aprovado);
-      const rejectedByMonth = dashboardApiData.temporalEvolution.map(te => te.nao_conforme);
-      const inAnalysisByMonth = dashboardApiData.temporalEvolution.map(te => te.em_analise);
-      const pendingByMonth = dashboardApiData.temporalEvolution.map(te => te.aprovado_com_restricao);
-
+  const processInspectionData = useCallback((): DashboardData => {
+    if (!dashboardApiData) {
       return {
-        totalInspecoes,
-        inspecoesAprovadas: aprovadas,
-        inspecoesReprovadas: reprovadas,
-        taxaAprovacao: approvedCard?.percentage || 0,
+        totalInspecoes: 0,
+        inspecoesAprovadas: 0,
+        inspecoesReprovadas: 0,
+        taxaAprovacao: 0,
         porStatus: {
-          labels: statusLabels,
-          data: statusData,
+          labels: ["Aprovadas", "Reprovadas", "Em Análise", "Pendentes"],
+          data: [0, 0, 0, 0],
         },
         evolucaoTemporal: {
-          labels: evolutionLabels,
-          aprovadas: approvedByMonth,
-          reprovadas: rejectedByMonth,
-          emAnalise: inAnalysisByMonth,
-          pendentes: pendingByMonth,
+          labels: Array.from({ length: 12 }, (_, i) => {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            return format(date, "MMM/yy", { locale: ptBR });
+          }).reverse(),
+          aprovadas: Array(12).fill(0),
+          reprovadas: Array(12).fill(0),
+          emAnalise: Array(12).fill(0),
+          pendentes: Array(12).fill(0),
         },
         porTipo: {
-          labels: tiposInspecao,
-          data: dadosPorTipo,
+          labels: [],
+          data: [],
         },
         comparativoAprovacoes: {
-          labels: evolutionLabels,
-          aprovadas: approvedByMonth,
-          reprovadas: rejectedByMonth,
+          labels: Array.from({ length: 12 }, (_, i) => {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            return format(date, "MMM/yy", { locale: ptBR });
+          }).reverse(),
+          aprovadas: Array(12).fill(0),
+          reprovadas: Array(12).fill(0),
         },
-        ultimasInspecoes: dashboardApiData.latestInspections || [],
+        ultimasInspecoes: [],
       };
-    },
-    [dashboardApiData, statusOptions],
-  );
+    }
 
+    // Extrair dados dos cards totalizadores
+    const totalCard = dashboardApiData.totalizingCards.find((card) => card.title.includes("Total"));
+    const approvedCard = dashboardApiData.totalizingCards.find(
+      (card) => card.title === "Inspeções Aprovadas",
+    );
+    const approvedWithRestrictionCard = dashboardApiData.totalizingCards.find(
+      (card) => card.title === "Com Restrições",
+    );
+    const inAnalysisCard = dashboardApiData.totalizingCards.find(
+      (card) => card.title === "Em Análise",
+    );
+    const nonConformingCard = dashboardApiData.totalizingCards.find(
+      (card) => card.title === "Não Conforme",
+    );
+
+    const totalInspecoes = totalCard?.value || 0;
+    const aprovadas = approvedCard?.value || 0;
+    const aprovadasComRestricao = approvedWithRestrictionCard?.value || 0;
+    const emAnalise = inAnalysisCard?.value || 0;
+    const naoConforme = nonConformingCard?.value || 0;
+
+    // Para compatibilidade com os gráficos existentes
+    const reprovadas = naoConforme;
+
+    // Dados por status para gráfico de pizza usando os status da API
+    const statusLabels = ["Aprovadas", "Aprovadas c/ Restrição", "Em Análise", "Não Conforme"];
+    const statusData = [aprovadas, aprovadasComRestricao, emAnalise, naoConforme];
+
+    // Dados por tipo de inspeção (usando dados de partTypes)
+    const tiposInspecao = dashboardApiData.partTypes?.map((pt) => pt.partTypeName) || [];
+    const dadosPorTipo = dashboardApiData.partTypes?.map((pt) => pt.amount) || [];
+
+    // Dados da evolução temporal
+    const evolutionLabels = dashboardApiData.temporalEvolution.map((te) =>
+      format(new Date(te.year, te.month - 1), "MMM/yy", { locale: ptBR }),
+    );
+    const approvedByMonth = dashboardApiData.temporalEvolution.map((te) => te.total_aprovado);
+    const rejectedByMonth = dashboardApiData.temporalEvolution.map((te) => te.nao_conforme);
+    const inAnalysisByMonth = dashboardApiData.temporalEvolution.map((te) => te.em_analise);
+    const pendingByMonth = dashboardApiData.temporalEvolution.map(
+      (te) => te.aprovado_com_restricao,
+    );
+
+    return {
+      totalInspecoes,
+      inspecoesAprovadas: aprovadas,
+      inspecoesReprovadas: reprovadas,
+      taxaAprovacao: approvedCard?.percentage || 0,
+      porStatus: {
+        labels: statusLabels,
+        data: statusData,
+      },
+      evolucaoTemporal: {
+        labels: evolutionLabels,
+        aprovadas: approvedByMonth,
+        reprovadas: rejectedByMonth,
+        emAnalise: inAnalysisByMonth,
+        pendentes: pendingByMonth,
+      },
+      porTipo: {
+        labels: tiposInspecao,
+        data: dadosPorTipo,
+      },
+      comparativoAprovacoes: {
+        labels: evolutionLabels,
+        aprovadas: approvedByMonth,
+        reprovadas: rejectedByMonth,
+      },
+      ultimasInspecoes: dashboardApiData.latestInspections || [],
+    };
+  }, [dashboardApiData, statusOptions]);
 
   // Atualizar dados processados quando API data mudar
   useEffect(() => {
@@ -272,7 +277,6 @@ export function Dashboard() {
       },
     },
   };
-
 
   const barChartOptions = {
     responsive: true,
@@ -357,20 +361,20 @@ export function Dashboard() {
       }
     : null;
 
-
-  const barChartData = dashboardData && dashboardData.porTipo.labels.length > 0
-    ? {
-        labels: dashboardData.porTipo.labels,
-        datasets: [
-          {
-            label: "Quantidade",
-            data: dashboardData.porTipo.data,
-            backgroundColor: chartColors.tipos,
-            borderWidth: 1,
-          },
-        ],
-      }
-    : null;
+  const barChartData =
+    dashboardData && dashboardData.porTipo.labels.length > 0
+      ? {
+          labels: dashboardData.porTipo.labels,
+          datasets: [
+            {
+              label: "Quantidade",
+              data: dashboardData.porTipo.data,
+              backgroundColor: chartColors.tipos,
+              borderWidth: 1,
+            },
+          ],
+        }
+      : null;
 
   const areaChartData = dashboardData
     ? {
@@ -415,7 +419,6 @@ export function Dashboard() {
         return "default"; // Cinza para outros casos
     }
   };
-
 
   return (
     <AnimatedPage>
@@ -483,16 +486,16 @@ export function Dashboard() {
           {/* Cards de Métricas */}
           <Row className="mb-4 g-3 d-flex justify-content-center">
             {dashboardApiData?.totalizingCards.map((card, index) => (
-              <Col 
-                key={index} 
+              <Col
+                key={index}
                 className="d-flex justify-content-center"
-                style={{ 
-                  flex: '1 1 0',
-                  minWidth: isSmartphone ? '100%' : '200px',
-                  maxWidth: isSmartphone ? '100%' : '240px'
+                style={{
+                  flex: "1 1 0",
+                  minWidth: isSmartphone ? "100%" : "200px",
+                  maxWidth: isSmartphone ? "100%" : "240px",
                 }}
               >
-                <Card className="w-100 shadow-sm" style={{ minHeight: '140px' }}>
+                <Card className="w-100 shadow-sm" style={{ minHeight: "140px" }}>
                   <Card.Body className="d-flex flex-column justify-content-between text-center">
                     {loading ? (
                       <Skeleton />
@@ -649,7 +652,7 @@ export function Dashboard() {
                               </Td>
                               <Td hideOnMobile={isSmartphone}>
                                 <Paragraph size="sm">
-                                  {new Date(inspecao.reportStartDate).toLocaleDateString('pt-BR')}
+                                  {new Date(inspecao.reportStartDate).toLocaleDateString("pt-BR")}
                                 </Paragraph>
                               </Td>
                               <Td hideOnMobile={isSmartphone}>
@@ -660,7 +663,10 @@ export function Dashboard() {
                               </Td>
                               <Td>
                                 <div className="d-flex justify-content-center">
-                                  <Tag size="lg" status={getStatusColor(inspecao.inspectionStatus.description)}>
+                                  <Tag
+                                    size="lg"
+                                    status={getStatusColor(inspecao.inspectionStatus.description)}
+                                  >
                                     {inspecao.inspectionStatus.description}
                                   </Tag>
                                 </div>

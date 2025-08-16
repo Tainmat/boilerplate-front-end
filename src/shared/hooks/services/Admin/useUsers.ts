@@ -9,11 +9,14 @@ export interface IUsers {
   name: string;
   socialName: string;
   email: string;
-  status: string;
+  isActive: boolean;
   profileId: string;
   profileName: string;
   profileAcronym: string;
   photoUrl: string;
+  signature?: string;
+  password?: string;
+  birthDate?: string;
   created_at: string;
   updated_at: string;
 }
