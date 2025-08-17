@@ -74,6 +74,7 @@ interface DashboardData {
   comparativoAprovacoes: {
     labels: string[];
     aprovadas: number[];
+    aprovadasComRestricao: number[];
     reprovadas: number[];
   };
   ultimasInspecoes: Array<{
@@ -156,6 +157,7 @@ export function Dashboard() {
             return format(date, "MMM/yy", { locale: ptBR });
           }).reverse(),
           aprovadas: Array(12).fill(0),
+          aprovadasComRestricao: Array(12).fill(0),
           reprovadas: Array(12).fill(0),
         },
         ultimasInspecoes: [],
@@ -199,6 +201,7 @@ export function Dashboard() {
       format(new Date(te.year, te.month - 1), "MMM/yy", { locale: ptBR }),
     );
     const approvedByMonth = dashboardApiData.temporalEvolution.map((te) => te.total_aprovado);
+    const approvedWithRestrictionByMonth = dashboardApiData.temporalEvolution.map((te) => te.aprovado_com_restricao);
     const rejectedByMonth = dashboardApiData.temporalEvolution.map((te) => te.nao_conforme);
     const inAnalysisByMonth = dashboardApiData.temporalEvolution.map((te) => te.em_analise);
     const pendingByMonth = dashboardApiData.temporalEvolution.map(
@@ -228,6 +231,7 @@ export function Dashboard() {
       comparativoAprovacoes: {
         labels: evolutionLabels,
         aprovadas: approvedByMonth,
+        aprovadasComRestricao: approvedWithRestrictionByMonth,
         reprovadas: rejectedByMonth,
       },
       ultimasInspecoes: dashboardApiData.latestInspections || [],
@@ -386,6 +390,13 @@ export function Dashboard() {
             data: dashboardData.comparativoAprovacoes.aprovadas,
             borderColor: chartColors.aprovado,
             backgroundColor: "rgba(75, 192, 75, 0.2)",
+          },
+          {
+            fill: true,
+            label: "Aprovadas c/ Restrição",
+            data: dashboardData.comparativoAprovacoes.aprovadasComRestricao,
+            borderColor: chartColors.aprovadasComRestricao,
+            backgroundColor: "rgba(255, 193, 7, 0.2)",
           },
           {
             fill: true,
@@ -578,7 +589,7 @@ export function Dashboard() {
               <Card className="h-100 shadow-sm">
                 <Card.Body>
                   <Subtitle size="xs" className="mb-3">
-                    Comparativo: Aprovadas vs. Não Conforme
+                    Comparativo: Aprovadas vs. Aprovadas c/ Restrição vs. Não Conforme
                   </Subtitle>
                   {loading ? (
                     <div style={{ height: "300px" }}>

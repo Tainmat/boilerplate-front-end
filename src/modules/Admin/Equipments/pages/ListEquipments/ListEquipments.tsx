@@ -183,7 +183,7 @@ export function ListEquipments() {
                     <Heading size="xs">Tipo de Peça</Heading>
                   </Th> */}
 
-                  <Th>
+                  <Th hideOnMobile={isSmartphone}>
                     <Heading size="xs">Pontos de Inspeção</Heading>
                   </Th>
 

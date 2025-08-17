@@ -10,7 +10,10 @@ import { LoadingLines } from "@shared/components/Core/Table/LoadingLines";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
 import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
-import { IInspectionSearchForm, initialInspectionSearchValues } from "./components/InspectionSearchForm/InspectionSearchForm.form";
+import {
+  IInspectionSearchForm,
+  initialInspectionSearchValues,
+} from "./components/InspectionSearchForm/InspectionSearchForm.form";
 import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
 import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
@@ -41,7 +44,8 @@ export function ListInspections() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { result, params, setParams } = useInspections();
-  const { result: inspectionStatusOptions, loading: loadingStatuses } = usePartInspectionStatusDropdown();
+  const { result: inspectionStatusOptions, loading: loadingStatuses } =
+    usePartInspectionStatusDropdown();
 
   const [loaded, setLoaded] = useState(false);
 
@@ -61,11 +65,7 @@ export function ListInspections() {
   ];
 
   // Preparar opções de status com "Todos" como primeira opção
-  const statusOptionsWithAll = [
-    { value: "", label: "Todos" },
-    ...inspectionStatusOptions
-  ];
-
+  const statusOptionsWithAll = [{ value: "", label: "Todos" }, ...inspectionStatusOptions];
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -112,11 +112,7 @@ export function ListInspections() {
 
   function handleOnSearch(data: IInspectionSearchForm) {
     if (params) {
-      const { 
-        search, 
-        searchingBy, 
-        inspectionStatusId
-      } = data;
+      const { search, searchingBy, inspectionStatusId } = data;
 
       const newParams = {
         ...params,
@@ -159,27 +155,27 @@ export function ListInspections() {
     navigate(!uuid ? ROUTE_SAVE_INSPECTION : `${ROUTE_UPDATE_INSPECTION}/${uuid}`);
   }
 
-  async function handleGeneratePdf(inspectionId: string) {
+  async function handleGeneratePdf(inspectionId: string, reportNumber: string) {
     try {
       showLoader();
-      
+
       const token = getAuthorizationToken();
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/operational/parts-inspection/${inspectionId}/download-pdf`,
+        `${import.meta.env.VITE_API_URL}operational/parts-inspection/${inspectionId}/download-pdf`,
         {
           headers: {
             Authorization: token,
           },
-          responseType: 'blob'
-        }
+          responseType: "blob",
+        },
       );
 
       // Criar URL do blob e fazer download
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `inspecao-${inspectionId}.pdf`;
+      link.download = `inspecao-${reportNumber}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -230,10 +226,6 @@ export function ListInspections() {
             >
               <Thead>
                 <Tr>
-                  <Th className="d-none d-lg-table-cell">
-                    <Heading size="xs">#</Heading>
-                  </Th>
-
                   <Th>
                     <Heading size="xs">Nº Relatório</Heading>
                   </Th>
@@ -272,7 +264,7 @@ export function ListInspections() {
                         key={item.id}
                         data={item}
                         onEdit={() => addNew(item.id)}
-                        onGeneratePdf={() => handleGeneratePdf(item.id)}
+                        onGeneratePdf={() => handleGeneratePdf(item.id, item.reportNumber)}
                         /* onShowLogs={() => setInspectionLogs(item.id)} */
                       />
                     ))
@@ -291,7 +283,12 @@ export function ListInspections() {
               <ItemsPerPage onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))} />
             </Col>
 
-            <Col xs={12} md={6} lg={8} className="d-flex justify-content-center justify-content-md-end">
+            <Col
+              xs={12}
+              md={6}
+              lg={8}
+              className="d-flex justify-content-center justify-content-md-end"
+            >
               {params && result ? (
                 <Pagination
                   key={params.page}

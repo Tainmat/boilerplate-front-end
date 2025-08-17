@@ -35,26 +35,25 @@ function getStatusColor(status: string): "success" | "warning" | "helper" | "def
 export function InspectionsTable({ data, onEdit, onShowLogs, onGeneratePdf }: Props) {
   return (
     <Tr>
-      <Td className="d-none d-lg-table-cell">
-        <Paragraph size="sm">{data.id.slice(-8)}</Paragraph>
-      </Td>
-
       <Td>
         <div>
-          <Paragraph size="sm" title={data.reportNumber}>{data.reportNumber}</Paragraph>
+          <Paragraph size="sm" title={data.reportNumber}>
+            {data.reportNumber}
+          </Paragraph>
           <div className="d-sm-none">
             <small className="text-muted d-block">
-              Rev: {data.revisionNumber} | {data.customer.fantasyName || data.customer.corporateName}
+              Rev: {data.revisionNumber} |{" "}
+              {data.customer.fantasyName || data.customer.corporateName}
             </small>
-            <small className="text-muted">
-              Inspetor: {data.inspectorUser.name}
-            </small>
+            <small className="text-muted">Inspetor: {data.inspectorUser.name}</small>
           </div>
         </div>
       </Td>
 
       <Td className="d-none d-md-table-cell">
-        <Paragraph size="sm" title={data.revisionNumber}>{data.revisionNumber}</Paragraph>
+        <Paragraph size="sm" title={data.revisionNumber}>
+          {data.revisionNumber}
+        </Paragraph>
       </Td>
 
       <Td className="d-none d-sm-table-cell">
@@ -72,7 +71,9 @@ export function InspectionsTable({ data, onEdit, onShowLogs, onGeneratePdf }: Pr
       </Td>
 
       <Td className="d-none d-lg-table-cell">
-        <Paragraph size="sm" title={data.inspectorUser.name}>{data.inspectorUser.name}</Paragraph>
+        <Paragraph size="sm" title={data.inspectorUser.name}>
+          {data.inspectorUser.name}
+        </Paragraph>
       </Td>
 
       <Td>

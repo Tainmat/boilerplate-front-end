@@ -17,7 +17,8 @@ import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
+import path, { resolve } from "path";
 
 // Dados fictícios para perfis
 const perfis = [
@@ -48,12 +49,9 @@ export function CreateUsers() {
     if (uuid) {
       get<IUsers>(`${"/parametrizations/profile-management/users"}/${uuid}`)
         .then((data) => {
-          console.log('Dados recebidos da API:', data);
           if (data.data) {
             const response = data.data.data;
-            console.log('Response data:', response);
-            console.log('Signature do backend:', response.signature);
-            
+
             const userData: IUserRegisterForm = {
               id: response.id,
               name: response.name,
@@ -62,11 +60,11 @@ export function CreateUsers() {
               birthDate: response.birthDate,
               email: response.email,
               profileId: response.profileId,
-              isActive: response.isActive ? "true" as const : "false" as const,
+              isActive: response.isActive ? ("true" as const) : ("false" as const),
               signature: response.signature || "",
             };
-            
-            console.log('Chamando setUser com:', userData);
+
+            console.log("Chamando setUser com:", userData);
             setUser(userData);
           } else {
             addToast({
@@ -100,6 +98,32 @@ export function CreateUsers() {
       });
     }
   }, [setPageBreadcrumb, uuid, navigate, addToast]);
+
+  /* function getImageDataUrl(imagePath: string): string {
+    try {
+      const imageBuffer = fs.readFileSync(imagePath);
+      const imageBase64 = imageBuffer.toString("base64");
+      const ext = path.extname(imagePath).toLowerCase();
+
+      const mimeType =
+        {
+          ".png": "image/png",
+          ".jpg": "image/jpeg",
+          ".jpeg": "image/jpeg",
+          ".gif": "image/gif",
+          ".webp": "image/webp",
+          ".svg": "image/svg+xml",
+          ".bmp": "image/bmp",
+        }[ext] || "image/png";
+
+      const dataUrl = `data:${mimeType};base64,${imageBase64}`;
+
+      return dataUrl;
+    } catch (error) {
+      console.error(`Erro ao ler imagem ${imagePath}:`, error);
+      return "";
+    }
+  } */
 
   async function handleOnSubmit(formValues: IUserRegisterForm) {
     const payload = {
@@ -165,6 +189,14 @@ export function CreateUsers() {
               />
             </Col>
           </Row>
+          {/* <img
+            src={
+              user?.signature && typeof user.signature === "string"
+                ? getImageDataUrl(user.signature)
+                : ""
+            }
+            alt="Description"
+          /> */}
         </Container>
       </Section>
     </AnimatedPage>
