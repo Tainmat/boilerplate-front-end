@@ -11,9 +11,11 @@ import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.inter
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { useAlertContext } from "@shared/contexts/Alert";
 import { Field, Form, Formik } from "formik";
+import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useProfileNotAssociatedDropdown } from "@/shared/hooks/services/Admin/Dropdown/useProfileNotAssociatedDropdown";
+import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 
 interface Props {
   initialValues: IUserRegisterForm | null;
@@ -26,6 +28,9 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
   const { result: profilesOptions } = useProfileNotAssociatedDropdown();
+  const [isCompressingImage, setIsCompressingImage] = useState(false);
+  const [isSignatureChanged, setIsSignatureChanged] = useState(false);
+  const [isSignatureDeleted, setIsSignatureDeleted] = useState(false);
 
   if (!initialValues) {
     return (
@@ -57,7 +62,15 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
     <Formik
       initialValues={initialValues}
       validationSchema={usersValidationSchema}
-      onSubmit={onSubmit}
+      onSubmit={(values) => {
+        // Adicionar informações sobre signature nos dados
+        const dataWithSignatureFlags = {
+          ...values,
+          __isSignatureChanged: isSignatureChanged,
+          __isSignatureDeleted: isSignatureDeleted
+        };
+        onSubmit(dataWithSignatureFlags);
+      }}
     >
       {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => {
         console.log('RegisterForm - signature value:', values.signature);
@@ -176,28 +189,56 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                 as={InputFile}
                 label="Assinatura"
                 name="signature"
-                placeholder="Clique para selecionar ou arraste a assinatura do usuário"
+                placeholder={isCompressingImage ? "Comprimindo imagem..." : "Clique para selecionar ou arraste a assinatura do usuário"}
                 type="file"
                 accept="image/*"
                 value={values.signature || ""}
+                disabled={isCompressingImage}
                 error={touched.signature && !!errors.signature}
                 helperText={touched.signature && !!errors.signature ? errors.signature : ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                      const base64 = event.target?.result as string;
-                      setFieldValue("signature", base64);
-                    };
-                    reader.readAsDataURL(file);
+                    try {
+                      setIsCompressingImage(true);
+                      setIsSignatureChanged(true); // Marcar que a assinatura foi alterada
+                      setIsSignatureDeleted(false); // Resetar flag de deletada se nova imagem foi selecionada
+                      console.log("📸 Iniciando compressão da assinatura...");
+                      
+                      // Comprimir a imagem usando a função personalizada
+                      const compressedBase64 = await comprimirImagem(file, {
+                        maxSizeMB: 0.5, // Limite de 500KB para assinaturas
+                        maxWidthOrHeight: 800, // Máximo 800px
+                        quality: 0.8,
+                        fileType: "image/jpeg"
+                      });
+                      
+                      setFieldValue("signature", compressedBase64);
+                      console.log("✅ Assinatura comprimida com sucesso!");
+                    } catch (error) {
+                      console.error("❌ Erro ao comprimir assinatura:", error);
+                      
+                      // Em caso de erro, usar o método original
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const base64 = event.target?.result as string;
+                        setFieldValue("signature", base64);
+                      };
+                      reader.readAsDataURL(file);
+                    } finally {
+                      setIsCompressingImage(false);
+                    }
                   } else {
                     setFieldValue("signature", "");
+                    setIsSignatureChanged(true); // Marcar como alterada quando removida
                   }
                 }}
                 onRemove={() => {
                   setFieldValue("signature", "");
                   setFieldTouched("signature", true);
+                  setIsSignatureChanged(true); // Marcar como alterada quando removida
+                  setIsSignatureDeleted(true); // Marcar especificamente como deletada
+                  console.log("🗑️ Assinatura marcada para deleção");
                 }}
               />
             </Col>

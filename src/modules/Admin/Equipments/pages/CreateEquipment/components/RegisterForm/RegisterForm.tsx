@@ -7,8 +7,10 @@ import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.inter
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { useAlertContext } from "@shared/contexts/Alert";
 import { Field, Form, Formik } from "formik";
+import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
 
@@ -22,6 +24,9 @@ interface Props {
 export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
+  const [isCompressingImage, setIsCompressingImage] = useState(false);
+  const [isCroquisChanged, setIsCroquisChanged] = useState(false);
+  const [isCroquisDeleted, setIsCroquisDeleted] = useState(false);
 
   if (!initialValues) {
     return (
@@ -58,7 +63,15 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
     <Formik
       initialValues={initialValues}
       validationSchema={equipmentValidationSchema}
-      onSubmit={onSubmit}
+      onSubmit={(values) => {
+        // Adicionar informações sobre croqui nos dados
+        const dataWithCroquisFlags = {
+          ...values,
+          __isCroquisChanged: isCroquisChanged,
+          __isCroquisDeleted: isCroquisDeleted,
+        };
+        onSubmit(dataWithCroquisFlags);
+      }}
     >
       {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => (
         <Form>
@@ -146,24 +159,59 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                 as={InputFile}
                 label="Croqui"
                 name="coverUrl"
-                placeholder="Clique para selecionar ou arraste o croqui do equipamento"
+                placeholder={
+                  isCompressingImage
+                    ? "Comprimindo imagem..."
+                    : "Clique para selecionar ou arraste o croqui do equipamento"
+                }
                 type="file"
                 accept="image/*"
+                disabled={isCompressingImage}
                 error={touched.coverUrl && !!errors.coverUrl}
                 helperText={touched.coverUrl && !!errors.coverUrl ? errors.coverUrl : ""}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    // Converter para base64
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                      const base64 = event.target?.result as string;
-                      setFieldValue("coverUrl", base64);
-                    };
-                    reader.readAsDataURL(file);
+                    try {
+                      setIsCompressingImage(true);
+                      setIsCroquisChanged(true); // Marcar que o croqui foi alterado
+                      setIsCroquisDeleted(false); // Resetar flag de deletado se nova imagem foi selecionada
+                      console.log("📸 Iniciando compressão do croqui...");
+
+                      // Comprimir a imagem usando a função personalizada
+                      const compressedBase64 = await comprimirImagem(file, {
+                        maxSizeMB: 2, // Limite de 2MB para croquis (podem ser mais detalhados)
+                        maxWidthOrHeight: 1920, // Máximo 1920px
+                        quality: 0.85, // 85% de qualidade para manter detalhes
+                        fileType: "image/jpeg",
+                      });
+
+                      setFieldValue("coverUrl", compressedBase64);
+                      console.log("✅ Croqui comprimido com sucesso!");
+                    } catch (error) {
+                      console.error("❌ Erro ao comprimir croqui:", error);
+
+                      // Em caso de erro, usar o método original
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const base64 = event.target?.result as string;
+                        setFieldValue("coverUrl", base64);
+                      };
+                      reader.readAsDataURL(file);
+                    } finally {
+                      setIsCompressingImage(false);
+                    }
                   } else {
                     setFieldValue("coverUrl", "");
+                    setIsCroquisChanged(true); // Marcar como alterado quando removido
                   }
+                }}
+                onRemove={() => {
+                  setFieldValue("coverUrl", "");
+                  setFieldTouched("coverUrl", true);
+                  setIsCroquisChanged(true); // Marcar como alterado quando removido
+                  setIsCroquisDeleted(true); // Marcar especificamente como deletado
+                  console.log("🗑️ Croqui marcado para deleção");
                 }}
               />
             </Col>

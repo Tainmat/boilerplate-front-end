@@ -17,6 +17,7 @@ import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
+import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 
 import { inspectionValidationSchema, IInspectionRegisterForm } from "./RegisterForm.form";
 
@@ -79,6 +80,7 @@ export function InspectionRegisterForm({
       initialValues={initialValues}
       validationSchema={inspectionValidationSchema}
       onSubmit={onSubmit}
+      enableReinitialize={true}
     >
       {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => {
         const handlePositionChange = (position: number, checked: boolean) => {
@@ -108,7 +110,7 @@ export function InspectionRegisterForm({
                   <Card.Body>
                     <div className="d-flex align-items-center gap-3">
                       <strong>Equipamento Selecionado:</strong>
-                      <span>{selectedEquipment.name}</span>
+                      <strong style={{ color: "#047a32" }}>{selectedEquipment.name}</strong>
                       {selectedEquipment.description && (
                         <>
                           <span className="text-muted">-</span>
@@ -624,6 +626,7 @@ export function InspectionRegisterForm({
                       >
                         {selectedEquipment && selectedEquipment.coverUrl ? (
                           <div>
+                            {/* coverUrl contém o croqui do endpoint operational/parts-inspection quando disponível */}
                             <img
                               src={selectedEquipment.coverUrl}
                               alt={`Croqui - ${selectedEquipment.name}`}
@@ -631,9 +634,6 @@ export function InspectionRegisterForm({
                               style={{ maxHeight: "400px", maxWidth: "100%" }}
                             />
                             <div className="mt-3">
-                              <h6 style={{ color: "#047a32", fontWeight: "600" }}>
-                                {selectedEquipment.name}
-                              </h6>
                               <small className="text-muted">
                                 {selectedEquipment.totalInspectionPoints} pontos de inspeção
                               </small>
@@ -839,41 +839,48 @@ export function InspectionRegisterForm({
                                   onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
-                                      // Validar tamanho do arquivo (2MB)
-                                      if (file.size > 2 * 1024 * 1024) {
-                                        alert('Arquivo muito grande! O tamanho máximo é 2MB.');
-                                        e.target.value = ''; // Limpa o input
-                                        return;
-                                      }
-                                      
-                                      // Validar tipo de arquivo
-                                      if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
-                                        alert('Formato não suportado! Use apenas JPG, PNG ou GIF.');
-                                        e.target.value = ''; // Limpa o input
-                                        return;
-                                      }
-                                      
-                                      // Converter para base64
-                                      const reader = new FileReader();
-                                      reader.onload = (event) => {
-                                        const base64 = event.target?.result as string;
+                                      try {
+                                        // Validar tipo de arquivo
+                                        if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+                                          alert('Formato não suportado! Use apenas JPG, PNG ou GIF.');
+                                          e.target.value = ''; // Limpa o input
+                                          return;
+                                        }
+                                        
+                                        console.log('📸 Iniciando compressão da imagem adicional...');
+                                        
+                                        // Comprimir a imagem usando a função personalizada
+                                        const compressedBase64 = await comprimirImagem(file, {
+                                          maxSizeMB: 1, // Limite de 1MB para imagens adicionais
+                                          maxWidthOrHeight: 1920, // Máximo 1920px
+                                          quality: 0.8, // 80% de qualidade
+                                          fileType: "image/jpeg",
+                                        });
+                                        
+                                        console.log('✅ Compressão concluída para imagem adicional');
                                         
                                         const currentImages = values.additionalImages || { images: [], imagesToDel: [] };
                                         const updatedImages = [...(currentImages.images || [])];
                                         
                                         updatedImages[slotIndex] = {
-                                          base64: base64,
+                                          base64: compressedBase64,
                                           name: file.name,
-                                          size: file.size,
-                                          type: file.type
+                                          size: 0, // Tamanho após compressão não é facilmente calculável
+                                          type: 'image/jpeg' // Sempre JPEG após compressão
                                         };
                                         
                                         setFieldValue('additionalImages', {
                                           images: updatedImages,
                                           imagesToDel: currentImages.imagesToDel || []
                                         });
-                                      };
-                                      reader.readAsDataURL(file);
+                                        
+                                        // Limpar o input para permitir selecionar a mesma imagem novamente
+                                        e.target.value = '';
+                                      } catch (error) {
+                                        console.error('❌ Erro na compressão da imagem:', error);
+                                        alert('Erro ao processar a imagem. Tente novamente.');
+                                        e.target.value = '';
+                                      }
                                     }
                                   }}
                                 />
@@ -896,7 +903,7 @@ export function InspectionRegisterForm({
                     <Col xs={12}>
                       <small className="text-muted">
                         <strong>Instruções:</strong> Você pode adicionar até 3 imagens complementares (opcional). 
-                        Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 2MB por imagem.
+                        Formatos aceitos: JPG, PNG, GIF. As imagens serão automaticamente comprimidas para otimizar o envio.
                       </small>
                     </Col>
                   </Row>

@@ -47,7 +47,7 @@ export interface IInspectionRegisterForm {
 export const inspectionValidationSchema = Yup.object().shape({
   customerId: Yup.string().required("O campo é obrigatório!"),
   inspectorUserId: Yup.string().required("O campo é obrigatório!"),
-  partTypeId: Yup.string().required("O campo é obrigatório!"),
+  partTypeId: Yup.string(),
   reportNumber: Yup.string()
     .required("O campo é obrigatório!")
     .max(50, "O campo deve conter no máximo 50 caracteres!"),
@@ -95,18 +95,13 @@ export const inspectionValidationSchema = Yup.object().shape({
         Yup.mixed().nullable().test("imageValidation", "Dados da imagem inválidos", (value: any) => {
           if (!value) return true; // null é válido (slot vazio)
           
-          // Verifica se é um objeto com as propriedades esperadas
-          if (typeof value !== 'object' || !value.base64 || !value.name || !value.size || !value.type) {
+          // Verifica se é um objeto com as propriedades mínimas necessárias
+          if (typeof value !== 'object' || !value.base64) {
             return false;
           }
           
-          // Valida tamanho (2MB)
-          if (value.size > 2 * 1024 * 1024) {
-            return false;
-          }
-          
-          // Valida tipo de arquivo
-          if (!["image/jpeg", "image/png", "image/gif"].includes(value.type)) {
+          // Valida se base64 é uma string válida
+          if (typeof value.base64 !== 'string' || !value.base64.startsWith('data:image/')) {
             return false;
           }
           

@@ -125,11 +125,39 @@ export function CreateUsers() {
     }
   } */
 
-  async function handleOnSubmit(formValues: IUserRegisterForm) {
-    const payload = {
-      ...formValues,
-      isActive: formValues.isActive === "true",
+  async function handleOnSubmit(formValues: IUserRegisterForm & { __isSignatureChanged?: boolean; __isSignatureDeleted?: boolean }) {
+    const { __isSignatureChanged, __isSignatureDeleted, ...cleanFormValues } = formValues;
+    
+    // Construir payload base
+    const payload: any = {
+      ...cleanFormValues,
+      isActive: cleanFormValues.isActive === "true",
     };
+
+    // Lógica para signature e deleteSignature
+    if (!uuid) {
+      // Novo usuário: incluir signature se preenchida
+      if (cleanFormValues.signature) {
+        payload.signature = cleanFormValues.signature;
+        console.log("✅ Signature incluída no payload (novo usuário)");
+      }
+    } else {
+      // Edição de usuário existente
+      if (__isSignatureDeleted) {
+        // Signature foi deletada
+        payload.deleteSignature = true;
+        delete payload.signature; // Não enviar signature quando deletada
+        console.log("🗑️ deleteSignature=true enviado (signature foi deletada)");
+      } else if (__isSignatureChanged && cleanFormValues.signature) {
+        // Signature foi alterada (nova imagem)
+        payload.signature = cleanFormValues.signature;
+        console.log("✅ Signature incluída no payload (signature foi alterada)");
+      } else {
+        // Signature não foi alterada
+        delete payload.signature;
+        console.log("⚠️ Signature removida do payload (não foi alterada em edição)");
+      }
+    }
 
     try {
       showLoader();

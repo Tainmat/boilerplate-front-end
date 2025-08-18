@@ -57,82 +57,7 @@ export function CreateInspection() {
         showLoader();
         const data = await fetchInspection(id);
 
-        // Função para converter URL em base64 usando Canvas (evita problemas de CORS)
-        const convertUrlToBase64 = async (url: string): Promise<string> => {
-          try {
-            console.log('Tentando carregar imagem de:', url);
-            
-            // Primeira tentativa: usar fetch direto
-            try {
-              const response = await fetch(url, {
-                method: 'GET',
-                mode: 'cors',
-                credentials: 'include'
-              });
-              
-              if (response.ok) {
-                const blob = await response.blob();
-                console.log('Blob recebido via fetch:', blob.type, blob.size);
-                
-                return new Promise((resolve, reject) => {
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    const result = reader.result as string;
-                    console.log('Base64 gerado via fetch:', result ? 'Sucesso' : 'Falhou');
-                    resolve(result);
-                  };
-                  reader.onerror = reject;
-                  reader.readAsDataURL(blob);
-                });
-              }
-            } catch (fetchError) {
-              console.log('Fetch falhou, tentando abordagem alternativa:', fetchError);
-            }
-            
-            // Segunda tentativa: usar HTMLImageElement + Canvas (funciona melhor com CORS)
-            return new Promise((resolve, reject) => {
-              const img = new Image();
-              img.crossOrigin = 'anonymous'; // Importante para CORS
-              
-              img.onload = () => {
-                try {
-                  const canvas = document.createElement('canvas');
-                  const ctx = canvas.getContext('2d');
-                  
-                  if (!ctx) {
-                    reject(new Error('Não foi possível obter contexto do canvas'));
-                    return;
-                  }
-                  
-                  canvas.width = img.width;
-                  canvas.height = img.height;
-                  
-                  ctx.drawImage(img, 0, 0);
-                  
-                  const base64 = canvas.toDataURL('image/png');
-                  console.log('Base64 gerado via canvas:', base64 ? 'Sucesso' : 'Falhou');
-                  resolve(base64);
-                } catch (canvasError) {
-                  console.error('Erro no canvas:', canvasError);
-                  reject(canvasError);
-                }
-              };
-              
-              img.onerror = (error) => {
-                console.error('Erro ao carregar imagem:', error);
-                reject(error);
-              };
-              
-              img.src = url;
-            });
-            
-          } catch (error) {
-            console.error('Erro ao converter URL para base64:', error);
-            return '';
-          }
-        };
-
-        // Processar imagens dos attachments existentes
+        // Processar imagens dos attachments existentes que já vêm em base64 do backend
         const existingImages: (IImageData | null)[] = [null, null, null];
         
         console.log('Dados recebidos da API:', data);
@@ -141,59 +66,27 @@ export function CreateInspection() {
         if (data.attachments && data.attachments.length > 0) {
           console.log(`Processando ${data.attachments.length} attachments...`);
           
-          // Converter URLs para base64 de forma assíncrona
-          const imagePromises = data.attachments.slice(0, 3).map(async (attachment: any, index: number) => {
+          // Processar imagens que já vêm em base64 do backend
+          data.attachments.slice(0, 3).forEach((attachment: any, index: number) => {
             console.log(`Processando attachment ${index}:`, attachment);
             
-            if (attachment.inspectionAttachmentUrl) {
-              try {
-                // O inspectionAttachmentUrl retorna um path do servidor como:
-                // "/var/www/jometto.com.br/qas-usincheck/assets/public/inspections/..."
-                // Precisamos extrair apenas a parte relevante e construir a URL correta
-                
-                let imageUrl: string;
-                
-                if (attachment.inspectionAttachmentUrl.startsWith('http')) {
-                  // Se já é uma URL completa, usar diretamente
-                  imageUrl = attachment.inspectionAttachmentUrl;
-                } else if (attachment.inspectionAttachmentUrl.includes('/assets/public/')) {
-                  // Extrair apenas a parte após /assets/public/
-                  const assetPath = attachment.inspectionAttachmentUrl.split('/assets/public/')[1];
-                  imageUrl = `https://qas-usincheck.jometto.com.br/assets/public/${assetPath}`;
-                } else {
-                  // Fallback: usar o VITE_API_URL
-                  imageUrl = `${import.meta.env.VITE_API_URL}${attachment.inspectionAttachmentUrl}`;
-                }
-                
-                console.log(`URL original: ${attachment.inspectionAttachmentUrl}`);
-                console.log(`URL construída para attachment ${index}:`, imageUrl);
-                
-                const base64 = await convertUrlToBase64(imageUrl);
-                
-                if (base64) {
-                  const imageData = {
-                    id: attachment.id,
-                    base64: base64,
-                    name: `attachment-${attachment.id}.png`,
-                    size: 0, // Tamanho não disponível do servidor
-                    type: base64.includes('data:image/') ? base64.split(';')[0].split(':')[1] : 'image/png'
-                  };
-                  
-                  console.log(`Imagem ${index} processada com sucesso:`, imageData);
-                  existingImages[index] = imageData;
-                } else {
-                  console.warn(`Base64 vazio para attachment ${index}`);
-                }
-              } catch (error) {
-                console.error(`Erro ao carregar imagem ${attachment.id}:`, error);
-              }
+            if (attachment.url && attachment.url.startsWith('data:image/')) {
+              // attachment.url já é base64
+              const imageData = {
+                id: attachment.id,
+                base64: attachment.url,
+                name: `attachment-${attachment.id}.jpg`,
+                size: 0, // Tamanho não disponível do servidor
+                type: attachment.url.includes('data:image/') ? attachment.url.split(';')[0].split(':')[1] : 'image/jpeg'
+              };
+              
+              console.log(`Imagem ${index} processada com sucesso:`, imageData);
+              existingImages[index] = imageData;
             } else {
-              console.warn(`URL de attachment ${index} não encontrada:`, attachment);
+              console.warn(`Attachment ${index} não é base64 válido:`, attachment);
             }
           });
-
-          // Aguardar o carregamento de todas as imagens
-          await Promise.all(imagePromises);
+          
           console.log('Imagens processadas:', existingImages);
         } else {
           console.log('Nenhum attachment encontrado');
@@ -259,7 +152,7 @@ export function CreateInspection() {
             id: data.partType.id,
             name: data.partType.name,
             description: data.partType.description || "",
-            coverUrl: data.partType.coverUrl || "",
+            coverUrl: data.partType.croqui || data.partType.coverUrl || "", // Prioriza croqui do endpoint operational/parts-inspection
             totalInspectionPoints: data.partType.totalInspectionPoints || 0,
             isActive: true,
             created_at: new Date().toISOString(),
@@ -289,7 +182,7 @@ export function CreateInspection() {
     setInspection({
       customerId: "",
       inspectorUserId: "",
-      partTypeId: equipment.id,
+      partTypeId: equipment.id || "",
       reportNumber: "",
       reportStartDate: "",
       reportEndDate: "",
@@ -312,7 +205,7 @@ export function CreateInspection() {
       instruments: "",
       /* generalConsiderations: "", */
       // Posições de inspeção selecionadas
-      selectedPositions: [],
+      selectedPositions: [1], // Iniciar com posição 1 selecionada por padrão
       // Nova estrutura de imagens adicionais
       additionalImages: {
         images: [null, null, null], // 3 slots vazios
@@ -448,14 +341,6 @@ export function CreateInspection() {
                     {currentStep === "equipment" ? "Selecionar Equipamento" : "Cadastrar Inspeção"}
                   </Subtitle>
                 </div>
-                {currentStep === "form" && selectedEquipment && (
-                  <div className="ms-auto d-flex align-items-center gap-2 mt-2 mt-md-0">
-                    <span className="text-muted d-none d-sm-inline">Equipamento:</span>
-                    <strong className="text-truncate" style={{ maxWidth: "200px" }}>
-                      {selectedEquipment.name}
-                    </strong>
-                  </div>
-                )}
               </div>
             </Col>
           </Row>

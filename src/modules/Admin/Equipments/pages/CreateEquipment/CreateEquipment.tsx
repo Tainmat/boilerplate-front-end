@@ -133,7 +133,7 @@ export function CreateEquipment() {
               description: response.description,
               totalInspectionPoints: response.totalInspectionPoints,
               isActive: response.isActive ? "true" : "false",
-              coverUrl: response.coverUrl || "",
+              coverUrl: response.croqui || "",
             });
           } else {
             addToast({
@@ -165,17 +165,47 @@ export function CreateEquipment() {
     }
   }, [setPageBreadcrumb, uuid, navigate, addToast]);
 
-  async function handleOnSubmit(formValues: IEquipmentRegisterForm) {
+  async function handleOnSubmit(
+    formValues: IEquipmentRegisterForm & {
+      __isCroquisChanged?: boolean;
+      __isCroquisDeleted?: boolean;
+    },
+  ) {
+    const { __isCroquisChanged, __isCroquisDeleted, ...cleanFormValues } = formValues;
+
     try {
       showLoader();
 
-      const payload = {
-        name: formValues.name,
-        description: formValues.description,
-        totalInspectionPoints: Number(formValues.totalInspectionPoints),
-        isActive: formValues.isActive === "true",
-        croqui: formValues.coverUrl || "", // Já vem como base64 do formulário
+      // Construir payload base
+      const payload: any = {
+        name: cleanFormValues.name,
+        description: cleanFormValues.description,
+        totalInspectionPoints: Number(cleanFormValues.totalInspectionPoints),
+        isActive: cleanFormValues.isActive === "true",
       };
+
+      // Lógica para croqui e deleteCroqui
+      if (!uuid) {
+        // Novo equipamento: incluir croqui se preenchido
+        if (cleanFormValues.coverUrl) {
+          payload.croqui = cleanFormValues.coverUrl;
+          console.log("✅ Croqui incluído no payload (novo equipamento)");
+        }
+      } else {
+        // Edição de equipamento existente
+        if (__isCroquisDeleted) {
+          // Croqui foi deletado
+          payload.deleteCroqui = true;
+          console.log("🗑️ deleteCroqui=true enviado (croqui foi deletado)");
+        } else if (__isCroquisChanged && cleanFormValues.coverUrl) {
+          // Croqui foi alterado (nova imagem)
+          payload.croqui = cleanFormValues.coverUrl;
+          console.log("✅ Croqui incluído no payload (croqui foi alterado)");
+        } else {
+          // Croqui não foi alterado
+          console.log("⚠️ Croqui removido do payload (não foi alterado em edição)");
+        }
+      }
 
       if (uuid) {
         const { data, message } = await put<IEquipment>(
