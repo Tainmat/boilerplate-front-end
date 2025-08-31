@@ -116,12 +116,10 @@ export function useDashboard(period?: string) {
     async (periodParam?: string): Promise<IDashboardPartType[]> => {
       try {
         const params = getPeriodDates(periodParam || "last12months");
-        console.log("Fetching part types with params:", params);
         const { data } = await get<IDashboardPartType[]>(
           "/operational/parts-inspection/dashboard/inspection-part-types",
           params,
         );
-        console.log("Part types response:", data);
         return data.data || [];
       } catch (error) {
         console.error("Error fetching part types:", error);
@@ -135,12 +133,10 @@ export function useDashboard(period?: string) {
     async (periodParam?: string): Promise<IDashboardTemporalEvolution[]> => {
       try {
         const params = getPeriodDates(periodParam || "last12months");
-        console.log("Fetching temporal evolution with params:", params);
         const { data } = await get<IDashboardTemporalEvolution[]>(
           "/operational/parts-inspection/dashboard/temporal-evolution",
           params,
         );
-        console.log("Temporal evolution response:", data);
         return data.data || [];
       } catch (error) {
         console.error("Error fetching temporal evolution:", error);
@@ -154,12 +150,10 @@ export function useDashboard(period?: string) {
     async (periodParam?: string): Promise<IDashboardTotalizingCard[]> => {
       try {
         const params = getPeriodDates(periodParam || "last12months");
-        console.log("Fetching totalizing cards with params:", params);
         const { data } = await get<IApiTotalizingCardsResponse>(
           "/operational/parts-inspection/dashboard/totalizing-cards",
           params,
         );
-        console.log("Totalizing cards response:", data);
 
         // Mapear o retorno da API para cards amigáveis
         const apiData = data.data || data;
@@ -224,12 +218,10 @@ export function useDashboard(period?: string) {
           page: 1,
           order: "reportEndDate", // Mais recentes primeiro
         };
-        console.log("Fetching latest inspections with params:", params);
         const { data } = await get<{ data: IDashboardInspection[] }>(
           "/operational/parts-inspection",
           params,
         );
-        console.log("Latest inspections response:", data);
         return data.data || [];
       } catch (error) {
         console.error("Error fetching latest inspections:", error);
@@ -241,7 +233,6 @@ export function useDashboard(period?: string) {
 
   const loadDashboardData = useCallback(
     async (periodParam?: string) => {
-      console.log("Loading dashboard data with period:", periodParam);
       setLoading(true);
       setError(null);
 
@@ -253,13 +244,6 @@ export function useDashboard(period?: string) {
             fetchTotalizingCards(periodParam),
             fetchLatestInspections(periodParam),
           ]);
-
-        console.log("All dashboard data loaded:", {
-          partTypes,
-          temporalEvolution,
-          totalizingCards,
-          latestInspections,
-        });
 
         setData({
           partTypes,
@@ -285,7 +269,6 @@ export function useDashboard(period?: string) {
   );
 
   useEffect(() => {
-    console.log("useEffect triggered with period:", period);
     loadDashboardData(period);
   }, [loadDashboardData, period]);
 

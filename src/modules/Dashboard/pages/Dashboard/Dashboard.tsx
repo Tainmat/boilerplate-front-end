@@ -125,7 +125,7 @@ export function Dashboard() {
 
   // Função para processar os dados das inspeções
   const processInspectionData = useCallback((): DashboardData => {
-    if (!dashboardApiData) {
+    if (!dashboardApiData || !dashboardApiData.temporalEvolution || dashboardApiData.temporalEvolution.length === 0) {
       return {
         totalInspecoes: 0,
         inspecoesAprovadas: 0,
@@ -200,13 +200,54 @@ export function Dashboard() {
     const evolutionLabels = dashboardApiData.temporalEvolution.map((te) =>
       format(new Date(te.year, te.month - 1), "MMM/yy", { locale: ptBR }),
     );
-    const approvedByMonth = dashboardApiData.temporalEvolution.map((te) => te.total_aprovado);
-    const approvedWithRestrictionByMonth = dashboardApiData.temporalEvolution.map((te) => te.aprovado_com_restricao);
-    const rejectedByMonth = dashboardApiData.temporalEvolution.map((te) => te.nao_conforme);
+    // Usar os valores corretos dos totalizingCards para o gráfico comparativo
+    const approvedByMonth = dashboardApiData.temporalEvolution.map((te, index, arr) => {
+      // Se o temporal evolution tem dados válidos, use apenas o campo "aprovado" (não total_aprovado)
+      if (te.aprovado > 0) {
+        return te.aprovado;
+      }
+      // Caso contrário, coloque o valor total no mês mais recente (último item)
+      if (aprovadas > 0 && index === arr.length - 1) {
+        return aprovadas;
+      }
+      return 0;
+    });
+
+    const approvedWithRestrictionByMonth = dashboardApiData.temporalEvolution.map((te, index, arr) => {
+      // Se o temporal evolution tem dados válidos, use-os
+      if (te.aprovado_com_restricao > 0) {
+        return te.aprovado_com_restricao;
+      }
+      // Caso contrário, coloque o valor total no mês mais recente (último item)
+      if (aprovadasComRestricao > 0 && index === arr.length - 1) {
+        return aprovadasComRestricao;
+      }
+      return 0;
+    });
+
+    const rejectedByMonth = dashboardApiData.temporalEvolution.map((te, index, arr) => {
+      // Se o temporal evolution tem dados válidos, use-os
+      if (te.nao_conforme > 0) {
+        return te.nao_conforme;
+      }
+      // Caso contrário, coloque o valor total no mês mais recente (último item)
+      if (naoConforme > 0 && index === arr.length - 1) {
+        return naoConforme;
+      }
+      return 0;
+    });
     const inAnalysisByMonth = dashboardApiData.temporalEvolution.map((te) => te.em_analise);
     const pendingByMonth = dashboardApiData.temporalEvolution.map(
       (te) => te.aprovado_com_restricao,
     );
+
+    const comparativoData = {
+      labels: evolutionLabels,
+      aprovadas: approvedByMonth,
+      aprovadasComRestricao: approvedWithRestrictionByMonth,
+      reprovadas: rejectedByMonth,
+    };
+
 
     return {
       totalInspecoes,
@@ -228,13 +269,8 @@ export function Dashboard() {
         labels: tiposInspecao,
         data: dadosPorTipo,
       },
-      comparativoAprovacoes: {
-        labels: evolutionLabels,
-        aprovadas: approvedByMonth,
-        aprovadasComRestricao: approvedWithRestrictionByMonth,
-        reprovadas: rejectedByMonth,
-      },
-      ultimasInspecoes: dashboardApiData.latestInspections || [],
+      comparativoAprovacoes: comparativoData,
+      ultimasInspecoes: dashboardApiData?.latestInspections || [],
     };
   }, [dashboardApiData, statusOptions]);
 
