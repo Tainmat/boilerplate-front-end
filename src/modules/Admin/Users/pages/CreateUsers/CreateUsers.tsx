@@ -17,8 +17,6 @@ import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import fs from "fs";
-import path, { resolve } from "path";
 
 // Dados fictícios para perfis
 const perfis = [
@@ -64,7 +62,6 @@ export function CreateUsers() {
               signature: response.signature || "",
             };
 
-            console.log("Chamando setUser com:", userData);
             setUser(userData);
           } else {
             addToast({
@@ -125,37 +122,31 @@ export function CreateUsers() {
     }
   } */
 
-  async function handleOnSubmit(formValues: IUserRegisterForm & { __isSignatureChanged?: boolean; __isSignatureDeleted?: boolean }) {
+  async function handleOnSubmit(
+    formValues: IUserRegisterForm & {
+      __isSignatureChanged?: boolean;
+      __isSignatureDeleted?: boolean;
+    },
+  ) {
     const { __isSignatureChanged, __isSignatureDeleted, ...cleanFormValues } = formValues;
-    
-    // Construir payload base
+
     const payload: any = {
       ...cleanFormValues,
       isActive: cleanFormValues.isActive === "true",
     };
 
-    // Lógica para signature e deleteSignature
     if (!uuid) {
-      // Novo usuário: incluir signature se preenchida
       if (cleanFormValues.signature) {
         payload.signature = cleanFormValues.signature;
-        console.log("✅ Signature incluída no payload (novo usuário)");
       }
     } else {
-      // Edição de usuário existente
       if (__isSignatureDeleted) {
-        // Signature foi deletada
         payload.deleteSignature = true;
-        delete payload.signature; // Não enviar signature quando deletada
-        console.log("🗑️ deleteSignature=true enviado (signature foi deletada)");
-      } else if (__isSignatureChanged && cleanFormValues.signature) {
-        // Signature foi alterada (nova imagem)
-        payload.signature = cleanFormValues.signature;
-        console.log("✅ Signature incluída no payload (signature foi alterada)");
-      } else {
-        // Signature não foi alterada
         delete payload.signature;
-        console.log("⚠️ Signature removida do payload (não foi alterada em edição)");
+      } else if (__isSignatureChanged && cleanFormValues.signature) {
+        payload.signature = cleanFormValues.signature;
+      } else {
+        delete payload.signature;
       }
     }
 
