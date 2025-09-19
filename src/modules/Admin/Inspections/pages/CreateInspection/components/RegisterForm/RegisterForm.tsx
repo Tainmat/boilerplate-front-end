@@ -38,26 +38,39 @@ export function InspectionRegisterForm({
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
 
+  const colors: string[] = [
+    "#000000",
+    "#333333",
+    "#666666",
+    "#999999",
+    "#cccccc",
+    "#2c3e50",
+    "#000099",
+    "#3498db",
+    "#e74c3c",
+    "#f1c0c0",
+    "#f39c12",
+    "#fff2cc",
+    "#27ae60",
+    "#c8e6c9",
+  ];
+
   const executiveConfig = {
     toolbar: [
       // Formatação de texto
       ["bold", "italic", "underline"],
 
-      // Paleta de cores corporativas
+      // Paleta de cores corporativas (texto)
       [
         {
-          color: [
-            "#000000",
-            "#333333",
-            "#666666",
-            "#999999",
-            "#cccccc",
-            "#2c3e50",
-            "#3498db",
-            "#e74c3c",
-            "#f39c12",
-            "#27ae60",
-          ],
+          color: colors,
+        },
+      ],
+
+      // Paleta de cores de fundo
+      [
+        {
+          background: colors,
         },
       ],
 
