@@ -31,3 +31,27 @@ export const filesToBase64 = async (files: File[]): Promise<string[]> => {
   const base64Promises = files.map(file => fileToBase64(file));
   return Promise.all(base64Promises);
 };
+
+/**
+ * Formata uma string base64 para ser usada em um elemento <img>
+ * Adiciona o prefixo data:image necessário se não estiver presente
+ * @param base64String - String base64 (com ou sem prefixo)
+ * @param mimeType - Tipo MIME da imagem (padrão: image/png)
+ * @returns String formatada para uso em src de img
+ */
+export const formatBase64ForImage = (
+  base64String: string | undefined | null,
+  mimeType: string = 'image/png'
+): string | undefined => {
+  if (!base64String) {
+    return undefined;
+  }
+
+  // Se já tem o prefixo data:image, retorna como está
+  if (base64String.startsWith('data:')) {
+    return base64String;
+  }
+
+  // Adiciona o prefixo data:image
+  return `data:${mimeType};base64,${base64String}`;
+};

@@ -1,3 +1,6 @@
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+
 import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
 import { Section } from "@shared/components/Core/Containers/Section";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
@@ -9,29 +12,29 @@ import { ItemsPerPage } from "@shared/components/Core/Table/ItemsPerPage";
 import { LoadingLines } from "@shared/components/Core/Table/LoadingLines";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
+import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
+import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
+import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
+import { useLoaderContext } from "@shared/contexts/Loader";
+import { useToastContext } from "@shared/contexts/Toast";
+import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
+import { useInspections } from "@shared/hooks/services/Admin/useInspections";
+import { useCallback, useEffect, useState } from "react";
+import { Col, Container, Row } from "react-bootstrap";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
 import {
   IInspectionSearchForm,
   initialInspectionSearchValues,
 } from "./components/InspectionSearchForm/InspectionSearchForm.form";
-import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
-import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
-import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
-import { useInspections } from "@shared/hooks/services/Admin/useInspections";
-import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
-import { useToastContext } from "@shared/contexts/Toast";
-import { useLoaderContext } from "@shared/contexts/Loader";
-import { getAuthorizationToken } from "@shared/services/api/token";
-import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
-import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   ROUTE_SAVE_INSPECTION,
   ROUTE_UPDATE_INSPECTION,
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 
+import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
+import { InspectionPDFReport } from "./components/InspectionPDFReport ";
 import { InspectionsTable } from "./components/InspectionsTable";
 
 export function ListInspections() {
@@ -40,6 +43,7 @@ export function ListInspections() {
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { addToast, handleApiRejection } = useToastContext();
   const { showLoader, hideLoader } = useLoaderContext();
+  const { fetchInspection } = useInspection();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -66,6 +70,39 @@ export function ListInspections() {
 
   // Preparar opções de status com "Todos" como primeira opção
   const statusOptionsWithAll = [{ value: "", label: "Todos" }, ...inspectionStatusOptions];
+
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: pdfRef,
+    documentTitle: `Relatorio_${inspectionToPrint?.reportNumber || ""}`,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    `,
+    onAfterPrint: () => {
+      // Limpar dados após impressão
+      setInspectionToPrint(null);
+      hideLoader();
+    },
+    onPrintError: () => {
+      addToast({
+        type: "warning",
+        title: "Erro ao gerar PDF",
+        description: "Não foi possível gerar o PDF. Tente novamente.",
+      });
+      hideLoader();
+    },
+  });
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -155,43 +192,36 @@ export function ListInspections() {
     navigate(!uuid ? ROUTE_SAVE_INSPECTION : `${ROUTE_UPDATE_INSPECTION}/${uuid}`);
   }
 
-  async function handleGeneratePdf(inspectionId: string, reportNumber: string) {
+  async function handleGeneratePdf(inspectionId: string) {
     try {
       showLoader();
+      const data = await fetchInspection(inspectionId);
 
-      const token = getAuthorizationToken();
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}operational/parts-inspection/${inspectionId}/download-pdf`,
-        {
-          headers: {
-            Authorization: token,
-          },
-          responseType: "blob",
-        },
-      );
+      if (data) {
+        // Setar os dados da inspeção
+        setInspectionToPrint(data);
 
-      // Criar URL do blob e fazer download
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `inspecao-${reportNumber}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      addToast({
-        type: "success",
-        title: "Sucesso!",
-        description: "PDF gerado com sucesso!",
-      });
+        // Aguardar renderização e chamar impressão
+        setTimeout(() => {
+          handlePrint();
+        }, 100);
+      }
     } catch (error) {
-      handleApiRejection();
-    } finally {
       hideLoader();
+      handleApiRejection();
+      addToast({
+        type: "warning",
+        title: "Erro ao buscar dados",
+        description: "Não foi possível buscar os dados da inspeção.",
+      });
     }
   }
+
+  useEffect(() => {
+    if (inspectionToPrint && pdfRef.current) {
+      handlePrint();
+    }
+  }, [inspectionToPrint]);
 
   return (
     <AnimatedPage>
@@ -264,7 +294,7 @@ export function ListInspections() {
                         key={item.id}
                         data={item}
                         onEdit={() => addNew(item.id)}
-                        onGeneratePdf={() => handleGeneratePdf(item.id, item.reportNumber)}
+                        onGeneratePdf={() => handleGeneratePdf(item.id)}
                         /* onShowLogs={() => setInspectionLogs(item.id)} */
                       />
                     ))
@@ -303,6 +333,11 @@ export function ListInspections() {
             </Col>
           </Row>
         </Container>
+        {inspectionToPrint && (
+          <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+            <InspectionPDFReport ref={pdfRef} inspection={inspectionToPrint} />
+          </div>
+        )}
       </Section>
     </AnimatedPage>
   );

@@ -1,0 +1,1 @@
+export { InspectionPDFReport } from "./InspectionPDFReport";
