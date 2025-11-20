@@ -176,7 +176,6 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                       setIsCompressingImage(true);
                       setIsCroquisChanged(true); // Marcar que o croqui foi alterado
                       setIsCroquisDeleted(false); // Resetar flag de deletado se nova imagem foi selecionada
-                      console.log("📸 Iniciando compressão do croqui...");
 
                       // Comprimir a imagem usando a função personalizada
                       const compressedBase64 = await comprimirImagem(file, {
@@ -187,10 +186,7 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                       });
 
                       setFieldValue("coverUrl", compressedBase64);
-                      console.log("✅ Croqui comprimido com sucesso!");
                     } catch (error) {
-                      console.error("❌ Erro ao comprimir croqui:", error);
-
                       // Em caso de erro, usar o método original
                       const reader = new FileReader();
                       reader.onload = (event) => {
@@ -211,7 +207,6 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                   setFieldTouched("coverUrl", true);
                   setIsCroquisChanged(true); // Marcar como alterado quando removido
                   setIsCroquisDeleted(true); // Marcar especificamente como deletado
-                  console.log("🗑️ Croqui marcado para deleção");
                 }}
               />
             </Col>

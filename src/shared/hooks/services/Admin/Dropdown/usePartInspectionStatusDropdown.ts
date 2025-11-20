@@ -38,7 +38,6 @@ export function usePartInspectionStatusDropdown() {
         setResult([]);
       }
     } catch (error) {
-      console.error("Error fetching part inspection statuses:", error);
       setResult([]);
     } finally {
       setLoading(false);

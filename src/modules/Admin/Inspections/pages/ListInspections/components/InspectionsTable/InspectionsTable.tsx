@@ -17,8 +17,8 @@ function getStatusColor(status: string): "success" | "warning" | "helper" | "def
   switch (status.toLowerCase()) {
     case "aprovado":
       return "success";
-    case "aprovado com restrição":
-      return "helper"; // laranja
+    case "com restrição":
+      return "default"; // azul
     case "não conforme":
       return "warning"; // vermelho
     case "em análise":

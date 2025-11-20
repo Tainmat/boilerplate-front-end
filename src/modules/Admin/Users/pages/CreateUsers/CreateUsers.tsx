@@ -117,7 +117,6 @@ export function CreateUsers() {
 
       return dataUrl;
     } catch (error) {
-      console.error(`Erro ao ler imagem ${imagePath}:`, error);
       return "";
     }
   } */

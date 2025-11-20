@@ -1,4 +1,4 @@
-import { get, fakeRequest } from "@shared/services/api/api.service";
+import { get } from "@shared/services/api/api.service";
 import { IApiResponse } from "@shared/services/api/api.service.interface";
 import { removeEmptyEntries } from "@shared/utils/generic";
 import { useCallback, useEffect, useState } from "react";
@@ -93,7 +93,7 @@ export function useInspections() {
         search: params?.search,
         records: params?.items,
         page: params?.page,
-        order: params?.order,
+        order: "reportStartDate:DESC",
         inspectionStatusId: params?.inspectionStatusId,
       });
 

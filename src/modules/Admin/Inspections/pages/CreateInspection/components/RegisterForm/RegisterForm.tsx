@@ -914,10 +914,6 @@ export function InspectionRegisterForm({
                                             return;
                                           }
 
-                                          console.log(
-                                            "📸 Iniciando compressão da imagem adicional...",
-                                          );
-
                                           // Comprimir a imagem usando a função personalizada
                                           const compressedBase64 = await comprimirImagem(file, {
                                             maxSizeMB: 1, // Limite de 1MB para imagens adicionais
@@ -925,10 +921,6 @@ export function InspectionRegisterForm({
                                             quality: 0.8, // 80% de qualidade
                                             fileType: "image/jpeg",
                                           });
-
-                                          console.log(
-                                            "✅ Compressão concluída para imagem adicional",
-                                          );
 
                                           const currentImages = values.additionalImages || {
                                             images: [],
@@ -951,7 +943,6 @@ export function InspectionRegisterForm({
                                           // Limpar o input para permitir selecionar a mesma imagem novamente
                                           e.target.value = "";
                                         } catch (error) {
-                                          console.error("❌ Erro na compressão da imagem:", error);
                                           alert("Erro ao processar a imagem. Tente novamente.");
                                           e.target.value = "";
                                         }

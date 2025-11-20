@@ -25,10 +25,8 @@ export const comprimirImagem = async (input, options = {}) => {
 
     // Se input é um DataURI, converter para File
     if (typeof input === "string") {
-      console.log("📸 Convertendo DataURI para File...");
       fileToCompress = await dataURItoFile(input);
     } else if (input instanceof File) {
-      console.log("📁 Processando arquivo:", input.name);
       fileToCompress = input;
     } else {
       throw new Error("Input deve ser um File ou DataURI");
@@ -36,41 +34,25 @@ export const comprimirImagem = async (input, options = {}) => {
 
     // Log do tamanho original
     const originalSizeMB = fileToCompress.size / 1024 / 1024;
-    console.log(`🔍 Tamanho original: ${originalSizeMB.toFixed(2)} MB`);
 
     // Se já está menor que o limite, só otimizar qualidade
     if (originalSizeMB <= defaultOptions.maxSizeMB) {
-      console.log("✅ Imagem já está no tamanho ideal, apenas otimizando...");
       defaultOptions.maxSizeMB = originalSizeMB * 0.8; // Reduzir um pouco
     }
 
     // Comprimir imagem
-    console.log("⚡ Iniciando compressão...");
     const compressedFile = await imageCompression(
       fileToCompress,
       defaultOptions
     );
 
-    // Log do resultado
-    const compressedSizeMB = compressedFile.size / 1024 / 1024;
-    const reduction =
-      ((originalSizeMB - compressedSizeMB) / originalSizeMB) * 100;
-
-    console.log(`✨ Compressão concluída!`);
-    console.log(`📉 Tamanho final: ${compressedSizeMB.toFixed(2)} MB`);
-    console.log(`🎯 Redução: ${reduction.toFixed(1)}%`);
-
     // Converter resultado para DataURI
     const dataURI = await fileToDataURI(compressedFile);
 
-    console.log("🎉 Conversão para DataURI concluída");
     return dataURI;
   } catch (error) {
-    console.error("❌ Erro na compressão:", error);
-
     // Se falhar, retornar original (se for DataURI) ou erro
     if (typeof input === "string") {
-      console.log("🔄 Retornando imagem original devido ao erro");
       return input;
     }
 

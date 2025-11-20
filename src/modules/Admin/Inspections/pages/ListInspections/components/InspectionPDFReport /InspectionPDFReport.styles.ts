@@ -290,7 +290,7 @@ export const StatusText = styled.h4<{ status: string }>`
   font-weight: bold;
   margin: 0;
   color: ${(props) => {
-    if (props.status?.includes("aprovado-restricao")) return "#f59e0b";
+    if (props.status?.includes("com-restricao")) return "#f59e0b";
     if (props.status?.includes("aprovado")) return "#16a34a";
     if (props.status?.includes("nao-conforme")) return "#dc2626";
     if (props.status?.includes("em-analise")) return "#2563eb";

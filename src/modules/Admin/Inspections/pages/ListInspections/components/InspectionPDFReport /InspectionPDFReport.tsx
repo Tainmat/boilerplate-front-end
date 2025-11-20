@@ -15,7 +15,7 @@ export const InspectionPDFReport = forwardRef<HTMLDivElement, InspectionPDFRepor
     const getStatusClass = (status: string): string => {
       const statusMap: Record<string, string> = {
         Aprovado: "aprovado",
-        "Aprovado com restrição": "aprovado-restricao",
+        "Com restrição": "com-restricao",
         "Não conforme": "nao-conforme",
         "Em análise": "em-analise",
       };

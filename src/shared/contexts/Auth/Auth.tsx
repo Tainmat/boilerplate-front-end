@@ -129,7 +129,6 @@ function AuthContext({ children }: Props) {
             lastUpdateDate: "2024-06-15T14:30:00Z",
             roles: ["admin"],
           }; */
-          console.log("User Authenticated:", user);
           setUser(user);
           setLocalStorageItem("Usincheck@JOmetto:user", user);
 

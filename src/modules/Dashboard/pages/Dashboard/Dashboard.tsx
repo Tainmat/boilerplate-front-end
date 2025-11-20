@@ -74,7 +74,7 @@ interface DashboardData {
   comparativoAprovacoes: {
     labels: string[];
     aprovadas: number[];
-    aprovadasComRestricao: number[];
+    comRestricao: number[];
     reprovadas: number[];
   };
   ultimasInspecoes: Array<{
@@ -94,7 +94,7 @@ const chartColors = {
   reprovado: "rgba(220, 53, 69, 0.8)", // Vermelho (helper)
   emAnalise: "rgba(54, 162, 235, 0.8)", // Azul
   pendente: "rgba(255, 206, 86, 0.8)", // Amarelo
-  aprovadasComRestricao: "rgba(255, 193, 7, 0.8)", // Laranja (warning)
+  comRestricao: "rgba(255, 193, 7, 0.8)", // Laranja (warning)
   tipos: [
     "rgba(75, 192, 192, 0.8)",
     "rgba(153, 102, 255, 0.8)",
@@ -157,7 +157,7 @@ export function Dashboard() {
             return format(date, "MMM/yy", { locale: ptBR });
           }).reverse(),
           aprovadas: Array(12).fill(0),
-          aprovadasComRestricao: Array(12).fill(0),
+          comRestricao: Array(12).fill(0),
           reprovadas: Array(12).fill(0),
         },
         ultimasInspecoes: [],
@@ -169,8 +169,8 @@ export function Dashboard() {
     const approvedCard = dashboardApiData.totalizingCards.find(
       (card) => card.title === "Inspeções Aprovadas",
     );
-    const approvedWithRestrictionCard = dashboardApiData.totalizingCards.find(
-      (card) => card.title === "Com Restrições",
+    const withRestrictionCard = dashboardApiData.totalizingCards.find(
+      (card) => card.title === "Com Restrição",
     );
     const inAnalysisCard = dashboardApiData.totalizingCards.find(
       (card) => card.title === "Em Análise",
@@ -181,7 +181,7 @@ export function Dashboard() {
 
     const totalInspecoes = totalCard?.value || 0;
     const aprovadas = approvedCard?.value || 0;
-    const aprovadasComRestricao = approvedWithRestrictionCard?.value || 0;
+    const comRestricao = withRestrictionCard?.value || 0;
     const emAnalise = inAnalysisCard?.value || 0;
     const naoConforme = nonConformingCard?.value || 0;
 
@@ -189,8 +189,8 @@ export function Dashboard() {
     const reprovadas = naoConforme;
 
     // Dados por status para gráfico de pizza usando os status da API
-    const statusLabels = ["Aprovadas", "Aprovadas c/ Restrição", "Em Análise", "Não Conforme"];
-    const statusData = [aprovadas, aprovadasComRestricao, emAnalise, naoConforme];
+    const statusLabels = ["Aprovadas", "Com Restrição", "Em Análise", "Não Conforme"];
+    const statusData = [aprovadas, comRestricao, emAnalise, naoConforme];
 
     // Dados por tipo de inspeção (usando dados de partTypes)
     const tiposInspecao = dashboardApiData.partTypes?.map((pt) => pt.partTypeName) || [];
@@ -213,14 +213,14 @@ export function Dashboard() {
       return 0;
     });
 
-    const approvedWithRestrictionByMonth = dashboardApiData.temporalEvolution.map((te, index, arr) => {
+    const withRestrictionByMonth = dashboardApiData.temporalEvolution.map((te, index, arr) => {
       // Se o temporal evolution tem dados válidos, use-os
-      if (te.aprovado_com_restricao > 0) {
-        return te.aprovado_com_restricao;
+      if (te.com_restricao > 0) {
+        return te.com_restricao;
       }
       // Caso contrário, coloque o valor total no mês mais recente (último item)
-      if (aprovadasComRestricao > 0 && index === arr.length - 1) {
-        return aprovadasComRestricao;
+      if (comRestricao > 0 && index === arr.length - 1) {
+        return comRestricao;
       }
       return 0;
     });
@@ -238,13 +238,13 @@ export function Dashboard() {
     });
     const inAnalysisByMonth = dashboardApiData.temporalEvolution.map((te) => te.em_analise);
     const pendingByMonth = dashboardApiData.temporalEvolution.map(
-      (te) => te.aprovado_com_restricao,
+      (te) => te.com_restricao,
     );
 
     const comparativoData = {
       labels: evolutionLabels,
       aprovadas: approvedByMonth,
-      aprovadasComRestricao: approvedWithRestrictionByMonth,
+      comRestricao: withRestrictionByMonth,
       reprovadas: rejectedByMonth,
     };
 
@@ -391,7 +391,7 @@ export function Dashboard() {
             data: dashboardData.porStatus.data,
             backgroundColor: [
               chartColors.aprovado,
-              chartColors.aprovadasComRestricao,
+              chartColors.comRestricao,
               chartColors.emAnalise,
               chartColors.reprovado,
             ],
@@ -429,9 +429,9 @@ export function Dashboard() {
           },
           {
             fill: true,
-            label: "Aprovadas c/ Restrição",
-            data: dashboardData.comparativoAprovacoes.aprovadasComRestricao,
-            borderColor: chartColors.aprovadasComRestricao,
+            label: "Com Restrição",
+            data: dashboardData.comparativoAprovacoes.comRestricao,
+            borderColor: chartColors.comRestricao,
             backgroundColor: "rgba(255, 193, 7, 0.2)",
           },
           {
@@ -456,7 +456,7 @@ export function Dashboard() {
     switch (status) {
       case "Aprovado":
         return "success"; // Verde
-      case "Aprovado com restrição":
+      case "Com restrição":
         return "helper"; // Vermelho
       case "Em análise":
         return "neutral"; // Azul
@@ -625,7 +625,7 @@ export function Dashboard() {
               <Card className="h-100 shadow-sm">
                 <Card.Body>
                   <Subtitle size="xs" className="mb-3">
-                    Comparativo: Aprovadas vs. Aprovadas c/ Restrição vs. Não Conforme
+                    Comparativo: Aprovadas vs. Com Restrição vs. Não Conforme
                   </Subtitle>
                   {loading ? (
                     <div style={{ height: "300px" }}>

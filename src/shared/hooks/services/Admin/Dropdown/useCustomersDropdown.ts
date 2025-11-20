@@ -38,7 +38,6 @@ export function useCustomersDropdown() {
         setResult([]);
       }
     } catch (error) {
-      console.error("Error fetching customers:", error);
       setResult([]);
     } finally {
       setLoading(false);

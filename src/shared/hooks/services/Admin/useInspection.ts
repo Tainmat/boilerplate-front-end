@@ -179,8 +179,6 @@ export function useInspection() {
 
   const uploadInspectionAttachments = useCallback(async (id: string, imageData: { images: string[]; imagesToDel: string[] }) => {
     try {
-      console.log("Uploading image data:", imageData);
-      
       const payload = {
         images: imageData.images,
         imagesToDel: imageData.imagesToDel

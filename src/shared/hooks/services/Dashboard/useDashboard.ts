@@ -1,6 +1,6 @@
 import { get } from "@shared/services/api/api.service";
-import { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
+import { useCallback, useEffect, useState } from "react";
 
 export interface IDashboardPartType {
   partTypeId: string;
@@ -13,7 +13,7 @@ export interface IDashboardTemporalEvolution {
   year: number;
   em_analise: number;
   aprovado: number;
-  aprovado_com_restricao: number;
+  com_restricao: number;
   nao_conforme: number;
   total_aprovado: number;
 }
@@ -31,7 +31,7 @@ export interface IApiTotalizingCardsResponse {
     amount: number;
     percentage: number;
   };
-  aprovado_com_restricao: {
+  com_restricao: {
     amount: number;
     percentage: number;
   };
@@ -122,7 +122,6 @@ export function useDashboard(period?: string) {
         );
         return data.data || [];
       } catch (error) {
-        console.error("Error fetching part types:", error);
         return [];
       }
     },
@@ -139,7 +138,6 @@ export function useDashboard(period?: string) {
         );
         return data.data || [];
       } catch (error) {
-        console.error("Error fetching temporal evolution:", error);
         return [];
       }
     },
@@ -149,7 +147,9 @@ export function useDashboard(period?: string) {
   const fetchTotalizingCards = useCallback(
     async (periodParam?: string): Promise<IDashboardTotalizingCard[]> => {
       try {
-        const params = getPeriodDates(periodParam || "last12months");
+        const params = {
+          ...getPeriodDates(periodParam || "last12months"),
+        };
         const { data } = await get<IApiTotalizingCardsResponse>(
           "/operational/parts-inspection/dashboard/totalizing-cards",
           params,
@@ -186,9 +186,9 @@ export function useDashboard(period?: string) {
             status: "warning",
           },
           {
-            title: "Com Restrições",
-            value: apiData.aprovado_com_restricao?.amount || 0,
-            percentage: apiData.aprovado_com_restricao?.percentage || 0,
+            title: "Com Restrição",
+            value: apiData.com_restricao?.amount || 0,
+            percentage: apiData.com_restricao?.percentage || 0,
             icon: "warning",
             status: "helper",
           },
@@ -202,7 +202,6 @@ export function useDashboard(period?: string) {
 
         return cards;
       } catch (error) {
-        console.error("Error fetching totalizing cards:", error);
         return [];
       }
     },
@@ -216,7 +215,7 @@ export function useDashboard(period?: string) {
           ...getPeriodDates(periodParam || "last12months"),
           records: 10, // Últimas 10 inspeções
           page: 1,
-          order: "reportEndDate", // Mais recentes primeiro
+          order: "reportStartDate:DESC",
         };
         const { data } = await get<{ data: IDashboardInspection[] }>(
           "/operational/parts-inspection",
@@ -224,7 +223,6 @@ export function useDashboard(period?: string) {
         );
         return data.data || [];
       } catch (error) {
-        console.error("Error fetching latest inspections:", error);
         return [];
       }
     },
@@ -253,7 +251,6 @@ export function useDashboard(period?: string) {
         });
       } catch (error) {
         setError("Erro ao carregar dados da dashboard");
-        console.error("Dashboard data loading error:", error);
       } finally {
         setLoading(false);
       }

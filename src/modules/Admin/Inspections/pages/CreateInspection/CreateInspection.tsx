@@ -59,17 +59,10 @@ export function CreateInspection() {
 
         // Processar imagens dos attachments existentes que já vêm em base64 do backend
         const existingImages: (IImageData | null)[] = [null, null, null];
-        
-        console.log('Dados recebidos da API:', data);
-        console.log('Attachments encontrados:', data.attachments);
-        
+
         if (data.attachments && data.attachments.length > 0) {
-          console.log(`Processando ${data.attachments.length} attachments...`);
-          
           // Processar imagens que já vêm em base64 do backend
           data.attachments.slice(0, 3).forEach((attachment: any, index: number) => {
-            console.log(`Processando attachment ${index}:`, attachment);
-            
             if (attachment.url && attachment.url.startsWith('data:image/')) {
               // attachment.url já é base64
               const imageData = {
@@ -79,17 +72,10 @@ export function CreateInspection() {
                 size: 0, // Tamanho não disponível do servidor
                 type: attachment.url.includes('data:image/') ? attachment.url.split(';')[0].split(':')[1] : 'image/jpeg'
               };
-              
-              console.log(`Imagem ${index} processada com sucesso:`, imageData);
+
               existingImages[index] = imageData;
-            } else {
-              console.warn(`Attachment ${index} não é base64 válido:`, attachment);
             }
           });
-          
-          console.log('Imagens processadas:', existingImages);
-        } else {
-          console.log('Nenhum attachment encontrado');
         }
 
         // Converter dados da API para o formato do formulário
@@ -141,9 +127,6 @@ export function CreateInspection() {
           }
         };
 
-        console.log('Dados do formulário sendo definidos:', formData);
-        console.log('Imagens adicionais no formulário:', formData.additionalImages);
-        
         setInspection(formData);
 
         // Se há dados do part type, usar como equipamento selecionado

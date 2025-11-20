@@ -37,7 +37,6 @@ export function useProfileNotAssociatedDropdown() {
           setResult([]);
         }
       } catch (error) {
-        console.error("Error fetching profiles:", error);
         setResult([]);
       }
     }

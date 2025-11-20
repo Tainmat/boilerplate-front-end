@@ -8,7 +8,6 @@ export function convertIsoDateToPtBr(isoDate: string): string {
     const date = new Date(isoDate);
     return date.toLocaleDateString('pt-BR');
   } catch (error) {
-    console.error('Error converting date:', error);
     return isoDate;
   }
 }
@@ -30,7 +29,6 @@ export function formatDate(date: Date, format: string = 'dd/MM/yyyy'): string {
       .replace('yyyy', year.toString())
       .replace('yy', year.toString().slice(-2));
   } catch (error) {
-    console.error('Error formatting date:', error);
     return '';
   }
 }
@@ -61,7 +59,6 @@ export function convertDateFormat(
       return date.toISOString();
     }
   } catch (error) {
-    console.error('Error converting date format:', error);
     return dateStr;
   }
 }

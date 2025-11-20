@@ -71,8 +71,6 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
       }}
     >
       {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => {
-        console.log("RegisterForm - signature value:", values.signature);
-        console.log("RegisterForm - initialValues:", initialValues);
         return (
           <Form>
             <Row className="mb-4">
@@ -205,7 +203,6 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                         setIsCompressingImage(true);
                         setIsSignatureChanged(true); // Marcar que a assinatura foi alterada
                         setIsSignatureDeleted(false); // Resetar flag de deletada se nova imagem foi selecionada
-                        console.log("📸 Iniciando compressão da assinatura...");
 
                         // Comprimir a imagem usando a função personalizada
                         const compressedBase64 = await comprimirImagem(file, {
@@ -216,10 +213,7 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                         });
 
                         setFieldValue("signature", compressedBase64);
-                        console.log("✅ Assinatura comprimida com sucesso!");
                       } catch (error) {
-                        console.error("❌ Erro ao comprimir assinatura:", error);
-
                         // Em caso de erro, usar o método original
                         const reader = new FileReader();
                         reader.onload = (event) => {
@@ -240,7 +234,6 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                     setFieldTouched("signature", true);
                     setIsSignatureChanged(true); // Marcar como alterada quando removida
                     setIsSignatureDeleted(true); // Marcar especificamente como deletada
-                    console.log("🗑️ Assinatura marcada para deleção");
                   }}
                 />
               </Col>

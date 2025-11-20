@@ -52,8 +52,6 @@ export function InputFile({
   const [isDragging, setIsDragging] = useState(false);
 
   const buildImageUrl = (imagePath: string): string => {
-    console.log('BuildImageUrl - input:', imagePath);
-    
     // Se já é uma URL completa ou base64, usar diretamente
     if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
       return imagePath;
@@ -63,27 +61,22 @@ export function InputFile({
     if (imagePath.includes('/assets/public/')) {
       const assetPath = imagePath.split('/assets/public/')[1];
       const url = `https://qas-usincheck.jometto.com.br/assets/public/${assetPath}`;
-      console.log('URL construída:', url);
       return url;
     }
-    
+
     // Fallback para outros casos
     const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
     const url = `https://qas-usincheck.jometto.com.br${cleanPath}`;
-    console.log('URL fallback:', url);
     return url;
   };
 
   useEffect(() => {
-    console.log(`InputFile [${name}] - value recebido:`, value);
-    
     if (value && value.trim() !== "") {
       const imageUrl = buildImageUrl(value);
       setImagePreview(imageUrl);
       setFileName("Imagem carregada");
       setFileCount(1);
     } else {
-      console.log(`InputFile [${name}] - value vazio, limpando preview`);
       setImagePreview(null);
       setFileName("");
       setFileCount(0);
@@ -243,12 +236,9 @@ export function InputFile({
 
         {imagePreview ? (
           <ImagePreview>
-            <img 
-              src={imagePreview} 
-              alt="Preview" 
-              onLoad={() => {
-                console.log(`InputFile [${name}] - Imagem carregada com sucesso:`, imagePreview);
-              }}
+            <img
+              src={imagePreview}
+              alt="Preview"
             />
             <div className="overlay">
               <div className="file-info">

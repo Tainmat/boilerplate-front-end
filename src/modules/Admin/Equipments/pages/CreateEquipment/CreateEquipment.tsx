@@ -9,11 +9,11 @@ import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
 /* import { customers } from "@shared/hooks/services/Admin/useCustomers"; */
+import { ROUTE_LIST_EQUIPMENTS } from "@/modules/Admin/Equipments/routes/Equipment.paths";
 import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { ROUTE_LIST_EQUIPMENTS } from "@/modules/Admin/Equipments/routes/Equipment.paths";
 
 import { EquipmentRegisterForm } from "./components/RegisterForm";
 import { IEquipmentRegisterForm } from "./components/RegisterForm/RegisterForm.form";
@@ -189,21 +189,17 @@ export function CreateEquipment() {
         // Novo equipamento: incluir croqui se preenchido
         if (cleanFormValues.coverUrl) {
           payload.croqui = cleanFormValues.coverUrl;
-          console.log("✅ Croqui incluído no payload (novo equipamento)");
         }
       } else {
         // Edição de equipamento existente
         if (__isCroquisDeleted) {
           // Croqui foi deletado
           payload.deleteCroqui = true;
-          console.log("🗑️ deleteCroqui=true enviado (croqui foi deletado)");
         } else if (__isCroquisChanged && cleanFormValues.coverUrl) {
           // Croqui foi alterado (nova imagem)
           payload.croqui = cleanFormValues.coverUrl;
-          console.log("✅ Croqui incluído no payload (croqui foi alterado)");
         } else {
           // Croqui não foi alterado
-          console.log("⚠️ Croqui removido do payload (não foi alterado em edição)");
         }
       }
 

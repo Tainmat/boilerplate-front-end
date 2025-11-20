@@ -37,7 +37,6 @@ export function useUsersDropdown() {
         setResult([]);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
       setResult([]);
     } finally {
       setLoading(false);

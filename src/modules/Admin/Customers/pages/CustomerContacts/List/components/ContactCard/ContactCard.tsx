@@ -34,7 +34,7 @@ export function ContactCard({ item, onRefetch, onEdit }: Props) {
       });
       onRefetch && onRefetch();
     } catch (error) {
-      console.error(error);
+      // Error handling
     }
   }
 
@@ -46,7 +46,7 @@ export function ContactCard({ item, onRefetch, onEdit }: Props) {
       });
       onRefetch && onRefetch();
     } catch (error) {
-      console.error(error);
+      // Error handling
     }
   }
 
