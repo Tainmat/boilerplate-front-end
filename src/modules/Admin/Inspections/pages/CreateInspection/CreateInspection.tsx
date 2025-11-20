@@ -214,10 +214,11 @@ export function CreateInspection() {
         imagesToDel: [] as string[]
       };
 
-      // Adicionar imagens atuais em base64
+      // Adicionar APENAS imagens novas (sem ID, ou seja, que não vieram do servidor)
       if (formValues.additionalImages?.images) {
         formValues.additionalImages.images.forEach((imageData) => {
-          if (imageData && imageData.base64) {
+          // Só envia se a imagem tem base64 E não tem ID (imagem nova)
+          if (imageData && imageData.base64 && !imageData.id) {
             imageDataToUpload.images.push(imageData.base64);
           }
         });
