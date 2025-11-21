@@ -10,6 +10,7 @@ export const PDFContainer = styled.div`
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transform: scale(0.94);
 
   @media print {
     width: 210mm;
