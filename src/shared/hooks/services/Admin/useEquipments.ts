@@ -1,4 +1,3 @@
-import { StringBoolean } from "@/shared/constants/options";
 import { get } from "@shared/services/api/api.service";
 import { IApiResponse } from "@shared/services/api/api.service.interface";
 import { removeEmptyEntries } from "@shared/utils/generic";
@@ -10,7 +9,7 @@ export interface IEquipment {
   description: string;
   totalInspectionPoints: number;
   isActive: boolean;
-  coverUrl: string;
+  croqui: string;
   created_at: string;
   updated_at: string;
 }

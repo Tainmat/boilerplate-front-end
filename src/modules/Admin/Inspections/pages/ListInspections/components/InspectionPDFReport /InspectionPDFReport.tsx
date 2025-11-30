@@ -1,7 +1,7 @@
 import { IInspectionDetail } from "@/shared/hooks/services/Admin/useInspection";
 import { formatDateBR } from "@/shared/utils/date/dayjs";
 import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
-import AssinaturaMatheus from "@assets/images/assinatura_matheus.png";
+import AssinaturaLeandro from "@assets/images/assinatura_leandro.png";
 import Logo from "@assets/images/logo2.png";
 import { forwardRef } from "react";
 import * as S from "./InspectionPDFReport.styles";
@@ -82,7 +82,7 @@ export const InspectionPDFReport = forwardRef<HTMLDivElement, InspectionPDFRepor
                     <input
                       type="checkbox"
                       id={`position-${pos}`}
-                      checked={inspection.positionNumber === pos}
+                      checked={inspection.positionNumber.split(",").includes(pos.toString())}
                       readOnly
                     />
                     <label htmlFor={`position-${pos}`}>{pos}º</label>
@@ -205,14 +205,16 @@ export const InspectionPDFReport = forwardRef<HTMLDivElement, InspectionPDFRepor
         <S.SignatureSection>
           <S.SignatureItem>
             <h6>Inspetor:</h6>
-            {/* Adicionar imagem da assinatura do inspetor se disponível */}
+            {inspection.inspectorUser?.signature && (
+              <img src={formatBase64ForImage(inspection.inspectorUser.signature)} />
+            )}
           </S.SignatureItem>
 
           <S.Separator />
 
           <S.SignatureItem>
             <h6>Supervisão:</h6>
-            <img src={AssinaturaMatheus} alt="Assinatura Supervisão" />
+            <img src={AssinaturaLeandro} alt="Assinatura Supervisão" />
           </S.SignatureItem>
 
           <S.Separator />

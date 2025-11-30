@@ -256,7 +256,7 @@ export const ImagesGrid = styled.div`
 export const SignatureSection = styled(Section)`
   display: grid;
   grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
-  height: 86px;
+  height: 100px;
 `;
 
 export const SignatureItem = styled.div`
@@ -274,8 +274,8 @@ export const SignatureItem = styled.div`
   }
 
   img {
-    max-width: 200px;
-    max-height: 60px;
+    width: 200px;
+    max-height: 65px;
     object-fit: contain;
   }
 `;

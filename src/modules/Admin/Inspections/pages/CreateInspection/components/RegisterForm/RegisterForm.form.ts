@@ -75,7 +75,7 @@ export const inspectionValidationSchema = Yup.object().shape({
   isLP: Yup.boolean(),
   isDU: Yup.boolean(),
   finalConclusion: Yup.string()
-    .max(500, "O campo deve conter no máximo 500 caracteres!"),
+    .max(2048, "O campo deve conter no máximo 2048 caracteres!"),
   inspectionStatusId: Yup.string().required("O campo é obrigatório!"),
   isSandingBrushSandblasting: Yup.boolean(),
   isCleaningChemistry: Yup.boolean(),

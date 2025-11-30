@@ -12,7 +12,7 @@ export interface IInspectionDetail {
   revisionNumber: string;
   sheetNumber: string;
   componentId: string;
-  positionNumber: number;
+  positionNumber: string;
   inspectionLocation: string;
   mdaInformation: string;
   isVI: boolean;
@@ -27,13 +27,6 @@ export interface IInspectionDetail {
   isCleaningChemistry: boolean;
   instruments: string;
   generalConsiderations: string;
-  // Posições de inspeção
-  position1: string;
-  position2: string;
-  position3: string;
-  position4: string;
-  position5: string;
-  position6: string;
   // Conclusões específicas
   flankAndBottomConclusion: string;
   keywayChannelsConclusion: string;
@@ -50,6 +43,7 @@ export interface IInspectionDetail {
   inspectorUser?: {
     id: string;
     name: string;
+    signature?: string;
   };
   partType?: {
     id: string;
@@ -177,25 +171,28 @@ export function useInspection() {
     }
   }, []);
 
-  const uploadInspectionAttachments = useCallback(async (id: string, imageData: { images: string[]; imagesToDel: string[] }) => {
-    try {
-      const payload = {
-        images: imageData.images,
-        imagesToDel: imageData.imagesToDel
-      };
+  const uploadInspectionAttachments = useCallback(
+    async (id: string, imageData: { images: string[]; imagesToDel: string[] }) => {
+      try {
+        const payload = {
+          images: imageData.images,
+          imagesToDel: imageData.imagesToDel,
+        };
 
-      const { data } = await post<IInspectionAttachment[]>(
-        `/operational/parts-inspection/${id}/attachments`,
-        payload,
-        {
-          "Content-Type": "application/json",
-        },
-      );
-      return data.data || data;
-    } catch (error) {
-      throw error;
-    }
-  }, []);
+        const { data } = await post<IInspectionAttachment[]>(
+          `/operational/parts-inspection/${id}/attachments`,
+          payload,
+          {
+            "Content-Type": "application/json",
+          },
+        );
+        return data.data || data;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [],
+  );
 
   const deleteInspectionAttachment = useCallback(
     async (inspectionId: string, attachmentId: string) => {

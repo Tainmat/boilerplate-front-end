@@ -13,11 +13,12 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
-import { useInspection, IInspectionCreateData } from "@shared/hooks/services/Admin/useInspection";
+import { IInspectionCreateData, useInspection } from "@shared/hooks/services/Admin/useInspection";
 
-import { InspectionRegisterForm } from "./components/RegisterForm";
-import { IInspectionRegisterForm, IImageData } from "./components/RegisterForm/RegisterForm.form";
+import { get } from "@/shared/services/api/api.service";
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
+import { InspectionRegisterForm } from "./components/RegisterForm";
+import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
 
 export function CreateInspection() {
   const navigate = useNavigate();
@@ -25,12 +26,8 @@ export function CreateInspection() {
   const { addToast, handleApiRejection } = useToastContext();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { uuid } = useParams();
-  const {
-    fetchInspection,
-    createInspection,
-    updateInspection,
-    uploadInspectionAttachments,
-  } = useInspection();
+  const { fetchInspection, createInspection, updateInspection, uploadInspectionAttachments } =
+    useInspection();
 
   const [inspection, setInspection] = useState<IInspectionRegisterForm | null>(null);
   const [currentStep, setCurrentStep] = useState<"equipment" | "form">("equipment");
@@ -63,14 +60,16 @@ export function CreateInspection() {
         if (data.attachments && data.attachments.length > 0) {
           // Processar imagens que já vêm em base64 do backend
           data.attachments.slice(0, 3).forEach((attachment: any, index: number) => {
-            if (attachment.url && attachment.url.startsWith('data:image/')) {
+            if (attachment.url && attachment.url.startsWith("data:image/")) {
               // attachment.url já é base64
               const imageData = {
                 id: attachment.id,
                 base64: attachment.url,
                 name: `attachment-${attachment.id}.jpg`,
                 size: 0, // Tamanho não disponível do servidor
-                type: attachment.url.includes('data:image/') ? attachment.url.split(';')[0].split(':')[1] : 'image/jpeg'
+                type: attachment.url.includes("data:image/")
+                  ? attachment.url.split(";")[0].split(":")[1]
+                  : "image/jpeg",
               };
 
               existingImages[index] = imageData;
@@ -105,9 +104,12 @@ export function CreateInspection() {
           instruments: data.instruments || "",
           // Determinar quais posições foram preenchidas
           selectedPositions: (() => {
-            if (data.positionNumber && typeof data.positionNumber === 'string') {
+            if (data.positionNumber && typeof data.positionNumber === "string") {
               // Se positionNumber é uma string no formato "1,2,4,6", fazer parse
-              return data.positionNumber.split(',').map((num: string) => parseInt(num.trim())).filter((num: number) => !isNaN(num));
+              return data.positionNumber
+                .split(",")
+                .map((num: string) => parseInt(num.trim()))
+                .filter((num: number) => !isNaN(num));
             } else {
               // Legacy: verificar posições individuais
               const positions = [];
@@ -123,8 +125,8 @@ export function CreateInspection() {
           // Estrutura de imagens adicionais com dados existentes
           additionalImages: {
             images: existingImages,
-            imagesToDel: []
-          }
+            imagesToDel: [],
+          },
         };
 
         setInspection(formData);
@@ -135,7 +137,7 @@ export function CreateInspection() {
             id: data.partType.id,
             name: data.partType.name,
             description: data.partType.description || "",
-            coverUrl: data.partType.croqui || data.partType.coverUrl || "", // Prioriza croqui do endpoint operational/parts-inspection
+            croqui: data.partType.croqui,
             totalInspectionPoints: data.partType.totalInspectionPoints || 0,
             isActive: true,
             created_at: new Date().toISOString(),
@@ -159,43 +161,49 @@ export function CreateInspection() {
     handleApiRejection,
   ]);
 
-  function handleEquipmentSelection(equipment: IEquipment) {
-    setSelectedEquipment(equipment);
+  async function handleEquipmentSelection(equipment: IEquipment) {
+    try {
+      const partType = await get<IEquipment>(`parametrizations/part-types/${equipment.id}`);
 
-    setInspection({
-      customerId: "",
-      inspectorUserId: "",
-      partTypeId: equipment.id || "",
-      reportNumber: "",
-      reportStartDate: "",
-      reportEndDate: "",
-      revisionNumber: "00",
-      sheetNumber: "1/1",
-      componentId: "",
-      positionNumber: "",
-      inspectionLocation: "",
-      mdaInformation: "",
-      isVI: false,
-      isDM: false,
-      isPM: false,
-      isUS: false,
-      isLP: false,
-      isDU: false,
-      finalConclusion: "",
-      inspectionStatusId: "",
-      isSandingBrushSandblasting: false,
-      isCleaningChemistry: false,
-      instruments: "",
-      /* generalConsiderations: "", */
-      // Posições de inspeção selecionadas
-      selectedPositions: [1], // Iniciar com posição 1 selecionada por padrão
-      // Nova estrutura de imagens adicionais
-      additionalImages: {
-        images: [null, null, null], // 3 slots vazios
-        imagesToDel: []
-      }
-    });
-    setCurrentStep("form");
+      setSelectedEquipment(partType.data.data);
+
+      setInspection({
+        customerId: "",
+        inspectorUserId: "",
+        partTypeId: equipment.id || "",
+        reportNumber: "",
+        reportStartDate: "",
+        reportEndDate: "",
+        revisionNumber: "00",
+        sheetNumber: "1/1",
+        componentId: "",
+        positionNumber: "",
+        inspectionLocation: "",
+        mdaInformation: "",
+        isVI: false,
+        isDM: false,
+        isPM: false,
+        isUS: false,
+        isLP: false,
+        isDU: false,
+        finalConclusion: "",
+        inspectionStatusId: "",
+        isSandingBrushSandblasting: false,
+        isCleaningChemistry: false,
+        instruments: "",
+        /* generalConsiderations: "", */
+        // Posições de inspeção selecionadas
+        selectedPositions: [], // Nenhuma posição selecionada por padrão
+        // Nova estrutura de imagens adicionais
+        additionalImages: {
+          images: [null, null, null], // 3 slots vazios
+          imagesToDel: [],
+        },
+      });
+      setCurrentStep("form");
+    } catch (error) {
+      console.error("Erro ao buscar imagem do equipamento:", error);
+    }
   }
 
   function handleBackToEquipmentSelection() {
@@ -211,7 +219,7 @@ export function CreateInspection() {
       // Preparar estrutura completa de imagens para envio em base64
       const imageDataToUpload = {
         images: [] as string[],
-        imagesToDel: [] as string[]
+        imagesToDel: [] as string[],
       };
 
       // Adicionar APENAS imagens novas (sem ID, ou seja, que não vieram do servidor)
@@ -270,18 +278,17 @@ export function CreateInspection() {
         additionalObservations: "",
       };
 
-
       let inspectionId = uuid;
 
       if (uuid) {
         // Modo edição - PUT
         await updateInspection(uuid, apiData);
-        
+
         // Se há imagens para anexar ou excluir, enviar separadamente
         if (imageDataToUpload.images.length > 0 || imageDataToUpload.imagesToDel.length > 0) {
           await uploadInspectionAttachments(uuid, imageDataToUpload);
         }
-        
+
         addToast({
           type: "success",
           title: "Sucesso!",
@@ -291,12 +298,12 @@ export function CreateInspection() {
         // Modo criação - POST
         const createdInspection = await createInspection(apiData);
         inspectionId = createdInspection?.id || createdInspection;
-        
+
         // Se há imagens para anexar e temos o ID da inspeção, enviar attachments
         if (imageDataToUpload.images.length > 0 && inspectionId) {
           await uploadInspectionAttachments(inspectionId, imageDataToUpload);
         }
-        
+
         addToast({
           type: "success",
           title: "Sucesso!",

@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
 import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 
+import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { IInspectionRegisterForm, inspectionValidationSchema } from "./RegisterForm.form";
@@ -135,7 +136,6 @@ export function InspectionRegisterForm({
     >
       {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => {
         const handlePositionChange = (position: number, checked: boolean) => {
-          setFieldTouched("selectedPositions");
           const currentPositions = values.selectedPositions || [];
           let newPositions: number[];
 
@@ -147,9 +147,15 @@ export function InspectionRegisterForm({
             newPositions = currentPositions.filter((p) => p !== position);
           }
 
+          // Atualiza os valores
           setFieldValue("selectedPositions", newPositions);
           // Atualiza o campo positionNumber para o backend no formato "1,2,4,6"
           setFieldValue("positionNumber", newPositions.join(","));
+
+          // Marca como touched após garantir que os valores foram atualizados
+          setTimeout(() => {
+            setFieldTouched("selectedPositions", true, true);
+          }, 0);
         };
 
         return (
@@ -681,11 +687,11 @@ export function InspectionRegisterForm({
                           className="border rounded p-4 text-center"
                           style={{ backgroundColor: "#f8f9fa" }}
                         >
-                          {selectedEquipment && selectedEquipment.coverUrl ? (
+                          {selectedEquipment && selectedEquipment.croqui ? (
                             <div>
                               {/* coverUrl contém o croqui do endpoint operational/parts-inspection quando disponível */}
                               <img
-                                src={selectedEquipment.coverUrl}
+                                src={formatBase64ForImage(selectedEquipment.croqui)}
                                 alt={`Croqui - ${selectedEquipment.name}`}
                                 className="img-fluid rounded shadow-sm"
                                 style={{ maxHeight: "400px", maxWidth: "100%" }}
@@ -745,6 +751,19 @@ export function InspectionRegisterForm({
                           onChange={(e) => setFieldValue("finalConclusion", e)}
                           modules={executiveConfig}
                         />
+                        <div className="d-flex justify-content-end mt-2">
+                          <small
+                            className={`${
+                              (values.finalConclusion?.length || 0) > 2048
+                                ? "text-danger"
+                                : (values.finalConclusion?.length || 0) > 1800
+                                  ? "text-warning"
+                                  : "text-muted"
+                            }`}
+                          >
+                            {values.finalConclusion?.length || 0} / 2048
+                          </small>
+                        </div>
                       </Col>
                       {/* <Col xs={12}>
                       <InputRichText
