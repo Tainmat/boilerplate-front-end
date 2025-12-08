@@ -74,6 +74,21 @@ export function ListInspections() {
   const pdfRef = useRef<HTMLDivElement>(null);
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
 
+  const onAfterPrint = useCallback(() => {
+    // Limpar dados após impressão
+    setInspectionToPrint(null);
+    hideLoader();
+  }, [hideLoader]);
+
+  const onPrintError = useCallback(() => {
+    addToast({
+      type: "warning",
+      title: "Erro ao gerar PDF",
+      description: "Não foi possível gerar o PDF. Tente novamente.",
+    });
+    hideLoader();
+  }, [addToast, hideLoader]);
+
   const handlePrint = useReactToPrint({
     contentRef: pdfRef,
     documentTitle: `Relatorio_${inspectionToPrint?.reportNumber || ""}`,
@@ -89,19 +104,8 @@ export function ListInspections() {
         }
       }
     `,
-    onAfterPrint: () => {
-      // Limpar dados após impressão
-      setInspectionToPrint(null);
-      hideLoader();
-    },
-    onPrintError: () => {
-      addToast({
-        type: "warning",
-        title: "Erro ao gerar PDF",
-        description: "Não foi possível gerar o PDF. Tente novamente.",
-      });
-      hideLoader();
-    },
+    onAfterPrint,
+    onPrintError,
   });
 
   useEffect(() => {
@@ -204,7 +208,7 @@ export function ListInspections() {
         // Aguardar renderização e chamar impressão
         setTimeout(() => {
           handlePrint();
-        }, 100);
+        }, 3000);
       }
     } catch (error) {
       hideLoader();
@@ -216,12 +220,6 @@ export function ListInspections() {
       });
     }
   }
-
-  useEffect(() => {
-    if (inspectionToPrint && pdfRef.current) {
-      handlePrint();
-    }
-  }, [inspectionToPrint]);
 
   return (
     <AnimatedPage>
@@ -334,7 +332,18 @@ export function ListInspections() {
           </Row>
         </Container>
         {inspectionToPrint && (
-          <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "210mm",
+              opacity: 0,
+              pointerEvents: "none",
+              zIndex: -9999,
+              overflow: "hidden",
+            }}
+          >
             <InspectionPDFReport ref={pdfRef} inspection={inspectionToPrint} />
           </div>
         )}
