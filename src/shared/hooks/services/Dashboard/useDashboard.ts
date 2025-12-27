@@ -216,6 +216,7 @@ export function useDashboard(period?: string) {
           records: 10, // Últimas 10 inspeções
           page: 1,
           order: "reportStartDate:DESC",
+          status: "active",
         };
         const { data } = await get<{ data: IDashboardInspection[] }>(
           "/operational/parts-inspection",
