@@ -14,17 +14,19 @@ interface Props {
   handleOnChangeStatusInspection: () => void;
 }
 
-function getStatusColor(status: string): "success" | "warning" | "helper" | "default" {
+function getStatusColor(
+  status: string,
+): "success" | "warning" | "helper" | "default" | "brand-secondary-pure" {
   switch (status.toLowerCase()) {
     case "aprovado":
       return "success";
     case "com restrição":
-      return "default"; // azul
+      return "helper"; // azul
     case "não conforme":
       return "warning"; // vermelho
     case "em análise":
     case "em andamento":
-      return "helper";
+      return "brand-secondary-pure";
     case "rejeitado":
     case "cancelado":
       return "warning";

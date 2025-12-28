@@ -193,6 +193,13 @@ export function useDashboard(period?: string) {
             status: "helper",
           },
           {
+            title: "Em Análise",
+            value: apiData.em_analise?.amount || 0,
+            percentage: apiData.em_analise?.percentage || 0,
+            icon: "pending_actions",
+            status: "neutral",
+          },
+          {
             title: "Taxa de Aprovação",
             value: Math.round(taxaAprovacao),
             icon: "trending_up",

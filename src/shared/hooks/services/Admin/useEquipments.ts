@@ -25,7 +25,7 @@ export function useEquipments() {
       const queryParams = removeEmptyEntries({
         searchingBy: params?.searchIn,
         search: params?.value,
-        records: params?.items,
+        records: params?.records,
         status: params?.status,
         order: params?.order,
         page: params?.page,

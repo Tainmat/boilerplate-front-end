@@ -455,7 +455,7 @@ export function Dashboard() {
       case "Com restrição":
         return "helper"; // Vermelho
       case "Em análise":
-        return "neutral"; // Azul
+        return "brand-secondary-pure"; // Azul
       case "Não conforme":
         return "warning"; // Laranja
       default:
@@ -740,8 +740,6 @@ export function Dashboard() {
                           </Tr>
                         )}
                       </Tbody>
-
-                      
                     </Table>
                   </div>
                 </Card.Body>

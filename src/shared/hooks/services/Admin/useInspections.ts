@@ -40,7 +40,7 @@ export function useInspections() {
       const queryParams = removeEmptyEntries({
         searchingBy: params?.searchingBy,
         search: params?.search,
-        records: params?.items,
+        records: params?.records,
         page: params?.page,
         order: "reportStartDate:DESC",
         inspectionStatusId: params?.inspectionStatusId,
@@ -53,7 +53,7 @@ export function useInspections() {
         setResult({
           data: data.data,
           page: data.page,
-          total: data.records,
+          total: data.total,
         });
       } else {
         setResult({

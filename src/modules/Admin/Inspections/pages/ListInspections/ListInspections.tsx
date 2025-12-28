@@ -142,7 +142,7 @@ export function ListInspections() {
       } else {
         params = {
           ...initialInspectionSearchValues,
-          items: DEFAULT_ITEMS_PER_PAGE,
+          records: DEFAULT_ITEMS_PER_PAGE,
           page: 1,
           order: "reportNumber",
         };
@@ -169,12 +169,12 @@ export function ListInspections() {
     }
   }
 
-  function handleOnChangeItemsPerPage(items: number) {
+  function handleOnChangeItemsPerPage(records: number) {
     if (params) {
       const newParams = {
         ...params,
         page: 1,
-        items,
+        records,
       };
 
       handleSearchParams(newParams);
@@ -334,22 +334,17 @@ export function ListInspections() {
             </Table>
           </Row>
 
-          <Row className="align-items-center">
-            <Col xs={12} md={6} lg={4} className="mb-3 mb-md-0">
+          <Row>
+            <Col xs={9}>
               <ItemsPerPage onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))} />
             </Col>
 
-            <Col
-              xs={12}
-              md={6}
-              lg={8}
-              className="d-flex justify-content-center justify-content-md-end"
-            >
+            <Col xs={3} className="d-flex justify-content-end ">
               {params && result ? (
                 <Pagination
                   key={params.page}
                   defaultCurrent={params.page}
-                  pageSize={Number(params.items)}
+                  pageSize={Number(params.records)}
                   total={result.total}
                   onChange={(page) => handleOnChangePage(page)}
                 />
