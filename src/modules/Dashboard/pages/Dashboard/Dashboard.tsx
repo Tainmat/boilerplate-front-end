@@ -1,40 +1,41 @@
-import { useEffect, useState, useCallback } from "react";
-import { Container, Row, Col, Card, Form } from "react-bootstrap";
-import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
 import { Section } from "@shared/components/Core/Containers/Section";
+import { Select } from "@shared/components/Core/Form/Fields/Select";
+import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
+import { Icon } from "@shared/components/Core/Icons/Icon";
+import { Skeleton } from "@shared/components/Core/Skeleton";
+import { Table, Tbody, Td, Th, Thead, Tr } from "@shared/components/Core/Table";
+import { Tag } from "@shared/components/Core/Tag";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Subtitle } from "@shared/components/Core/Typography/Subtitle";
-import { Icon } from "@shared/components/Core/Icons/Icon";
-import { Select } from "@shared/components/Core/Form/Fields/Select";
-import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
-import { Table, Thead, Tbody, Tr, Th, Td } from "@shared/components/Core/Table";
-import { Tag } from "@shared/components/Core/Tag";
-import { Pagination } from "@shared/components/Core/Pagination";
-import { Skeleton } from "@shared/components/Core/Skeleton";
+import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
+import { useCallback, useEffect, useState } from "react";
+import { Card, Col, Container, Form, Row } from "react-bootstrap";
 /* import { customers } from "@shared/hooks/services/Admin/useCustomers"; */
-import { useDashboard } from "@shared/hooks/services/Dashboard/useDashboard";
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
+import { useDashboard } from "@shared/hooks/services/Dashboard/useDashboard";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 // Importação dos componentes de gráficos
+import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
+import { ButtonLink } from "@/shared/components/Core/Buttons/ButtonLink";
 import {
-  Chart as ChartJS,
   ArcElement,
-  Tooltip as ChartTooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
   BarElement,
-  Title,
+  CategoryScale,
+  Chart as ChartJS,
+  Tooltip as ChartTooltip,
   Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
 } from "chart.js";
-import { Pie, Line, Bar } from "react-chartjs-2";
+import { Bar, Line, Pie } from "react-chartjs-2";
 
 // Registrando componentes do Chart.js
 ChartJS.register(
@@ -114,7 +115,7 @@ export function Dashboard() {
   const { result: statusOptions } = usePartInspectionStatusDropdown();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(5);
+
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
@@ -125,7 +126,11 @@ export function Dashboard() {
 
   // Função para processar os dados das inspeções
   const processInspectionData = useCallback((): DashboardData => {
-    if (!dashboardApiData || !dashboardApiData.temporalEvolution || dashboardApiData.temporalEvolution.length === 0) {
+    if (
+      !dashboardApiData ||
+      !dashboardApiData.temporalEvolution ||
+      dashboardApiData.temporalEvolution.length === 0
+    ) {
       return {
         totalInspecoes: 0,
         inspecoesAprovadas: 0,
@@ -237,9 +242,7 @@ export function Dashboard() {
       return 0;
     });
     const inAnalysisByMonth = dashboardApiData.temporalEvolution.map((te) => te.em_analise);
-    const pendingByMonth = dashboardApiData.temporalEvolution.map(
-      (te) => te.com_restricao,
-    );
+    const pendingByMonth = dashboardApiData.temporalEvolution.map((te) => te.com_restricao);
 
     const comparativoData = {
       labels: evolutionLabels,
@@ -247,7 +250,6 @@ export function Dashboard() {
       comRestricao: withRestrictionByMonth,
       reprovadas: rejectedByMonth,
     };
-
 
     return {
       totalInspecoes,
@@ -445,12 +447,6 @@ export function Dashboard() {
       }
     : null;
 
-  // Paginação da tabela
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems =
-    dashboardData?.ultimasInspecoes.slice(indexOfFirstItem, indexOfLastItem) || [];
-
   // Função para obter cor do status
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -459,7 +455,7 @@ export function Dashboard() {
       case "Com restrição":
         return "helper"; // Vermelho
       case "Em análise":
-        return "neutral"; // Azul
+        return "brand-secondary-pure"; // Azul
       case "Não conforme":
         return "warning"; // Laranja
       default:
@@ -691,38 +687,49 @@ export function Dashboard() {
                                 </Td>
                               </Tr>
                             ))
-                        ) : currentItems.length > 0 ? (
-                          currentItems.map((inspecao, index) => (
-                            <Tr key={index} expandable={isSmartphone}>
-                              <Td>
-                                <Paragraph size="sm">{inspecao.reportNumber}</Paragraph>
-                              </Td>
-                              <Td hideOnMobile={isSmartphone}>
-                                <Paragraph size="sm">
-                                  {new Date(inspecao.reportStartDate).toLocaleDateString("pt-BR")}
-                                </Paragraph>
-                              </Td>
-                              <Td hideOnMobile={isSmartphone}>
-                                <Paragraph size="sm">{inspecao.customer.fantasyName}</Paragraph>
-                              </Td>
-                              <Td>
-                                <Paragraph size="sm">{inspecao.partType.name}</Paragraph>
-                              </Td>
-                              <Td>
+                        ) : dashboardData && dashboardData?.ultimasInspecoes.length > 0 ? (
+                          <>
+                            {dashboardData?.ultimasInspecoes.map((inspecao, index) => (
+                              <Tr key={index} expandable={isSmartphone}>
+                                <Td>
+                                  <Paragraph size="sm">{inspecao.reportNumber}</Paragraph>
+                                </Td>
+                                <Td hideOnMobile={isSmartphone}>
+                                  <Paragraph size="sm">
+                                    {new Date(inspecao.reportStartDate).toLocaleDateString("pt-BR")}
+                                  </Paragraph>
+                                </Td>
+                                <Td hideOnMobile={isSmartphone}>
+                                  <Paragraph size="sm">{inspecao.customer.fantasyName}</Paragraph>
+                                </Td>
+                                <Td>
+                                  <Paragraph size="sm">{inspecao.partType.name}</Paragraph>
+                                </Td>
+                                <Td>
+                                  <div className="d-flex justify-content-center">
+                                    <Tag
+                                      size="lg"
+                                      status={getStatusColor(inspecao.inspectionStatus.description)}
+                                    >
+                                      {inspecao.inspectionStatus.description}
+                                    </Tag>
+                                  </div>
+                                </Td>
+                                <Td hideOnMobile={isSmartphone}>
+                                  <Paragraph size="sm">{inspecao.inspectorUser.name}</Paragraph>
+                                </Td>
+                              </Tr>
+                            ))}
+                            <Tr>
+                              <Td colSpan={6}>
                                 <div className="d-flex justify-content-center">
-                                  <Tag
-                                    size="lg"
-                                    status={getStatusColor(inspecao.inspectionStatus.description)}
-                                  >
-                                    {inspecao.inspectionStatus.description}
-                                  </Tag>
+                                  <ButtonLink route={ROUTE_LIST_INSPECTIONS} mode="dark" size="sm">
+                                    Ver Mais
+                                  </ButtonLink>
                                 </div>
                               </Td>
-                              <Td hideOnMobile={isSmartphone}>
-                                <Paragraph size="sm">{inspecao.inspectorUser.name}</Paragraph>
-                              </Td>
                             </Tr>
-                          ))
+                          </>
                         ) : (
                           <Tr>
                             <Td colSpan={6}>
@@ -735,18 +742,6 @@ export function Dashboard() {
                       </Tbody>
                     </Table>
                   </div>
-
-                  {/* Paginação */}
-                  {dashboardData && dashboardData.ultimasInspecoes.length > itemsPerPage && (
-                    <div className="d-flex justify-content-end mt-3">
-                      <Pagination
-                        defaultCurrent={currentPage}
-                        pageSize={itemsPerPage}
-                        total={dashboardData.ultimasInspecoes.length}
-                        onChange={(page) => setCurrentPage(page)}
-                      />
-                    </div>
-                  )}
                 </Card.Body>
               </Card>
             </Col>

@@ -5,25 +5,28 @@ import { Tooltip } from "@shared/components/Core/Tooltip";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 
 import { IInspection } from "@/shared/hooks/services/Admin/useInspections";
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 
 interface Props {
   data: IInspection;
   onEdit: () => void;
-  onShowLogs?: () => void;
   onGeneratePdf: () => void;
+  handleOnChangeStatusInspection: () => void;
 }
 
-function getStatusColor(status: string): "success" | "warning" | "helper" | "default" {
+function getStatusColor(
+  status: string,
+): "success" | "warning" | "helper" | "default" | "brand-secondary-pure" {
   switch (status.toLowerCase()) {
     case "aprovado":
       return "success";
     case "com restrição":
-      return "default"; // azul
+      return "helper"; // azul
     case "não conforme":
       return "warning"; // vermelho
     case "em análise":
     case "em andamento":
-      return "helper";
+      return "brand-secondary-pure";
     case "rejeitado":
     case "cancelado":
       return "warning";
@@ -32,7 +35,14 @@ function getStatusColor(status: string): "success" | "warning" | "helper" | "def
   }
 }
 
-export function InspectionsTable({ data, onEdit, onShowLogs, onGeneratePdf }: Props) {
+export function InspectionsTable({
+  data,
+  onEdit,
+  handleOnChangeStatusInspection,
+  onGeneratePdf,
+}: Props) {
+  const { isSystemAdmin } = useAuthRoles();
+
   return (
     <Tr>
       <Td>
@@ -79,16 +89,27 @@ export function InspectionsTable({ data, onEdit, onShowLogs, onGeneratePdf }: Pr
       <Td>
         <div className="d-flex justify-content-center gap-2">
           <Tooltip title="Editar" place="top-start">
-            <ButtonIcon size="sm" icon="edit" onClick={() => onEdit()} />
+            <ButtonIcon disabled={!data.isActive} size="sm" icon="edit" onClick={() => onEdit()} />
           </Tooltip>
 
           <Tooltip title="Gerar PDF" place="top-start">
-            <ButtonIcon size="sm" icon="picture_as_pdf" onClick={() => onGeneratePdf()} />
+            <ButtonIcon
+              disabled={!data.isActive}
+              size="sm"
+              icon="picture_as_pdf"
+              onClick={() => onGeneratePdf()}
+            />
           </Tooltip>
 
-          {/* <Tooltip title="Visualizar Logs" place="top-start">
-            <ButtonIcon size="sm" icon="open_in_new" onClick={() => onShowLogs()} />
-          </Tooltip> */}
+          <Tooltip title={data.isActive ? "Desativar" : "Ativar"} place="top-start">
+            <ButtonIcon
+              disabled={!isSystemAdmin()}
+              size="sm"
+              icon={data.isActive ? "toggle_on" : "toggle_off"}
+              mode={data.isActive ? "success" : "warning"}
+              onClick={() => handleOnChangeStatusInspection()}
+            />
+          </Tooltip>
         </div>
       </Td>
     </Tr>

@@ -1,0 +1,81 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.0'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Determine Build Command and Deploy Path
+        id: set_deploy_info
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "build_cmd=build:production" >> $GITHUB_OUTPUT
+            echo "path=/var/www/jometto.com.br/usincheck/html" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "build_cmd=build:dev" >> $GITHUB_OUTPUT
+            echo "path=/var/www/jometto.com.br/qas-usincheck/html" >> $GITHUB_OUTPUT
+            echo "environment=qas" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build project
+        run: yarn ${{ steps.set_deploy_info.outputs.build_cmd }}
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ steps.set_deploy_info.outputs.path }}
+          ENVIRONMENT: ${{ steps.set_deploy_info.outputs.environment }}
+        run: |
+          echo "🚀 Deploying to $ENVIRONMENT environment..."
+          echo "📁 Target path: $DEPLOY_PATH"
+
+          # Create directory if it doesn't exist
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_IP "mkdir -p $DEPLOY_PATH"
+
+          # Create backup of current deployment
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_IP "cp -r $DEPLOY_PATH $DEPLOY_PATH.backup.$(date +%Y%m%d_%H%M%S)" || true
+
+          # Deploy files
+          rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key" dist/ $SERVER_USER@$SERVER_IP:$DEPLOY_PATH/
+
+          echo "✅ Deploy completed successfully!"
+
+      - name: Verify deployment
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ steps.set_deploy_info.outputs.path }}
+        run: |
+          echo "🔍 Verifying deployment..."
+          ssh -i ~/.ssh/deploy_key $SERVER_USER@$SERVER_IP "ls -la $DEPLOY_PATH" || echo "⚠️ Could not verify deployment"
+
+      - name: Cleanup
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

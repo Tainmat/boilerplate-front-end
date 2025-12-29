@@ -1,3 +1,4 @@
+import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { InputSearch } from "@shared/components/Core/Form/Fields/Search/Input";
 import { SelectSearch } from "@shared/components/Core/Form/Fields/Search/Select";
@@ -8,10 +9,7 @@ import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
-import { 
-  initialInspectionSearchValues, 
-  IInspectionSearchForm 
-} from "./InspectionSearchForm.form";
+import { IInspectionSearchForm, initialInspectionSearchValues } from "./InspectionSearchForm.form";
 
 interface Props {
   searchOptions: IOption[];
@@ -21,12 +19,12 @@ interface Props {
   onAdd?: () => void;
 }
 
-export function InspectionSearchForm({ 
-  searchOptions, 
+export function InspectionSearchForm({
+  searchOptions,
   statusOptions = [],
-  defaultValues, 
-  onSubmit, 
-  onAdd 
+  defaultValues,
+  onSubmit,
+  onAdd,
 }: Props) {
   const { isDesktop, isSmartphone, isTablet, isNotebook } = useDeviceDetection();
   const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
@@ -36,9 +34,9 @@ export function InspectionSearchForm({
       if (defaultValues) {
         setInitialValues(defaultValues);
       } else if (searchOptions.length === 1) {
-        setInitialValues({ 
-          ...initialInspectionSearchValues, 
-          searchingBy: searchOptions[0].value 
+        setInitialValues({
+          ...initialInspectionSearchValues,
+          searchingBy: searchOptions[0].value,
         });
       } else {
         setInitialValues(initialInspectionSearchValues);
@@ -50,13 +48,10 @@ export function InspectionSearchForm({
     <Row>
       <Col>
         {initialValues ? (
-          <Formik 
-            initialValues={initialValues} 
-            onSubmit={(values) => onSubmit && onSubmit(values)}
-          >
+          <Formik initialValues={initialValues} onSubmit={(values) => onSubmit && onSubmit(values)}>
             {({ values, setFieldValue, submitForm }) => (
               <Form>
-                <Row className="align-items-end">
+                <Row className="align-items-end mb-3">
                   <Col xs={12} md={3}>
                     <Field
                       as={SelectSearch}
@@ -110,7 +105,7 @@ export function InspectionSearchForm({
                     </Col>
                   )}
 
-                  <Col xs={12} md={2} className="d-flex justify-content-end">
+                  <Col xs={12} md={2} className="d-flex align-items-center justify-content-end ">
                     <div className="d-flex gap-2">
                       <Tooltip title="Buscar" place="top-start">
                         <ButtonIcon type="submit" size="lg" icon="search" mode="helper" />
@@ -127,6 +122,23 @@ export function InspectionSearchForm({
                         </Tooltip>
                       )}
                     </div>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col>
+                    <Tooltip title="Buscar" place="top-start">
+                      <Field
+                        as={Switch}
+                        name="status"
+                        checked={values.status === "all"}
+                        description="Mostrar inativos"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          setFieldValue("status", e.target.checked ? "all" : "active");
+                          submitForm();
+                        }}
+                      />
+                    </Tooltip>
                   </Col>
                 </Row>
               </Form>

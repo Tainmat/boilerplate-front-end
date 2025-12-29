@@ -34,6 +34,7 @@ import {
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
+import { put } from "@/shared/services/api/api.service";
 import { InspectionPDFReport } from "./components/InspectionPDFReport ";
 import { InspectionsTable } from "./components/InspectionsTable";
 
@@ -47,7 +48,7 @@ export function ListInspections() {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { result, params, setParams } = useInspections();
+  const { result, params, setParams, refetch } = useInspections();
   const { result: inspectionStatusOptions, loading: loadingStatuses } =
     usePartInspectionStatusDropdown();
 
@@ -141,7 +142,7 @@ export function ListInspections() {
       } else {
         params = {
           ...initialInspectionSearchValues,
-          items: DEFAULT_ITEMS_PER_PAGE,
+          records: DEFAULT_ITEMS_PER_PAGE,
           page: 1,
           order: "reportNumber",
         };
@@ -153,7 +154,7 @@ export function ListInspections() {
 
   function handleOnSearch(data: IInspectionSearchForm) {
     if (params) {
-      const { search, searchingBy, inspectionStatusId } = data;
+      const { search, searchingBy, inspectionStatusId, status } = data;
 
       const newParams = {
         ...params,
@@ -161,18 +162,19 @@ export function ListInspections() {
         searchingBy,
         search,
         inspectionStatusId,
+        status,
       };
 
       handleSearchParams(newParams);
     }
   }
 
-  function handleOnChangeItemsPerPage(items: number) {
+  function handleOnChangeItemsPerPage(records: number) {
     if (params) {
       const newParams = {
         ...params,
         page: 1,
-        items,
+        records,
       };
 
       handleSearchParams(newParams);
@@ -218,6 +220,30 @@ export function ListInspections() {
         title: "Erro ao buscar dados",
         description: "Não foi possível buscar os dados da inspeção.",
       });
+    }
+  }
+
+  async function handleOnChangeStatusInspection(inspectionId: string, inStatus: boolean) {
+    showLoader();
+
+    try {
+      const { data } = await put(`/operational/parts-inspection/${inspectionId}/in-status`, {
+        inStatus,
+      });
+
+      if (data) {
+        addToast({
+          description: `A inspeção foi ${inStatus ? "ativada" : "inativada"} com sucesso.`,
+          type: "success",
+          title: "Sucesso",
+        });
+      }
+
+      refetch();
+    } catch {
+      handleApiRejection();
+    } finally {
+      hideLoader();
     }
   }
 
@@ -293,7 +319,9 @@ export function ListInspections() {
                         data={item}
                         onEdit={() => addNew(item.id)}
                         onGeneratePdf={() => handleGeneratePdf(item.id)}
-                        /* onShowLogs={() => setInspectionLogs(item.id)} */
+                        handleOnChangeStatusInspection={() =>
+                          handleOnChangeStatusInspection(item.id, !item.isActive)
+                        }
                       />
                     ))
                   ) : (
@@ -306,22 +334,17 @@ export function ListInspections() {
             </Table>
           </Row>
 
-          <Row className="align-items-center">
-            <Col xs={12} md={6} lg={4} className="mb-3 mb-md-0">
+          <Row>
+            <Col xs={9}>
               <ItemsPerPage onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))} />
             </Col>
 
-            <Col
-              xs={12}
-              md={6}
-              lg={8}
-              className="d-flex justify-content-center justify-content-md-end"
-            >
+            <Col xs={3} className="d-flex justify-content-end ">
               {params && result ? (
                 <Pagination
                   key={params.page}
                   defaultCurrent={params.page}
-                  pageSize={Number(params.items)}
+                  pageSize={Number(params.records)}
                   total={result.total}
                   onChange={(page) => handleOnChangePage(page)}
                 />
