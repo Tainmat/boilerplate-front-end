@@ -9,11 +9,7 @@ export interface ICustomerDropdown {
   fantasyName: string;
 }
 
-interface Props {
-  onlyActive?: boolean;
-}
-
-export function useCustomersDropdown({ onlyActive }: Props) {
+export function useCustomersDropdown() {
   const [result, setResult] = useState<IOption[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +19,7 @@ export function useCustomersDropdown({ onlyActive }: Props) {
       setResult([]);
 
       const queryParams = removeEmptyEntries({
-        onlyActive: onlyActive,
+        isActive: true,
       });
 
       const { data } = await get<{ data: ICustomerDropdown[] }>(
