@@ -158,12 +158,6 @@ export function useDashboard(period?: string) {
         // Mapear o retorno da API para cards amigáveis
         const apiData = data.data || data;
 
-        // Calcular taxa de aprovação (média entre aprovadas e não conforme)
-        const totalAprovadas = apiData.aprovado?.amount || 0;
-        const totalNaoConforme = apiData.nao_conforme?.amount || 0;
-        const totalParaCalculo = totalAprovadas + totalNaoConforme;
-        const taxaAprovacao = totalParaCalculo > 0 ? (totalAprovadas / totalParaCalculo) * 100 : 0;
-
         const cards: IDashboardTotalizingCard[] = [
           {
             title: "Total de Inspeções",
@@ -201,9 +195,9 @@ export function useDashboard(period?: string) {
           },
           {
             title: "Taxa de Aprovação",
-            value: Math.round(taxaAprovacao),
+            value: Math.round(apiData.taxa_aprovacao),
             icon: "trending_up",
-            status: taxaAprovacao > 70 ? "success" : "helper",
+            status: apiData.taxa_aprovacao > 70 ? "success" : "helper",
           },
         ];
 

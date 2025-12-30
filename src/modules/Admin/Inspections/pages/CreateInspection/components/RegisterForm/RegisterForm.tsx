@@ -362,7 +362,7 @@ export function InspectionRegisterForm({
                           label="Identificação do Componente *"
                           name="componentId"
                           placeholder="Ex: Engrenagem Principal - Módulo 8"
-                          maxLength={100}
+                          maxLength={50}
                           type="text"
                           error={touched.componentId && !!errors.componentId}
                           helperText={

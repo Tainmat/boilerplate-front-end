@@ -42,6 +42,7 @@ export interface IInspectionRegisterForm {
   selectedPositions: number[];
   // Nova estrutura de imagens adicionais
   additionalImages?: IAdditionalImages;
+  isActive: boolean;
 }
 
 export const inspectionValidationSchema = Yup.object().shape({
@@ -61,21 +62,17 @@ export const inspectionValidationSchema = Yup.object().shape({
     .max(10, "O campo deve conter no máximo 10 caracteres!"),
   componentId: Yup.string()
     .required("O campo é obrigatório!")
-    .max(100, "O campo deve conter no máximo 100 caracteres!"),
-  positionNumber: Yup.string()
-    .required("O campo é obrigatório!"),
-  inspectionLocation: Yup.string()
-    .max(100, "O campo deve conter no máximo 100 caracteres!"),
-  mdaInformation: Yup.string()
-    .max(200, "O campo deve conter no máximo 200 caracteres!"),
+    .max(50, "O campo deve conter no máximo 50 caracteres!"),
+  positionNumber: Yup.string().required("O campo é obrigatório!"),
+  inspectionLocation: Yup.string().max(100, "O campo deve conter no máximo 100 caracteres!"),
+  mdaInformation: Yup.string().max(200, "O campo deve conter no máximo 200 caracteres!"),
   isVI: Yup.boolean(),
   isDM: Yup.boolean(),
   isPM: Yup.boolean(),
   isUS: Yup.boolean(),
   isLP: Yup.boolean(),
   isDU: Yup.boolean(),
-  finalConclusion: Yup.string()
-    .max(2048, "O campo deve conter no máximo 2048 caracteres!"),
+  finalConclusion: Yup.string().max(2048, "O campo deve conter no máximo 2048 caracteres!"),
   inspectionStatusId: Yup.string().required("O campo é obrigatório!"),
   isSandingBrushSandblasting: Yup.boolean(),
   isCleaningChemistry: Yup.boolean(),
@@ -89,26 +86,30 @@ export const inspectionValidationSchema = Yup.object().shape({
     .min(1, "Selecione pelo menos uma posição de inspeção!")
     .required("Selecione pelo menos uma posição de inspeção!"),
   // Nova estrutura de imagens adicionais
-  additionalImages: Yup.object().shape({
-    images: Yup.array()
-      .of(
-        Yup.mixed().nullable().test("imageValidation", "Dados da imagem inválidos", (value: any) => {
-          if (!value) return true; // null é válido (slot vazio)
-          
-          // Verifica se é um objeto com as propriedades mínimas necessárias
-          if (typeof value !== 'object' || !value.base64) {
-            return false;
-          }
-          
-          // Valida se base64 é uma string válida
-          if (typeof value.base64 !== 'string' || !value.base64.startsWith('data:image/')) {
-            return false;
-          }
-          
-          return true;
-        })
-      )
-      .max(3, "Máximo de 3 slots de imagem"),
-    imagesToDel: Yup.array().of(Yup.string())
-  }).optional(),
+  additionalImages: Yup.object()
+    .shape({
+      images: Yup.array()
+        .of(
+          Yup.mixed()
+            .nullable()
+            .test("imageValidation", "Dados da imagem inválidos", (value: any) => {
+              if (!value) return true; // null é válido (slot vazio)
+
+              // Verifica se é um objeto com as propriedades mínimas necessárias
+              if (typeof value !== "object" || !value.base64) {
+                return false;
+              }
+
+              // Valida se base64 é uma string válida
+              if (typeof value.base64 !== "string" || !value.base64.startsWith("data:image/")) {
+                return false;
+              }
+
+              return true;
+            }),
+        )
+        .max(3, "Máximo de 3 slots de imagem"),
+      imagesToDel: Yup.array().of(Yup.string()),
+    })
+    .optional(),
 });
