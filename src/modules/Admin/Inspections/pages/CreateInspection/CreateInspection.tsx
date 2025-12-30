@@ -127,6 +127,7 @@ export function CreateInspection() {
             images: existingImages,
             imagesToDel: [],
           },
+          isActive: data.isActive,
         };
 
         setInspection(formData);
@@ -199,6 +200,7 @@ export function CreateInspection() {
           images: [null, null, null], // 3 slots vazios
           imagesToDel: [],
         },
+        isActive: true,
       });
       setCurrentStep("form");
     } catch (error) {
