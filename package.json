@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode dev",
+    "dev": "vite",
+    "dev:qas": "vite --mode dev",
     "build:dev": "tsc && vite build --mode dev",
-    "build:test": "tsc && vite build --mode test",
     "build:production": "tsc && vite build --mode production",
     "build": "tsc && vite build",
     "lint:fix": "eslint ./src --ext .jsx,.js,.ts,.tsx --fix --ignore-path ./.gitignore --max-warnings=0",

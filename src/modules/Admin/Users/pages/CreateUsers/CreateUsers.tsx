@@ -18,13 +18,6 @@ import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
-// Dados fictícios para perfis
-const perfis = [
-  { id: 1, uuidPerfil: "perf-1111", dsPerfil: "Administrador", dsSiglaPerfil: "ADM" },
-  { id: 2, uuidPerfil: "perf-2222", dsPerfil: "Inspetor", dsSiglaPerfil: "INS" },
-  { id: 3, uuidPerfil: "perf-3333", dsPerfil: "Cliente", dsSiglaPerfil: "CLI" },
-];
-
 export function CreateUsers() {
   const navigate = useNavigate();
   const { showLoader, hideLoader } = useLoaderContext();
@@ -58,8 +51,10 @@ export function CreateUsers() {
               birthDate: response.birthDate,
               email: response.email,
               profileId: response.profileId,
+              profileName: response.profileName || "",
               isActive: response.isActive ? ("true" as const) : ("false" as const),
               signature: response.signature || "",
+              customersIds: response.customersIds || [],
             };
 
             setUser(userData);
@@ -90,8 +85,10 @@ export function CreateUsers() {
         birthDate: "",
         email: "",
         profileId: "",
-        isActive: "false",
+        profileName: "",
+        isActive: "true",
         signature: "",
+        customersIds: [],
       });
     }
   }, [setPageBreadcrumb, uuid, navigate, addToast]);
