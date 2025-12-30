@@ -90,7 +90,7 @@ export function InspectionRegisterForm({
   };
 
   // Buscar dados para os selects
-  const { result: customersOptions, loading: loadingCustomers } = useCustomersDropdown();
+  const { result: customersOptions, loading: loadingCustomers } = useCustomersDropdown({});
   const { result: usersOptions, loading: loadingUsers } = useUsersDropdown();
   const { result: inspectionStatusOptions } = usePartInspectionStatusDropdown();
 
