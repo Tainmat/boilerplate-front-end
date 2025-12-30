@@ -62,7 +62,7 @@ export const inspectionValidationSchema = Yup.object().shape({
     .max(10, "O campo deve conter no máximo 10 caracteres!"),
   componentId: Yup.string()
     .required("O campo é obrigatório!")
-    .max(100, "O campo deve conter no máximo 100 caracteres!"),
+    .max(50, "O campo deve conter no máximo 50 caracteres!"),
   positionNumber: Yup.string().required("O campo é obrigatório!"),
   inspectionLocation: Yup.string().max(100, "O campo deve conter no máximo 100 caracteres!"),
   mdaInformation: Yup.string().max(200, "O campo deve conter no máximo 200 caracteres!"),

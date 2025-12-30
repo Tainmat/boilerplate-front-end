@@ -278,6 +278,7 @@ export function CreateInspection() {
         flankAndBottomConclusion: "",
         keywayChannelsConclusion: "",
         additionalObservations: "",
+        isActive: formValues.isActive,
       };
 
       let inspectionId = uuid;

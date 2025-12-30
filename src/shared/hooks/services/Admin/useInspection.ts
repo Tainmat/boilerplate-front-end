@@ -104,6 +104,7 @@ export interface IInspectionCreateData {
   /* supervisorName: string;
   clientRepresentativeName: string; */
   additionalImagesBase64?: string[];
+  isActive: boolean;
 }
 
 export function useInspection() {
