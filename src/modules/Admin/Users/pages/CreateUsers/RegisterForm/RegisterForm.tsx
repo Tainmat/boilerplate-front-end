@@ -1,6 +1,3 @@
-import { MultiSelect } from "@/shared/components/Core/Form/Fields/MultiSelect";
-import { IMultiSelectOption } from "@/shared/components/Core/Form/Fields/MultiSelect/MultiSelect.interface";
-import { useCustomersDropdown } from "@/shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
 import { useProfileNotAssociatedDropdown } from "@/shared/hooks/services/Admin/Dropdown/useProfileNotAssociatedDropdown";
 import {
   IUserRegisterForm,
@@ -29,7 +26,6 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
   const { result: profilesOptions } = useProfileNotAssociatedDropdown();
-  const { result: customersOptions } = useCustomersDropdown({ onlyActive: true });
   const [isCompressingImage, setIsCompressingImage] = useState(false);
   const [isSignatureChanged, setIsSignatureChanged] = useState(false);
   const [isSignatureDeleted, setIsSignatureDeleted] = useState(false);
@@ -125,7 +121,7 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
             </Row>
 
             <Row className="mb-4">
-              <Col xl={4}>
+              <Col xl={5}>
                 <Field
                   as={InputText}
                   label="E-mail do Usuário"
@@ -139,7 +135,7 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                 />
               </Col>
 
-              <Col xl={2}>
+              <Col xl={3}>
                 <Field
                   as={InputDatePicker}
                   label="Data de Nascimento"
@@ -152,70 +148,37 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                 />
               </Col>
 
-              <Col xl={3}>
+              <Col xl={4}>
                 <Field
                   as={Select}
                   label="Perfil"
                   name="profileId"
-                  value={values.profileId}
                   placeholder="Selecione um Perfil"
                   options={profilesOptions}
                   error={touched.profileId && !!errors.profileId}
                   helperText={touched.profileId && !!errors.profileId ? errors.profileId : ""}
-                  onChange={({ value, label }: IOption) => {
-                    setFieldValue("profileId", value, true);
-                    setFieldValue("profileName", label);
-
-                    // Limpa customersIds se não for perfil Cliente
-                    if (label !== "Cliente") {
-                      setFieldValue("customersIds", []);
-                    }
+                  onChange={({ value }: IOption) => {
+                    setFieldTouched("profileId");
+                    setFieldValue("profileId", value);
                   }}
                 />
               </Col>
-
-              {values.profileName === "Cliente" && (
-                <Col xl={3}>
-                  <Field
-                    as={MultiSelect}
-                    label="Clientes Associados"
-                    name="customersIds"
-                    placeholder="Selecione os Clientes"
-                    options={customersOptions}
-                    value={values.customersIds}
-                    error={touched.customersIds && !!errors.customersIds}
-                    helperText={
-                      touched.customersIds && !!errors.customersIds ? errors.customersIds : ""
-                    }
-                    onChange={(values: IMultiSelectOption[]) => {
-                      setFieldTouched("customersIds");
-
-                      setFieldValue(
-                        "customersIds",
-                        values.map((option) => option.value),
-                      );
-                    }}
-                  />
-                </Col>
-              )}
             </Row>
 
             <Row className="mb-4">
-              {!values.id && (
-                <Col xl={5}>
-                  <Field
-                    as={InputText}
-                    label="Senha do Usuário"
-                    name="password"
-                    placeholder="Informe a senha do Usuário"
-                    maxLength={20}
-                    inputMode="password"
-                    type="password"
-                    error={touched.password && !!errors.password}
-                    helperText={touched.password && !!errors.password ? errors.password : ""}
-                  />
-                </Col>
-              )}
+              <Col xl={5}>
+                <Field
+                  as={InputText}
+                  label="Senha do Usuário"
+                  name="password"
+                  placeholder="Informe a senha do Usuário"
+                  maxLength={20}
+                  inputMode="password"
+                  type="password"
+                  error={touched.password && !!errors.password}
+                  helperText={touched.password && !!errors.password ? errors.password : ""}
+                />
+              </Col>
 
               <Col xl={7}>
                 <Field
