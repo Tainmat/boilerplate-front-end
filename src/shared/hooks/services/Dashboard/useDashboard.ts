@@ -1,5 +1,5 @@
+import { removeEmptyEntries } from "@/shared/utils/generic";
 import { get } from "@shared/services/api/api.service";
-import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 
 export interface IDashboardPartType {
@@ -79,46 +79,25 @@ export interface IDashboardData {
   latestInspections: IDashboardInspection[];
 }
 
-// Função para converter período em datas
-const getPeriodDates = (period: string) => {
-  const today = new Date();
-  const finalDate = new Date(today);
-  const initialDate = new Date(today);
+export interface IDashboardParams {
+  initialReportStartDate: string;
+  finalReportStartDate: string;
+  customerId: string;
+}
 
-  switch (period) {
-    case "last30days":
-      initialDate.setDate(today.getDate() - 30);
-      break;
-    case "last90days":
-      initialDate.setDate(today.getDate() - 90);
-      break;
-    case "last6months":
-      initialDate.setMonth(today.getMonth() - 6);
-      break;
-    case "last12months":
-    default:
-      initialDate.setMonth(today.getMonth() - 12);
-      break;
-  }
-
-  return {
-    initialReportStartDate: format(initialDate, "yyyy-MM-dd"),
-    finalReportStartDate: format(finalDate, "yyyy-MM-dd"),
-  };
-};
-
-export function useDashboard(period?: string) {
+export function useDashboard() {
+  const [params, setParams] = useState<IDashboardParams | null>(null);
   const [data, setData] = useState<IDashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPartTypes = useCallback(
-    async (periodParam?: string): Promise<IDashboardPartType[]> => {
+    async (params: IDashboardParams): Promise<IDashboardPartType[]> => {
       try {
-        const params = getPeriodDates(periodParam || "last12months");
+        const payload = removeEmptyEntries(params);
         const { data } = await get<IDashboardPartType[]>(
           "/operational/parts-inspection/dashboard/inspection-part-types",
-          params,
+          payload,
         );
         return data.data || [];
       } catch (error) {
@@ -129,12 +108,12 @@ export function useDashboard(period?: string) {
   );
 
   const fetchTemporalEvolution = useCallback(
-    async (periodParam?: string): Promise<IDashboardTemporalEvolution[]> => {
+    async (params: IDashboardParams): Promise<IDashboardTemporalEvolution[]> => {
       try {
-        const params = getPeriodDates(periodParam || "last12months");
+        const payload = removeEmptyEntries(params);
         const { data } = await get<IDashboardTemporalEvolution[]>(
           "/operational/parts-inspection/dashboard/temporal-evolution",
-          params,
+          payload,
         );
         return data.data || [];
       } catch (error) {
@@ -145,14 +124,12 @@ export function useDashboard(period?: string) {
   );
 
   const fetchTotalizingCards = useCallback(
-    async (periodParam?: string): Promise<IDashboardTotalizingCard[]> => {
+    async (params: IDashboardParams): Promise<IDashboardTotalizingCard[]> => {
       try {
-        const params = {
-          ...getPeriodDates(periodParam || "last12months"),
-        };
+        const payload = removeEmptyEntries(params);
         const { data } = await get<IApiTotalizingCardsResponse>(
           "/operational/parts-inspection/dashboard/totalizing-cards",
-          params,
+          payload,
         );
 
         // Mapear o retorno da API para cards amigáveis
@@ -210,18 +187,20 @@ export function useDashboard(period?: string) {
   );
 
   const fetchLatestInspections = useCallback(
-    async (periodParam?: string): Promise<IDashboardInspection[]> => {
+    async (params: IDashboardParams): Promise<IDashboardInspection[]> => {
       try {
-        const params = {
-          ...getPeriodDates(periodParam || "last12months"),
-          records: 10, // Últimas 10 inspeções
+        const filters = removeEmptyEntries(params);
+
+        const payload = {
+          ...filters,
+          records: 10,
           page: 1,
           order: "reportStartDate:DESC",
           status: "active",
         };
         const { data } = await get<{ data: IDashboardInspection[] }>(
           "/operational/parts-inspection",
-          params,
+          payload,
         );
         return data.data || [];
       } catch (error) {
@@ -232,17 +211,17 @@ export function useDashboard(period?: string) {
   );
 
   const loadDashboardData = useCallback(
-    async (periodParam?: string) => {
+    async (params: IDashboardParams) => {
       setLoading(true);
       setError(null);
 
       try {
         const [partTypes, temporalEvolution, totalizingCards, latestInspections] =
           await Promise.all([
-            fetchPartTypes(periodParam),
-            fetchTemporalEvolution(periodParam),
-            fetchTotalizingCards(periodParam),
-            fetchLatestInspections(periodParam),
+            fetchPartTypes(params),
+            fetchTemporalEvolution(params),
+            fetchTotalizingCards(params),
+            fetchLatestInspections(params),
           ]);
 
         setData({
@@ -261,20 +240,22 @@ export function useDashboard(period?: string) {
   );
 
   const refetch = useCallback(
-    (periodParam?: string) => {
-      loadDashboardData(periodParam);
+    (params: IDashboardParams) => {
+      loadDashboardData(params);
     },
     [loadDashboardData],
   );
 
   useEffect(() => {
-    loadDashboardData(period);
-  }, [loadDashboardData, period]);
+    params && loadDashboardData(params);
+  }, [loadDashboardData, params]);
 
   return {
     data,
     loading,
     error,
     refetch,
+    setParams,
+    params,
   };
 }

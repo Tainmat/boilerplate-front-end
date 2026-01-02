@@ -1,7 +1,10 @@
-import { removeEmptyEntries } from "@/shared/utils/generic";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { get } from "@shared/services/api/api.service";
 import { useCallback, useEffect, useState } from "react";
+
+import { useAuthContext } from "@/shared/contexts/Auth";
+import { removeEmptyEntries } from "@/shared/utils/generic";
+import { useAuthRoles } from "../../Rules/Auth/useRoles";
 
 export interface ICustomerDropdown {
   id: string;
@@ -14,6 +17,8 @@ interface Props {
 }
 
 export function useCustomersDropdown({ onlyActive }: Props) {
+  const { user } = useAuthContext();
+  const { isCustomer } = useAuthRoles();
   const [result, setResult] = useState<IOption[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -22,22 +27,30 @@ export function useCustomersDropdown({ onlyActive }: Props) {
       setLoading(true);
       setResult([]);
 
+      let customers: ICustomerDropdown[] = [];
+
       const queryParams = removeEmptyEntries({
         onlyActive: onlyActive,
       });
 
-      const { data } = await get<{ data: ICustomerDropdown[] }>(
-        "parametrizations/customers/dropdown",
-        queryParams,
-      );
+      if (isCustomer()) {
+        customers = user?.customers || [];
+      } else {
+        const { data } = await get<{ data: ICustomerDropdown[] }>(
+          "parametrizations/customers/dropdown",
+          queryParams,
+        );
 
-      if (Array.isArray(data.data) && data.data.length > 0) {
-        const customers = data.data.map((item: ICustomerDropdown) => ({
+        customers = data.data;
+      }
+
+      if (Array.isArray(customers) && customers.length > 0) {
+        const customersOptions = customers.map((item: ICustomerDropdown) => ({
           value: item.id,
           label: item.fantasyName || item.corporateName,
         }));
 
-        setResult(customers);
+        setResult(customersOptions);
       } else {
         setResult([]);
       }

@@ -1,3 +1,5 @@
+import "react-quill-new/dist/quill.snow.css";
+
 import { Button } from "@shared/components/Core/Buttons/Button";
 import { Checkbox } from "@shared/components/Core/Form/Fields/Checkbox";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
@@ -10,17 +12,16 @@ import { useCustomersDropdown } from "@shared/hooks/services/Admin/Dropdown/useC
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useUsersDropdown } from "@shared/hooks/services/Admin/Dropdown/useUsersDropdown";
 import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
+import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Card, Col, Row } from "react-bootstrap";
+import ReactQuill from "react-quill-new";
 import { useNavigate } from "react-router-dom";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
-import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
-
 import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
-import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css";
+
 import { IInspectionRegisterForm, inspectionValidationSchema } from "./RegisterForm.form";
 
 interface Props {

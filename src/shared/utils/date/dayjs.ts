@@ -131,3 +131,11 @@ export const isTomorrow = (date: Date): boolean => {
 export const isYesterday = (date: Date): boolean => {
   return dayjs(date).isSame(dayjs().subtract(1, "day"), "day");
 };
+
+export const firstDayOfMonth = (): string => {
+  return dayjs().startOf("month").format("YYYY-MM-DD");
+};
+
+export const lastDayOfMonth = (): string => {
+  return dayjs().endOf("month").format("YYYY-MM-DD");
+};
