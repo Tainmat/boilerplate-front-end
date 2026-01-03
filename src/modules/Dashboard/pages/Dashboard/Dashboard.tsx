@@ -24,6 +24,7 @@ import {
 } from "chart.js";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import { Bar, Line, Pie } from "react-chartjs-2";
+import { TotalizingCards } from "./components/Charts/TotalizingCards";
 import { DashboardSearchForm } from "./components/SearchForm";
 import { useDashboardRules } from "./useDashboardRules";
 
@@ -57,7 +58,7 @@ export function Dashboard() {
     areaChartData,
     getStatusColor,
     params,
-    setParams,
+    handleSearchParams,
   } = useDashboardRules();
 
   return (
@@ -74,7 +75,10 @@ export function Dashboard() {
             </Col>
           </Row>
           {/* Filtros */}
-          <DashboardSearchForm initialValues={params} onSearch={(params) => setParams(params)} />
+          <DashboardSearchForm
+            initialValues={params}
+            onSearch={(params) => handleSearchParams(params)}
+          />
 
           {/* Última atualização */}
           <Row className="mb-4">
@@ -84,42 +88,10 @@ export function Dashboard() {
               </Paragraph>
             </Col>
           </Row>
+
           {/* Cards de Métricas */}
-          <Row className="mb-4 g-3 d-flex justify-content-center">
-            {dashboardApiData?.totalizingCards.map((card, index) => (
-              <Col
-                key={index}
-                className="d-flex justify-content-center"
-                style={{
-                  flex: "1 1 0",
-                  minWidth: isSmartphone ? "100%" : "200px",
-                  maxWidth: isSmartphone ? "100%" : "240px",
-                }}
-              >
-                <Card className="w-100 shadow-sm" style={{ minHeight: "140px" }}>
-                  <Card.Body className="d-flex flex-column justify-content-between text-center">
-                    {loading ? (
-                      <Skeleton />
-                    ) : (
-                      <>
-                        <Subtitle size="xs" color="primary" className="mb-2">
-                          {card.title}
-                        </Subtitle>
-                        <div className="mb-2">
-                          <Heading size="md">
-                            {card.title === "Taxa de Aprovação" ? `${card.value}%` : card.value}
-                          </Heading>
-                        </div>
-                        <div className="d-flex justify-content-center">
-                          <Icon icon={card.icon} size="md" mode={card.status} />
-                        </div>
-                      </>
-                    )}
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+          <TotalizingCards params={params} />
+
           {/* Gráficos - Primeira Linha */}
           <Row className="mb-4">
             {/* Gráfico de Pizza - Status */}

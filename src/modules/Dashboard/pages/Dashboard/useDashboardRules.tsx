@@ -1,11 +1,12 @@
 import { useBreadcrumbContext } from "@/shared/contexts/Layout/Breadcrumb";
 import { firstDayOfMonth, lastDayOfMonth } from "@/shared/utils/date/dayjs";
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
-import { useDashboard } from "@shared/hooks/services/Dashboard/useDashboard";
+import { IDashboardParams, useDashboard } from "@shared/hooks/services/Dashboard/useDashboard";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 // Tipos para os dados da dashboard
 export interface DashboardData {
@@ -64,8 +65,6 @@ export const chartColors = {
 export function useDashboardRules() {
   const { isSmartphone } = useDeviceDetection();
 
-  // Estados
-  const [dateRange, setDateRange] = useState<string>("last12months");
   const { data: dashboardApiData, loading, refetch, params, setParams } = useDashboard();
   const { result: statusOptions } = usePartInspectionStatusDropdown();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -73,15 +72,37 @@ export function useDashboardRules() {
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const { setPageBreadcrumb } = useBreadcrumbContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const handleSearchParams = useCallback(
+    (params: IDashboardParams) => {
+      setSearchParams({
+        q: window.btoa(JSON.stringify(params)),
+      });
+
+      setParams(params);
+    },
+    [setSearchParams, setParams],
+  );
 
   useLayoutEffect(() => {
     setPageBreadcrumb([{ text: "Página Inicial" }]);
 
-    setParams({
-      customerId: "",
-      initialReportStartDate: firstDayOfMonth(),
-      finalReportStartDate: lastDayOfMonth(),
-    });
+    if (params === null) {
+      let params;
+
+      if (searchParams.get("q")) {
+        params = JSON.parse(window.atob(String(searchParams.get("q"))));
+      } else {
+        params = {
+          customerId: "",
+          initialReportStartDate: firstDayOfMonth(),
+          finalReportStartDate: lastDayOfMonth(),
+        };
+      }
+
+      handleSearchParams(params);
+    }
   }, [setPageBreadcrumb]);
 
   // Função para processar os dados das inspeções
@@ -430,7 +451,6 @@ export function useDashboardRules() {
 
   return {
     // Estados
-    dateRange,
     dashboardData,
     dashboardApiData,
     loading,
@@ -454,6 +474,6 @@ export function useDashboardRules() {
     getStatusColor,
     handleAutoRefreshToggle,
     setCurrentPage,
-    setParams,
+    handleSearchParams,
   };
 }
