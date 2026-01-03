@@ -23,8 +23,9 @@ import {
   Title,
 } from "chart.js";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import { Bar, Line, Pie } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import { TotalizingCards } from "./components/Charts/TotalizingCards";
+import { StatusPieChart } from "./components/Charts/StatusPieChart";
 import { DashboardSearchForm } from "./components/SearchForm";
 import { useDashboardRules } from "./useDashboardRules";
 
@@ -46,14 +47,13 @@ export function Dashboard() {
   // Usar o hook de regras de negócio
   const {
     dashboardData,
-    dashboardApiData,
+    totalizingCardsData,
     loading,
+    totalizingCardsLoading,
     lastUpdated,
     isSmartphone,
-    pieChartOptions,
     barChartOptions,
     areaChartOptions,
-    pieChartData,
     barChartData,
     areaChartData,
     getStatusColor,
@@ -90,32 +90,13 @@ export function Dashboard() {
           </Row>
 
           {/* Cards de Métricas */}
-          <TotalizingCards params={params} />
+          <TotalizingCards data={totalizingCardsData} loading={totalizingCardsLoading} />
 
           {/* Gráficos - Primeira Linha */}
           <Row className="mb-4">
             {/* Gráfico de Pizza - Status */}
             <Col lg={6} md={12} className="mb-4 mb-lg-0">
-              <Card className="h-100 shadow-sm">
-                <Card.Body>
-                  <Subtitle size="xs" className="mb-3">
-                    Distribuição por Status
-                  </Subtitle>
-                  {loading ? (
-                    <div style={{ height: "300px" }}>
-                      <Skeleton />
-                    </div>
-                  ) : pieChartData ? (
-                    <div style={{ height: "300px" }}>
-                      <Pie data={pieChartData} options={pieChartOptions} />
-                    </div>
-                  ) : (
-                    <div className="d-flex justify-content-center align-items-center h-100">
-                      <Paragraph size="sm">Sem dados disponíveis</Paragraph>
-                    </div>
-                  )}
-                </Card.Body>
-              </Card>
+              <StatusPieChart data={totalizingCardsData} loading={totalizingCardsLoading} />
             </Col>
 
             {/* Gráfico de Barras - Tipos */}

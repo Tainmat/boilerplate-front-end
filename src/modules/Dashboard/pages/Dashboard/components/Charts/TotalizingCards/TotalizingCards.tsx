@@ -2,20 +2,21 @@ import { Icon } from "@/shared/components/Core/Icons/Icon";
 import { Skeleton } from "@/shared/components/Core/Skeleton";
 import { Heading } from "@/shared/components/Core/Typography/Heading";
 import { Subtitle } from "@/shared/components/Core/Typography/Subtitle";
-import { IDashboardParams } from "@/shared/hooks/services/Dashboard/useDashboard";
+import { ITotalizingCardData } from "@/shared/hooks/services/Dashboard/useTotalizingCards";
 import { Card, Col, Row } from "react-bootstrap";
 import { useTotalizingCardRules } from "./useTotalizingCardRules";
 
 interface Props {
-  params: IDashboardParams | null;
+  data: ITotalizingCardData | null;
+  loading: boolean;
 }
 
-export function TotalizingCards({ params }: Props) {
-  const { isSmartphone, data, loading } = useTotalizingCardRules({ params });
+export function TotalizingCards({ data, loading }: Props) {
+  const { isSmartphone, processData } = useTotalizingCardRules({ data });
 
   return (
     <Row className="mb-4 g-3 d-flex justify-content-center">
-      {data?.map((card, index) => (
+      {processData?.map((card, index) => (
         <Col
           key={index}
           className="d-flex justify-content-center"

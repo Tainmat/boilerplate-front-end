@@ -1,4 +1,5 @@
 import { useBreadcrumbContext } from "@/shared/contexts/Layout/Breadcrumb";
+import { useTotalizingCards } from "@/shared/hooks/services/Dashboard/useTotalizingCards";
 import { firstDayOfMonth, lastDayOfMonth } from "@/shared/utils/date/dayjs";
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { IDashboardParams, useDashboard } from "@shared/hooks/services/Dashboard/useDashboard";
@@ -74,6 +75,12 @@ export function useDashboardRules() {
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const {
+    data: totalizingCardsData,
+    loading: totalizingCardsLoading,
+    setParams: setTotalizingCardsParams,
+  } = useTotalizingCards();
+
   const handleSearchParams = useCallback(
     (params: IDashboardParams) => {
       setSearchParams({
@@ -81,6 +88,7 @@ export function useDashboardRules() {
       });
 
       setParams(params);
+      setTotalizingCardsParams(params);
     },
     [setSearchParams, setParams],
   );
@@ -454,6 +462,7 @@ export function useDashboardRules() {
     dashboardData,
     dashboardApiData,
     loading,
+    totalizingCardsLoading,
     currentPage,
     autoRefreshEnabled,
     lastUpdated,
@@ -469,6 +478,7 @@ export function useDashboardRules() {
     pieChartData,
     barChartData,
     areaChartData,
+    totalizingCardsData,
 
     // Funções
     getStatusColor,

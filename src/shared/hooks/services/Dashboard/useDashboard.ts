@@ -125,63 +125,7 @@ export function useDashboard() {
 
   const fetchTotalizingCards = useCallback(
     async (params: IDashboardParams): Promise<IDashboardTotalizingCard[]> => {
-      try {
-        const payload = removeEmptyEntries(params);
-        const { data } = await get<IApiTotalizingCardsResponse>(
-          "/operational/parts-inspection/dashboard/totalizing-cards",
-          payload,
-        );
-
-        // Mapear o retorno da API para cards amigáveis
-        const apiData = data.data || data;
-
-        const cards: IDashboardTotalizingCard[] = [
-          {
-            title: "Total de Inspeções",
-            value: apiData.total_inspecoes || 0,
-            icon: "assignment",
-            status: "primary",
-          },
-          {
-            title: "Inspeções Aprovadas",
-            value: apiData.aprovado?.amount || 0,
-            percentage: apiData.aprovado?.percentage || 0,
-            icon: "check_circle",
-            status: "success",
-          },
-          {
-            title: "Não Conforme",
-            value: apiData.nao_conforme?.amount || 0,
-            percentage: apiData.nao_conforme?.percentage || 0,
-            icon: "cancel",
-            status: "warning",
-          },
-          {
-            title: "Com Restrição",
-            value: apiData.com_restricao?.amount || 0,
-            percentage: apiData.com_restricao?.percentage || 0,
-            icon: "warning",
-            status: "helper",
-          },
-          {
-            title: "Em Análise",
-            value: apiData.em_analise?.amount || 0,
-            percentage: apiData.em_analise?.percentage || 0,
-            icon: "pending_actions",
-            status: "neutral",
-          },
-          {
-            title: "Taxa de Aprovação",
-            value: Math.round(apiData.taxa_aprovacao),
-            icon: "trending_up",
-            status: apiData.taxa_aprovacao > 70 ? "success" : "helper",
-          },
-        ];
-
-        return cards;
-      } catch (error) {
-        return [];
-      }
+      return [];
     },
     [],
   );
