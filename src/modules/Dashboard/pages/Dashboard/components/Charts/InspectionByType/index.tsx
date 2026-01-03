@@ -1,0 +1,1 @@
+export { InspectionByType } from "./InspectionByType";

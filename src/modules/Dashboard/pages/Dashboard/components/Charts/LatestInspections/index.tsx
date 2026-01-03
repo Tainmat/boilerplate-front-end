@@ -1,0 +1,1 @@
+export { LatestInspections } from "./LatestInspections";

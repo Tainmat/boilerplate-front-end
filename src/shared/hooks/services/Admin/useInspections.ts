@@ -32,11 +32,12 @@ export interface IInspection {
 export function useInspections() {
   const [params, setParams] = useState<Record<string, any> | null>(null);
   const [result, setResult] = useState<IApiResponse<IInspection> | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchData = useCallback(async (params: Record<string, any>) => {
     try {
       setResult(null);
-
+      setLoading(true);
       const queryParams = removeEmptyEntries({
         searchingBy: params?.searchingBy,
         search: params?.search,
@@ -45,6 +46,9 @@ export function useInspections() {
         order: "reportStartDate:DESC",
         inspectionStatusId: params?.inspectionStatusId,
         status: params?.status,
+        initialReportStartDate: params?.initialReportStartDate,
+        finalReportStartDate: params?.finalReportStartDate,
+        customerId: params?.customerId,
       });
 
       const { data } = await get<IInspection>("/operational/parts-inspection", queryParams);
@@ -68,6 +72,8 @@ export function useInspections() {
         page: 0,
         total: 0,
       });
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -79,5 +85,5 @@ export function useInspections() {
     params && fetchData(params);
   }, [params, fetchData]);
 
-  return { result, params, refetch, setParams };
+  return { result, params, refetch, setParams, loading };
 }

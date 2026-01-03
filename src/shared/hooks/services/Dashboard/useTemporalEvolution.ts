@@ -3,30 +3,19 @@ import { get } from "@/shared/services/api/api.service";
 import { removeEmptyEntries } from "@/shared/utils/generic";
 import { useCallback, useEffect, useState } from "react";
 
-export interface ITotalizingCardData {
-  em_analise: {
-    amount: number;
-    percentage: number;
-  };
-  aprovado: {
-    amount: number;
-    percentage: number;
-  };
-  com_restricao: {
-    amount: number;
-    percentage: number;
-  };
-  nao_conforme: {
-    amount: number;
-    percentage: number;
-  };
-  total_inspecoes: number;
-  taxa_aprovacao: number;
+export interface ITemporalEvolutionData {
+  month: number;
+  year: number;
+  em_analise: number;
+  aprovado: number;
+  com_restricao: number;
+  nao_conforme: number;
+  total_aprovado: number;
 }
 
-export function useTotalizingCards() {
+export function useTemporalEvolution() {
   const [params, setParams] = useState<IDashboardParams | null>(null);
-  const [data, setData] = useState<ITotalizingCardData | null>(null);
+  const [data, setData] = useState<ITemporalEvolutionData[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchData = useCallback(async (params: IDashboardParams) => {
@@ -34,13 +23,13 @@ export function useTotalizingCards() {
     setData(null);
     try {
       const payload = removeEmptyEntries(params);
-      const { data } = await get<ITotalizingCardData>(
-        "/operational/parts-inspection/dashboard/totalizing-cards",
+      const { data: response } = await get<ITemporalEvolutionData[]>(
+        "/operational/parts-inspection/dashboard/temporal-evolution",
         payload,
       );
 
-      if (data) {
-        setData(data.data);
+      if (response) {
+        setData(response.data || response);
       } else {
         setData(null);
       }
@@ -59,8 +48,10 @@ export function useTotalizingCards() {
   );
 
   useEffect(() => {
-    params && fetchData(params);
-  }, [fetchData, params]);
+    if (params) {
+      fetchData(params);
+    }
+  }, [params, fetchData]);
 
   return {
     data,

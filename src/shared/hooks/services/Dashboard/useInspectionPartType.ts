@@ -3,30 +3,15 @@ import { get } from "@/shared/services/api/api.service";
 import { removeEmptyEntries } from "@/shared/utils/generic";
 import { useCallback, useEffect, useState } from "react";
 
-export interface ITotalizingCardData {
-  em_analise: {
-    amount: number;
-    percentage: number;
-  };
-  aprovado: {
-    amount: number;
-    percentage: number;
-  };
-  com_restricao: {
-    amount: number;
-    percentage: number;
-  };
-  nao_conforme: {
-    amount: number;
-    percentage: number;
-  };
-  total_inspecoes: number;
-  taxa_aprovacao: number;
+export interface IInspectionPartType {
+  amount: number;
+  partTypeId: string;
+  partTypeName: string;
 }
 
-export function useTotalizingCards() {
+export function useInspectionPartType() {
   const [params, setParams] = useState<IDashboardParams | null>(null);
-  const [data, setData] = useState<ITotalizingCardData | null>(null);
+  const [data, setData] = useState<IInspectionPartType[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchData = useCallback(async (params: IDashboardParams) => {
@@ -34,18 +19,18 @@ export function useTotalizingCards() {
     setData(null);
     try {
       const payload = removeEmptyEntries(params);
-      const { data } = await get<ITotalizingCardData>(
-        "/operational/parts-inspection/dashboard/totalizing-cards",
+      const { data } = await get<IInspectionPartType[]>(
+        "/operational/parts-inspection/dashboard/inspection-part-types",
         payload,
       );
 
       if (data) {
         setData(data.data);
       } else {
-        setData(null);
+        setData([]);
       }
     } catch (error) {
-      setData(null);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -65,8 +50,8 @@ export function useTotalizingCards() {
   return {
     data,
     loading,
-    refetch,
     setParams,
     params,
+    refetch,
   };
 }
