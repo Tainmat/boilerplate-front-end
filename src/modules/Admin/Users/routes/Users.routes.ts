@@ -1,3 +1,4 @@
+import { ROLE_ADMINISTRATOR, ROLE_SYSTEM_ADMIN } from "@/shared/constants/user.roles";
 import {
   ROUTE_LIST_USERS,
   ROUTE_SAVE_USER,
@@ -23,15 +24,18 @@ export const userRoutes: IRouteProps[] = [
     path: ROUTE_LIST_USERS,
     component: ListUsers,
     isPrivate: true,
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR],
   },
   {
     path: ROUTE_SAVE_USER,
     component: CreateUsers,
     isPrivate: true,
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR],
   },
   {
     path: `${ROUTE_UPDATE_USER}/:uuid`,
     component: CreateUsers,
     isPrivate: true,
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR],
   },
 ];

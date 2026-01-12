@@ -2,31 +2,27 @@ import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { Td, Tr } from "@shared/components/Core/Table";
 import { Tag } from "@shared/components/Core/Tag";
 import { Tooltip } from "@shared/components/Core/Tooltip";
-import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Heading } from "@shared/components/Core/Typography/Heading";
+import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { IUsers } from "@shared/hooks/services/Admin/useUsers";
-import { Row, Col } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 
 interface Props {
   data: IUsers;
   onEdit: () => void;
-  onShowLogs?: () => void;
-  onAddProfile?: () => void;
   expanded?: boolean;
   onToggleExpand?: () => void;
   isSmartphone?: boolean;
-  isTablet?: boolean;
+  isRegister: boolean;
 }
 
 export function UsersTable({
   data,
   onEdit,
-  onShowLogs,
-  onAddProfile,
   expanded,
   onToggleExpand,
   isSmartphone,
-  isTablet,
+  isRegister,
 }: Props) {
   return (
     <>
@@ -67,20 +63,22 @@ export function UsersTable({
           </div>
         </Td>
 
-        <Td>
-          <div className="d-flex justify-content-center">
-            <Tooltip title="Editar" place="top-start">
-              <ButtonIcon
-                size="sm"
-                icon="edit"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-              />
-            </Tooltip>
-          </div>
-        </Td>
+        {isRegister && (
+          <Td>
+            <div className="d-flex justify-content-center">
+              <Tooltip title="Editar" place="top-start">
+                <ButtonIcon
+                  size="sm"
+                  icon="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                />
+              </Tooltip>
+            </div>
+          </Td>
+        )}
       </Tr>
 
       {/* Mobile expanded details row */}

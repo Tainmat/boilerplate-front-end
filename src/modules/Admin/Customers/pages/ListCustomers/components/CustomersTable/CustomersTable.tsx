@@ -1,34 +1,32 @@
+import { cnpjMask, phoneNumberMask } from "@/shared/utils/masks";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { Td, Tr } from "@shared/components/Core/Table";
 import { Tag } from "@shared/components/Core/Tag";
 import { Tooltip } from "@shared/components/Core/Tooltip";
-import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Heading } from "@shared/components/Core/Typography/Heading";
-import { Row, Col } from "react-bootstrap";
-import { cnpjMask, cpfMask, phoneNumberMask, cepMask } from "@/shared/utils/masks";
+import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
+import { Col, Row } from "react-bootstrap";
 
 import { ICustomer } from "@/shared/hooks/services/Admin/useCustomers";
 
 interface Props {
   data: ICustomer;
   onEdit: () => void;
-  onShowLogs?: () => void;
   onOpenContacts: () => void;
   expanded?: boolean;
   onToggleExpand?: () => void;
   isSmartphone?: boolean;
-  isTablet?: boolean;
+  isRegister: boolean;
 }
 
 export function CustomersTable({
   data,
   onEdit,
-  onShowLogs,
   onOpenContacts,
   expanded,
   onToggleExpand,
   isSmartphone,
-  isTablet,
+  isRegister,
 }: Props) {
   return (
     <>
@@ -81,31 +79,33 @@ export function CustomersTable({
           </div>
         </Td>
 
-        <Td>
-          <div className="d-flex justify-content-center">
-            <Tooltip title="Editar" place="top-start">
-              <ButtonIcon
-                size="sm"
-                icon="edit"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-              />
-            </Tooltip>
+        {isRegister && (
+          <Td>
+            <div className="d-flex justify-content-center">
+              <Tooltip title="Editar" place="top-start">
+                <ButtonIcon
+                  size="sm"
+                  icon="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                />
+              </Tooltip>
 
-            <Tooltip title="Contatos" place="top-start">
-              <ButtonIcon
-                size="sm"
-                icon="contacts"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenContacts();
-                }}
-              />
-            </Tooltip>
-          </div>
-        </Td>
+              <Tooltip title="Contatos" place="top-start">
+                <ButtonIcon
+                  size="sm"
+                  icon="contacts"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenContacts();
+                  }}
+                />
+              </Tooltip>
+            </div>
+          </Td>
+        )}
       </Tr>
 
       {/* Mobile expanded details row */}

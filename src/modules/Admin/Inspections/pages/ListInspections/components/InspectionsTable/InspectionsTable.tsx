@@ -42,6 +42,7 @@ export function InspectionsTable({
   onGeneratePdf,
 }: Props) {
   const { isSystemAdmin } = useAuthRoles();
+  const { isInspectionChanger } = useAuthRoles();
 
   return (
     <Tr>
@@ -88,8 +89,13 @@ export function InspectionsTable({
 
       <Td>
         <div className="d-flex justify-content-center gap-2">
-          <Tooltip title="Editar" place="top-start">
-            <ButtonIcon disabled={!data.isActive} size="sm" icon="edit" onClick={() => onEdit()} />
+          <Tooltip title={isInspectionChanger() ? "Editar" : "Visualizar"} place="top-start">
+            <ButtonIcon
+              disabled={!data.isActive}
+              size="sm"
+              icon={isInspectionChanger() ? "edit" : "open_in_new"}
+              onClick={() => onEdit()}
+            />
           </Tooltip>
 
           <Tooltip title="Gerar PDF" place="top-start">

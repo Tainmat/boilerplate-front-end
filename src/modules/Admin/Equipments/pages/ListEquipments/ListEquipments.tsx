@@ -18,17 +18,17 @@ import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
 import { TITLE_ADMIN_EQUIPMENTS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useEquipments } from "@shared/hooks/services/Admin/useEquipments";
+import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { useCallback, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 
 import {
-  ROUTE_LIST_EQUIPMENTS,
   ROUTE_SAVE_EQUIPMENT,
   ROUTE_UPDATE_EQUIPMENT,
 } from "@/modules/Admin/Equipments/routes/Equipment.paths";
 
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { EquipmentsTable } from "./components/EquipmentsTable";
 
 export function ListEquipments() {
@@ -39,6 +39,7 @@ export function ListEquipments() {
   const { result, params, setParams } = useEquipments();
   const [loaded, setLoaded] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const { isRegister } = useAuthRoles();
 
   const SEARCH_OPTIONS: IOption[] = [
     {
@@ -157,7 +158,7 @@ export function ListEquipments() {
                     : null
                 }
                 onSubmit={(search) => handleOnSearch(search)}
-                onAdd={addNew}
+                onAdd={isRegister() ? addNew : undefined}
               />
             </Col>
           </Row>
@@ -197,11 +198,13 @@ export function ListEquipments() {
                     </div>
                   </Th>
 
-                  <Th>
-                    <div className="d-flex justify-content-center">
-                      <Heading size="xs">Ações</Heading>
-                    </div>
-                  </Th>
+                  {isRegister() && (
+                    <Th>
+                      <div className="d-flex justify-content-center">
+                        <Heading size="xs">Ações</Heading>
+                      </div>
+                    </Th>
+                  )}
                 </Tr>
               </Thead>
 
@@ -217,6 +220,7 @@ export function ListEquipments() {
                         onToggleExpand={() => toggleRowExpand(item.id)}
                         isSmartphone={isSmartphone}
                         isTablet={isTablet}
+                        isRegister={isRegister()}
                       />
                     ))
                   ) : (

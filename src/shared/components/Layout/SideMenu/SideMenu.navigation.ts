@@ -1,6 +1,5 @@
 import {
   ROLE_ADMINISTRATOR,
-  ROLE_CUSTOMER,
   ROLE_INSPECTOR,
   ROLE_SYSTEM_ADMIN,
 } from "@shared/constants/user.roles";
@@ -22,6 +21,7 @@ interface INavigation {
     icon: string;
     route: string;
     mobileVisible?: boolean;
+    allowedRoles?: string[];
   }[];
 }
 
@@ -31,26 +31,26 @@ export const nav: INavigation[] = [
     label: "Página Inicial",
     route: ROUTE_DASHBOARD,
     mobileVisible: true,
-    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_CUSTOMER, ROLE_INSPECTOR],
   },
   {
     icon: "assignment",
     label: "Inspeções",
     route: ROUTE_LIST_INSPECTIONS,
     mobileVisible: true,
-    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_INSPECTOR],
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_INSPECTOR, ROLE_ADMINISTRATOR],
   },
   {
     icon: "multiline_chart",
     label: "Cadastros",
     mobileVisible: true,
-    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR],
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_INSPECTOR],
     list: [
       {
         icon: "",
         label: "Usuários",
         route: ROUTE_LIST_USERS,
         mobileVisible: true,
+        allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR],
       },
       {
         icon: "",

@@ -1,3 +1,4 @@
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { UsersTable } from "@modules/Admin/Users/pages/ListUsers/components/UsersTable";
 import { ROUTE_SAVE_USER, ROUTE_UPDATE_USER } from "@modules/Admin/Users/routes/Users.paths";
 import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
@@ -20,10 +21,10 @@ import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
 import { TITLE_ADMIN_USERS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useUsers } from "@shared/hooks/services/Admin/useUsers";
+import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { useCallback, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 
 export function ListUsers() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export function ListUsers() {
   const { result, params, setParams } = useUsers();
   const [loaded, setLoaded] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const { isRegister } = useAuthRoles();
 
   const SEARCH_OPTIONS: IOption[] = [
     {
@@ -156,7 +158,7 @@ export function ListUsers() {
                     : null
                 }
                 onSubmit={(search) => handleOnSearch(search)}
-                onAdd={addNew}
+                onAdd={isRegister() ? addNew : undefined}
               />
             </Col>
           </Row>
@@ -196,11 +198,13 @@ export function ListUsers() {
                     </div>
                   </Th>
 
-                  <Th>
-                    <div className="d-flex justify-content-center">
-                      <Heading size="xs">Ações</Heading>
-                    </div>
-                  </Th>
+                  {isRegister() && (
+                    <Th>
+                      <div className="d-flex justify-content-center">
+                        <Heading size="xs">Ações</Heading>
+                      </div>
+                    </Th>
+                  )}
                 </Tr>
               </Thead>
 
@@ -215,7 +219,7 @@ export function ListUsers() {
                         expanded={expandedRow === item.id}
                         onToggleExpand={() => toggleRowExpand(item.id)}
                         isSmartphone={isSmartphone}
-                        isTablet={isTablet}
+                        isRegister={isRegister()}
                       />
                     ))
                   ) : (

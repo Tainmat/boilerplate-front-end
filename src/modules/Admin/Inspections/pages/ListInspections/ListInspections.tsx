@@ -34,6 +34,7 @@ import {
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { put } from "@/shared/services/api/api.service";
 import { InspectionPDFReport } from "./components/InspectionPDFReport ";
 import { InspectionsTable } from "./components/InspectionsTable";
@@ -53,6 +54,8 @@ export function ListInspections() {
     usePartInspectionStatusDropdown();
 
   const [loaded, setLoaded] = useState(false);
+
+  const { isInspectionChanger } = useAuthRoles();
 
   const SEARCH_OPTIONS: IOption[] = [
     {
@@ -266,7 +269,7 @@ export function ListInspections() {
                     : null
                 }
                 onSubmit={(search) => handleOnSearch(search)}
-                onAdd={addNew}
+                onAdd={isInspectionChanger() ? addNew : undefined}
               />
             </Col>
           </Row>

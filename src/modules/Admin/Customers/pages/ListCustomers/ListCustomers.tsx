@@ -18,10 +18,10 @@ import { DEFAULT_ITEMS_PER_PAGE } from "@shared/constants/options";
 import { TITLE_PROCCESSES_CLIENTS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useCustomers } from "@shared/hooks/services/Admin/useCustomers";
+import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { useCallback, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 
 import {
   ROUTE_LIST_CUSTOMERS,
@@ -30,6 +30,7 @@ import {
 } from "@/modules/Admin/Customers/routes/Customer.paths";
 
 import { CustomerContext, useCustomerContext } from "@/shared/contexts/Customer/CustomerContext";
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { CustomersTable } from "./components/CustomersTable";
 
 export function ListCustomers() {
@@ -41,6 +42,7 @@ export function ListCustomers() {
   const [loaded, setLoaded] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const { selectCustomer } = useCustomerContext();
+  const { isRegister } = useAuthRoles();
 
   const SEARCH_OPTIONS: IOption[] = [
     {
@@ -168,7 +170,7 @@ export function ListCustomers() {
                       : null
                   }
                   onSubmit={(search) => handleOnSearch(search)}
-                  onAdd={addNew}
+                  onAdd={isRegister() ? addNew : undefined}
                 />
               </Col>
             </Row>
@@ -208,11 +210,13 @@ export function ListCustomers() {
                       </div>
                     </Th>
 
-                    <Th>
-                      <div className="d-flex justify-content-center">
-                        <Heading size="xs">Ações</Heading>
-                      </div>
-                    </Th>
+                    {isRegister() && (
+                      <Th>
+                        <div className="d-flex justify-content-center">
+                          <Heading size="xs">Ações</Heading>
+                        </div>
+                      </Th>
+                    )}
                   </Tr>
                 </Thead>
 
@@ -227,11 +231,11 @@ export function ListCustomers() {
                           expanded={expandedRow === item.id}
                           onToggleExpand={() => toggleRowExpand(item.id)}
                           isSmartphone={isSmartphone}
-                          isTablet={isTablet}
                           onOpenContacts={() => {
                             selectCustomer(item);
                             navigate(`${ROUTE_LIST_CUSTOMERS}/${item.id}/contacts`);
                           }}
+                          isRegister={isRegister()}
                         />
                       ))
                     ) : (
