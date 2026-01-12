@@ -29,6 +29,14 @@ export function useAuthRoles() {
     return checkIfUserHasRole(String(import.meta.env.VITE_APP_ROLE_CUSTOMER));
   }, [checkIfUserHasRole]);
 
+  const isRegister = useCallback((): boolean => {
+    return isAdministrator() || isSystemAdmin();
+  }, [checkIfUserHasRole]);
+
+  const isInspectionChanger = useCallback((): boolean => {
+    return isSystemAdmin() || isInspector();
+  }, [checkIfUserHasRole]);
+
   const handleUserRoles = useCallback((roles: Array<{ sigla: string }>): string[] => {
     if (!roles || !roles.length) return [];
 
@@ -41,6 +49,8 @@ export function useAuthRoles() {
     isAdministrator,
     isInspector,
     isCustomer,
+    isRegister,
+    isInspectionChanger,
     handleUserRoles,
   };
 }

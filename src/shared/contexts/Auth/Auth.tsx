@@ -15,16 +15,20 @@ import {
   setLocalStorageItem,
 } from "@shared/utils/storage/local";
 
-import { useNavigate } from "react-router-dom";
 import { ROUTE_LOGIN } from "@modules/Auth/routes/Login.paths";
-import { login, fakeRequest } from "@shared/services/api/api.service";
-import { decryptToPayload } from "@shared/utils/crypt";
+import { login } from "@shared/services/api/api.service";
+import { useNavigate } from "react-router-dom";
 import { useLoaderContext } from "../Loader";
-import { useAuthRoles } from "@shared/hooks/services/Rules/Auth/useRoles";
 
 interface Auth {
   expiresIn: number;
   token: string;
+}
+
+interface Customers {
+  id: string;
+  corporateName: string;
+  fantasyName: string;
 }
 
 interface UserAuth {
@@ -37,6 +41,7 @@ interface UserAuth {
   isFirstAccess: boolean;
   photoUrl: string | null;
   birthDate: string | null;
+  customers: Customers[];
 }
 
 interface UserCredentials {
@@ -66,8 +71,6 @@ function AuthContext({ children }: Props) {
   const navigate = useNavigate();
 
   const { hideLoader, showLoader } = useLoaderContext();
-
-  const { handleUserRoles } = useAuthRoles();
 
   const [loaded, setLoaded] = useState(false);
   const [user, setUser] = useState<UserAuth | null>(null);
@@ -106,29 +109,9 @@ function AuthContext({ children }: Props) {
             photoUrl: data.user.photoUrl,
             birthDate: data.user.birthDate,
             roles: data.user.profileAcronym ? [data.user.profileAcronym] : [],
+            customers: data.user.customers || [],
           };
 
-          /* const user: UserAuth = {
-            auth: {
-              expiresIn: 3600,
-              token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.faketoken.payload.signature",
-            },
-            userUuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-            userName: "JOÃO DA SILVA",
-            socialName: "João Silva",
-            email: "joao.silva@emailfalso.com",
-            companyName: "Empresa Fictícia Ltda",
-            companyCnpj: "12.345.678/0001-90",
-            sysPassword: true,
-            teamId: "TI-001",
-            position: "Desenvolvedor Full Stack",
-            pis: "123.45678.90-1",
-            identityNumber: "MG-12.345.678",
-            cpf: "123.456.789-00",
-            admissionDate: "2021-05-10T08:00:00Z",
-            lastUpdateDate: "2024-06-15T14:30:00Z",
-            roles: ["admin"],
-          }; */
           setUser(user);
           setLocalStorageItem("Usincheck@JOmetto:user", user);
 

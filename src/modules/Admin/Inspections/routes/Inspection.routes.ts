@@ -6,6 +6,11 @@ import {
   ROUTE_SAVE_INSPECTION,
   ROUTE_UPDATE_INSPECTION,
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
+import {
+  ROLE_ADMINISTRATOR,
+  ROLE_INSPECTOR,
+  ROLE_SYSTEM_ADMIN,
+} from "@/shared/constants/user.roles";
 
 const ListInspections = lazy(() =>
   import("@/modules/Admin/Inspections/pages/ListInspections").then((module) => ({
@@ -24,15 +29,18 @@ export const inspectionRoutes: IRouteProps[] = [
     path: ROUTE_LIST_INSPECTIONS,
     component: ListInspections,
     isPrivate: true,
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_INSPECTOR],
   },
   {
     path: ROUTE_SAVE_INSPECTION,
     component: CreateInspection,
     isPrivate: true,
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_INSPECTOR],
   },
   {
     path: `${ROUTE_UPDATE_INSPECTION}/:uuid`,
     component: CreateInspection,
     isPrivate: true,
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_INSPECTOR],
   },
 ];

@@ -336,7 +336,7 @@ export function SearchForm({ options, defaultValues, onSubmit, onAdd }: Props) {
             <Col xs={isSmartphone ? 12 : isNotebook ? 3 : 3}>
               <Skeleton size="lg" />
             </Col>
-            
+
             <Col xs={isSmartphone ? 12 : 2} className={isSmartphone ? "mb-3" : ""}>
               <Skeleton size="lg" />
             </Col>

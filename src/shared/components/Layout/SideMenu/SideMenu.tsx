@@ -97,6 +97,14 @@ export function SideMenu() {
 
                   <S.SubList>
                     {item.list?.filter((subitem: any) => !isSmartphone || subitem.mobileVisible !== false)
+                      .filter((subitem: any) => {
+                        if (subitem.allowedRoles) {
+                          return subitem.allowedRoles.some((role: string) =>
+                            checkIfUserHasRole(role),
+                          );
+                        }
+                        return true;
+                      })
                       .map((subitem: any, subidx: number) => (
                       <S.SubItem
                         key={subidx}

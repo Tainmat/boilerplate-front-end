@@ -17,6 +17,7 @@ export interface IUsers {
   signature?: string;
   password?: string;
   birthDate?: string;
+  customersIds?: string[];
   created_at: string;
   updated_at: string;
 }

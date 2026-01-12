@@ -1,3 +1,5 @@
+import "react-quill-new/dist/quill.snow.css";
+
 import { Button } from "@shared/components/Core/Buttons/Button";
 import { Checkbox } from "@shared/components/Core/Form/Fields/Checkbox";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
@@ -10,17 +12,17 @@ import { useCustomersDropdown } from "@shared/hooks/services/Admin/Dropdown/useC
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useUsersDropdown } from "@shared/hooks/services/Admin/Dropdown/useUsersDropdown";
 import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
+import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Card, Col, Row } from "react-bootstrap";
+import ReactQuill from "react-quill-new";
 import { useNavigate } from "react-router-dom";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
-import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
-
 import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
-import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css";
+
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { IInspectionRegisterForm, inspectionValidationSchema } from "./RegisterForm.form";
 
 interface Props {
@@ -36,6 +38,7 @@ export function InspectionRegisterForm({
   selectedEquipment,
   onBack,
 }: Props) {
+  const { isInspectionChanger } = useAuthRoles();
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
 
@@ -90,7 +93,7 @@ export function InspectionRegisterForm({
   };
 
   // Buscar dados para os selects
-  const { result: customersOptions, loading: loadingCustomers } = useCustomersDropdown();
+  const { result: customersOptions, loading: loadingCustomers } = useCustomersDropdown({});
   const { result: usersOptions, loading: loadingUsers } = useUsersDropdown();
   const { result: inspectionStatusOptions } = usePartInspectionStatusDropdown();
 
@@ -204,6 +207,7 @@ export function InspectionRegisterForm({
                         ) : (
                           <Field
                             as={Select}
+                            readOnly={!isInspectionChanger()}
                             label="Inspetor Responsável *"
                             name="inspectorUserId"
                             placeholder="Selecione o inspetor"
@@ -244,6 +248,7 @@ export function InspectionRegisterForm({
                       <Col md={6} lg={4}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Relatório Nº *"
                           name="reportNumber"
                           placeholder="Ex: REL-001-2024"
@@ -258,6 +263,7 @@ export function InspectionRegisterForm({
                       <Col md={3} lg={4}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Revisão Nº *"
                           name="revisionNumber"
                           placeholder="Ex: 00"
@@ -274,6 +280,7 @@ export function InspectionRegisterForm({
                       <Col md={3} lg={4}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Folha Nº *"
                           name="sheetNumber"
                           placeholder="Ex: 1/1"
@@ -290,6 +297,7 @@ export function InspectionRegisterForm({
                       <Col md={6}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Data de Início *"
                           name="reportStartDate"
                           type="date"
@@ -304,6 +312,7 @@ export function InspectionRegisterForm({
                       <Col md={6}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Data de Término *"
                           name="reportEndDate"
                           type="date"
@@ -341,6 +350,7 @@ export function InspectionRegisterForm({
                         ) : (
                           <Field
                             as={Select}
+                            readOnly={!isInspectionChanger()}
                             label="Cliente *"
                             name="customerId"
                             placeholder="Selecione o cliente"
@@ -359,6 +369,7 @@ export function InspectionRegisterForm({
                       <Col md={6}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Identificação do Componente *"
                           name="componentId"
                           placeholder="Ex: Engrenagem Principal - Módulo 8"
@@ -375,6 +386,7 @@ export function InspectionRegisterForm({
                       <Col md={6}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Local da Inspeção"
                           name="inspectionLocation"
                           placeholder="Ex: Área Industrial - Setor A"
@@ -391,6 +403,7 @@ export function InspectionRegisterForm({
                       <Col md={6}>
                         <Field
                           as={InputText}
+                          readOnly={!isInspectionChanger()}
                           label="Informações da Mda"
                           name="mdaInformation"
                           placeholder="Ex: Especificações técnicas complementares"
@@ -437,6 +450,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label="VI"
                               name="isVI"
                               checked={values.isVI}
@@ -454,6 +468,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label="DM"
                               name="isDM"
                               checked={values.isDM}
@@ -471,6 +486,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label="PM"
                               name="isPM"
                               checked={values.isPM}
@@ -488,6 +504,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label="US"
                               name="isUS"
                               checked={values.isUS}
@@ -505,6 +522,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label="LP"
                               name="isLP"
                               checked={values.isLP}
@@ -522,6 +540,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label="DU"
                               name="isDU"
                               checked={values.isDU}
@@ -548,6 +567,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label={
                                 <span
                                   className="d-block"
@@ -571,6 +591,7 @@ export function InspectionRegisterForm({
                           >
                             <Field
                               as={Checkbox}
+                              readOnly={!isInspectionChanger()}
                               label={
                                 <span
                                   className="d-block"
@@ -599,6 +620,7 @@ export function InspectionRegisterForm({
                         <Col xs={12}>
                           <Field
                             as={TextArea}
+                            readOnly={!isInspectionChanger()}
                             label="Instrumentos Utilizados"
                             name="instruments"
                             placeholder="Ex: Yoke eletromagnético, luminária UV, paquímetro digital, lupa 10x"
@@ -645,6 +667,7 @@ export function InspectionRegisterForm({
                                 style={{ borderColor: "#e9ecef" }}
                               >
                                 <Checkbox
+                                  readOnly={!isInspectionChanger()}
                                   label={`Posição ${position}`}
                                   name={`position_${position}`}
                                   checked={isSelected}
@@ -745,6 +768,7 @@ export function InspectionRegisterForm({
                     <Row className="g-3">
                       <Col xs={12}>
                         <ReactQuill
+                          readOnly={!isInspectionChanger()}
                           className="text-editor"
                           theme="snow"
                           value={values.finalConclusion}
@@ -795,6 +819,7 @@ export function InspectionRegisterForm({
                       <Col md={6}>
                         <Field
                           as={Select}
+                          readOnly={!isInspectionChanger()}
                           label="Status da Inspeção *"
                           name="inspectionStatusId"
                           placeholder="Selecione o status"
@@ -860,6 +885,7 @@ export function InspectionRegisterForm({
                                     }}
                                   />
                                   <button
+                                    disabled={!isInspectionChanger()}
                                     type="button"
                                     className="btn btn-sm btn-danger position-absolute"
                                     style={{ top: "8px", right: "8px", padding: "4px 8px" }}
@@ -899,7 +925,13 @@ export function InspectionRegisterForm({
                                 </div>
                               ) : (
                                 // Área de upload
-                                <div className="d-flex flex-column align-items-center justify-content-center h-100 p-3">
+                                <div
+                                  className="d-flex flex-column align-items-center justify-content-center h-100 p-3"
+                                  style={{
+                                    opacity: !isInspectionChanger() ? 0.5 : 1,
+                                    cursor: !isInspectionChanger() ? 'not-allowed' : 'default'
+                                  }}
+                                >
                                   <div className="text-center mb-3">
                                     <div
                                       style={{ fontSize: "3rem", color: "#6c757d", opacity: 0.5 }}
@@ -908,10 +940,13 @@ export function InspectionRegisterForm({
                                     </div>
                                     <h6 className="text-muted mb-2">Slot {slotIndex + 1}</h6>
                                     <small className="text-muted">
-                                      Clique para adicionar uma imagem
+                                      {isInspectionChanger()
+                                        ? "Clique para adicionar uma imagem"
+                                        : "Upload desabilitado"}
                                     </small>
                                   </div>
                                   <input
+                                    disabled={!isInspectionChanger()}
                                     type="file"
                                     accept="image/*"
                                     className="d-none"
@@ -970,8 +1005,12 @@ export function InspectionRegisterForm({
                                   />
                                   <label
                                     htmlFor={`image-upload-${slotIndex}`}
-                                    className="btn btn-outline-success btn-sm w-100"
-                                    style={{ cursor: "pointer" }}
+                                    className={`btn btn-sm w-100 ${isInspectionChanger() ? 'btn-outline-success' : 'btn-outline-secondary'}`}
+                                    style={{
+                                      cursor: isInspectionChanger() ? "pointer" : "not-allowed",
+                                      opacity: isInspectionChanger() ? 1 : 0.6,
+                                      pointerEvents: isInspectionChanger() ? "auto" : "none"
+                                    }}
                                   >
                                     Selecionar Imagem
                                   </label>
@@ -1030,40 +1069,56 @@ export function InspectionRegisterForm({
                       <Col xs={12}>
                         <div className="d-flex flex-row gap-2 justify-content-center justify-content-sm-end align-items-center">
                           <style>{`
-                          .mobile-action-btn {
+                          .action-btn {
                             display: flex !important;
                             align-items: center !important;
                             justify-content: center !important;
                             transition: all 0.2s ease !important;
                             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
                             position: relative !important;
-                            width: 2.5rem !important;
-                            height: 2.5rem !important;
-                            min-width: 2.5rem !important;
-                            min-height: 2.5rem !important;
                             border-radius: 6px !important;
-                            padding: 0 !important;
+                            padding: 0.5rem 1rem !important;
+                            font-size: 14px !important;
+                            font-weight: 600 !important;
+                            line-height: 1.5 !important;
+                            white-space: nowrap !important;
+                            gap: 0.5rem !important;
+                          }
+
+                          .action-btn:hover:not(:disabled) {
+                            transform: translateY(-2px) !important;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+                          }
+
+                          .action-btn:active:not(:disabled) {
+                            transform: translateY(0) !important;
+                          }
+
+                          .action-btn:disabled {
+                            opacity: 0.5 !important;
+                            cursor: not-allowed !important;
+                          }
+
+                          .btn-icon {
                             font-size: 18px !important;
-                            font-weight: bold !important;
                             line-height: 1 !important;
-                            text-align: center !important;
                           }
-                          
-                          .mobile-action-btn:hover:not(:disabled) {
-                            transform: scale(1.05) !important;
+
+                          .btn-text {
+                            display: none !important;
                           }
-                          
-                          .mobile-action-btn:active {
-                            transform: scale(0.95) !important;
+
+                          @media (min-width: 576px) {
+                            .btn-text {
+                              display: inline !important;
+                            }
                           }
-                          
-                          @media (max-width: 767px) {
-                            .mobile-action-btn {
-                              width: 2.25rem !important;
-                              height: 2.25rem !important;
-                              min-width: 2.25rem !important;
-                              min-height: 2.25rem !important;
-                              font-size: 16px !important;
+
+                          @media (max-width: 575px) {
+                            .action-btn {
+                              padding: 0.5rem !important;
+                              min-width: 2.5rem !important;
+                              min-height: 2.5rem !important;
                             }
                           }
                         `}</style>
@@ -1073,10 +1128,11 @@ export function InspectionRegisterForm({
                               type="button"
                               styles="secondary"
                               onClick={onBack}
-                              className="mobile-action-btn"
-                              title="Voltar"
+                              className="action-btn"
+                              title="Voltar para seleção de equipamento"
                             >
-                              ←
+                              <span className="btn-icon">←</span>
+                              <span className="btn-text">Voltar</span>
                             </Button>
                           )}
                           <Button
@@ -1084,20 +1140,22 @@ export function InspectionRegisterForm({
                             styles="primary"
                             mode="warning"
                             onClick={() => handleOnCancel(dirty)}
-                            className="mobile-action-btn"
-                            title="Cancelar"
+                            className="action-btn"
+                            title="Cancelar e descartar alterações"
                           >
-                            ×
+                            <span className="btn-icon">×</span>
+                            <span className="btn-text">Cancelar</span>
                           </Button>
                           <Button
                             type="submit"
                             styles="primary"
                             mode="success"
                             disabled={!dirty || !isValid}
-                            className="mobile-action-btn"
-                            title="Salvar"
+                            className="action-btn"
+                            title={!dirty ? "Nenhuma alteração para salvar" : !isValid ? "Preencha todos os campos obrigatórios" : "Salvar inspeção"}
                           >
-                            ✓
+                            <span className="btn-icon">✓</span>
+                            <span className="btn-text">Salvar</span>
                           </Button>
                         </div>
                       </Col>
