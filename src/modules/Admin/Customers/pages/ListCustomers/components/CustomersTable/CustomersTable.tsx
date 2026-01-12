@@ -93,7 +93,7 @@ export function CustomersTable({
                 />
               </Tooltip>
 
-              <Tooltip title="Contatos" place="top-start">
+              {/* <Tooltip title="Contatos" place="top-start">
                 <ButtonIcon
                   size="sm"
                   icon="contacts"
@@ -102,7 +102,7 @@ export function CustomersTable({
                     onOpenContacts();
                   }}
                 />
-              </Tooltip>
+              </Tooltip> */}
             </div>
           </Td>
         )}
