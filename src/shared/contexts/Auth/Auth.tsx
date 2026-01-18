@@ -52,6 +52,7 @@ interface UserCredentials {
 interface authResponse {
   authenticated: boolean;
   firstLogin?: boolean;
+  workOffline?: boolean;
 }
 
 interface AuthContextData {
@@ -118,6 +119,9 @@ function AuthContext({ children }: Props) {
           return {
             authenticated: true,
             firstLogin: user.isFirstAccess,
+            workOffline:
+              user.roles.includes(String(import.meta.env.VITE_APP_ROLE_SYSTEM_ADMIN)) ||
+              user.roles.includes(String(import.meta.env.VITE_APP_ROLE_INSPECTOR)),
           };
         }
         return { authenticated: false };

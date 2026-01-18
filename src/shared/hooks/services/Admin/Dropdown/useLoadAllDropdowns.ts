@@ -1,0 +1,78 @@
+import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
+import { useToastContext } from "@/shared/contexts/Toast";
+import { get } from "@/shared/services/api/api.service";
+import { setAllDropdowns } from "@/shared/store/modules/Dropdowns";
+import { removeEmptyEntries } from "@/shared/utils/generic";
+import { useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { ICustomerDropdown } from "./useCustomersDropdown";
+import { IPartInspectionStatusDropdown } from "./usePartInspectionStatusDropdown";
+
+export function useLoadAllDropdowns() {
+  const dispatch = useDispatch();
+  const { addToast } = useToastContext();
+
+  const loadDropdowns = useCallback(async () => {
+    const queryParams = removeEmptyEntries({
+      onlyActive: true,
+    });
+
+    try {
+      const [statusRes, customersRes, equipmentsRes] = await Promise.all([
+        get("parametrizations/part-inspection-status/dropdown", queryParams),
+        get("parametrizations/customers/dropdown", queryParams),
+        get("parametrizations/part-types/dropdown", queryParams),
+      ]);
+
+      const statusDropdown: IOption[] = statusRes.data.data.map(
+        (item: IPartInspectionStatusDropdown) => {
+          return {
+            label: item.description,
+            value: item.id,
+          };
+        },
+      );
+
+      const customersDropdown: IOption[] = customersRes.data.data.map((item: ICustomerDropdown) => {
+        return {
+          label: item.fantasyName,
+          value: item.id,
+        };
+      });
+
+      const equipmentsDropdown: IOption[] = equipmentsRes.data.data.map(
+        (item: { id: string; name: string }) => {
+          return {
+            label: item.name,
+            value: item.id,
+          };
+        },
+      );
+
+      dispatch(
+        setAllDropdowns({
+          inspectionStatus: statusDropdown,
+          customers: customersDropdown,
+          equipments: equipmentsDropdown,
+        }),
+      );
+    } catch {
+      dispatch(
+        setAllDropdowns({
+          inspectionStatus: [],
+          customers: [],
+          equipments: [],
+        }),
+      );
+
+      addToast({
+        description:
+          "Não foi possível carregar os dados para trabalhar offline, por favor tente carregar novamente antes de ficar Offline",
+        title: "Oooops!",
+        type: "warning",
+      });
+    }
+  }, [dispatch]);
+
+  return { loadDropdowns };
+}

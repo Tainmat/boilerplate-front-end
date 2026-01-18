@@ -27,6 +27,7 @@ export function removeLocalStorageItem(key: string): void {
 }
 
 export function clearLocalStorage(): void {
+  removeLocalStorageItem(import.meta.env.VITE_KEY_CRIPTOGRAFIA);
   removeLocalStorageItem("Usincheck@JOmetto:user");
   removeLocalStorageItem("Usincheck@JOmetto:customer");
 }

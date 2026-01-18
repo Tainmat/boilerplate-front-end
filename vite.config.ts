@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
@@ -22,8 +22,11 @@ export default defineConfig({
       manifest: {
         name: "UsinCheck",
         short_name: "UsinCheck",
-        description: "",
+        description: "Sistema UsinCheck",
         theme_color: "#ffffff",
+        background_color: "#ffffff",
+        display: "standalone",
+        start_url: "/",
         icons: [
           {
             src: "/logos/logo192.png",
@@ -34,8 +37,59 @@ export default defineConfig({
             src: "/logos/logo512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any maskable",
           },
         ],
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}"],
+
+        runtimeCaching: [
+          // Cache para chamadas de API - Network First
+          {
+            urlPattern: /^https:\/\/(qas-)?usincheck\.jometto\.com\.br\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24, // 24 horas
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+              networkTimeoutSeconds: 10, // Timeout de 10s
+            },
+          },
+          // Cache para imagens - Cache First
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "images-cache",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 dias
+              },
+            },
+          },
+          // Cache para fontes - Cache First
+          {
+            urlPattern: /\.(?:woff|woff2|ttf|eot)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "fonts-cache",
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 ano
+              },
+            },
+          },
+        ],
+      },
+      devOptions: {
+        enabled: true, // Habilita PWA em desenvolvimento
+        type: "module",
       },
     }),
   ],
