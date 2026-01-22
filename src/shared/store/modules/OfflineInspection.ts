@@ -58,11 +58,11 @@ const offlineInspectionsSlice = createSlice({
       state.cardsList = state.cardsList.filter((c) => c.id !== action.payload);
     },
 
-    setCurrentInspection: (state, action: PayloadAction<IOfflineInspection | null>) => {
+    setCurrent: (state, action: PayloadAction<IOfflineInspection | null>) => {
       state.currentInspection = action.payload;
     },
 
-    clearCurrentInspection: (state) => {
+    clearCurrent: (state) => {
       state.currentInspection = null;
     },
 
@@ -76,11 +76,11 @@ const offlineInspectionsSlice = createSlice({
 
 export const {
   addCard,
-  clearCurrentInspection,
+  clearCurrent,
   removeCard,
   resetOfflineInspections,
   setCardsList,
-  setCurrentInspection,
+  setCurrent,
   setIsSync,
   updateCard,
 } = offlineInspectionsSlice.actions;

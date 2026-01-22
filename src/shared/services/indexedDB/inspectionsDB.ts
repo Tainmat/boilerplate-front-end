@@ -31,6 +31,29 @@ async function getDB(): Promise<IDBPDatabase<InspectionDB>> {
   });
 }
 
+export async function add(inspection: IOfflineInspection): Promise<string> {
+  try {
+    const db = await getDB();
+    await db.add(STORE_NAME, inspection);
+    return inspection.id;
+  } catch (error) {
+    console.error("❌ Erro ao adicionar inspeção no IndexedDB:", error);
+    throw error;
+  }
+}
+
+export async function getById(id: string): Promise<IOfflineInspection | undefined> {
+  try {
+    const db = await getDB();
+    const inspection = await db.get(STORE_NAME, id);
+
+    return inspection;
+  } catch (error) {
+    console.error("❌ Erro ao buscar inspeção no IndexedDB:", error);
+    throw error;
+  }
+}
+
 export async function getAll(): Promise<IOfflineInspection[]> {
   try {
     const db = await getDB();
@@ -40,5 +63,81 @@ export async function getAll(): Promise<IOfflineInspection[]> {
   } catch (error) {
     console.error("❌ Erro ao buscar todas as inspeções no IndexedDB:", error);
     throw error;
+  }
+}
+
+export async function update(id: string, data: IOfflineInspection): Promise<void> {
+  try {
+    const db = await getDB();
+
+    const inspectionExists = await db.get(STORE_NAME, id);
+
+    if (!inspectionExists) {
+      throw new Error(`Inspeção ${id} não encontrada no IndexedDB`);
+    }
+
+    await db.put(STORE_NAME, data);
+  } catch (error) {
+    console.error("❌ Erro ao atualizar inspeção no IndexedDB:", error);
+    throw error;
+  }
+}
+
+export async function remove(id: string): Promise<void> {
+  try {
+    const db = await getDB();
+    await db.delete(STORE_NAME, id);
+  } catch (error) {
+    console.error("❌ Erro ao remover inspeção no IndexedDB:", error);
+    throw error;
+  }
+}
+
+export async function clear(): Promise<void> {
+  try {
+    const db = await getDB();
+    await db.clear(STORE_NAME);
+  } catch (error) {
+    console.error("❌ Erro ao limpar inspeções no IndexedDB:", error);
+    throw error;
+  }
+}
+
+export async function getByCustomer(customerId: string): Promise<IOfflineInspection[] | undefined> {
+  try {
+    const db = await getDB();
+    const inspections = await db.getAllFromIndex(STORE_NAME, "by-customer", customerId);
+
+    return inspections;
+  } catch (error) {
+    console.error("❌ Erro ao buscar inspeções por cliente:", error);
+    throw error;
+  }
+}
+
+export async function count(): Promise<number> {
+  try {
+    const db = await getDB();
+    const total = await db.count(STORE_NAME);
+
+    return total;
+  } catch (error) {
+    console.error("❌ Erro ao contar inspeções no IndexedDB:", error);
+    throw error;
+  }
+}
+
+export async function getStorageSize(): Promise<number> {
+  try {
+    const inspections = await getAll();
+
+    const jsonString = JSON.stringify(inspections);
+    const sizeInBytes = new Blob([jsonString]).size;
+    const sizeInMB = sizeInBytes / (1024 * 1024);
+
+    return sizeInMB;
+  } catch (error) {
+    console.error("❌ Erro ao calcular tamanho do storage:", error);
+    return 0;
   }
 }
