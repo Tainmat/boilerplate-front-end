@@ -16,6 +16,11 @@ api.interceptors.response.use(
   },
 
   async function (error: any) {
+    // Erro de rede (offline) - não tem response
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+
     const currentPath = window.location.pathname;
 
     // Verifica se a rota atual está nas rotas de autenticação
@@ -91,9 +96,9 @@ export async function login(
     return response.data;
   } catch (error: any) {
     return {
-      status: error?.response?.data.status_code || 0,
+      status: error?.response?.data?.status_code || 0,
       error: true,
-      message: error?.response?.data.message || "",
+      message: error?.response?.data?.message || "Erro de conexão",
     };
   }
 }
@@ -117,9 +122,9 @@ export async function post<T>(
     return response.data;
   } catch (error: any) {
     return {
-      status: error?.response?.data.status_code || 0,
+      status: error?.response?.data?.status_code || 0,
       error: true,
-      message: error?.response?.data.message || "",
+      message: error?.response?.data?.message || "Erro de conexão",
     };
   }
 }
@@ -143,9 +148,9 @@ export async function put<T>(
     return response.data;
   } catch (error: any) {
     return {
-      status: error?.response?.data.status_code || 0,
+      status: error?.response?.data?.status_code || 0,
       error: true,
-      message: error?.response?.data.message || "",
+      message: error?.response?.data?.message || "Erro de conexão",
     };
   }
 }
@@ -172,7 +177,7 @@ export async function get<T>(
     return {
       status: error?.response?.status || 0,
       error: true,
-      message: error?.response?.data.message || "",
+      message: error?.response?.data?.message || "Erro de conexão",
     };
   }
 }

@@ -14,7 +14,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prepare": "husky && husky install",
-    "test": "echo \"No tests defined\" && exit 0"
+    "test": "echo \"No tests defined\" && exit 0",
+    "server": "npx serve dist -p 15975"
   },
   "dependencies": {
     "@react-spring/web": "^10.0.1",

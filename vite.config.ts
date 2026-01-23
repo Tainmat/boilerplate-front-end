@@ -44,6 +44,15 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}"],
 
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/api\//],
+
+        // Desabilita a página de offline padrão do workbox
+        offlineGoogleAnalytics: false,
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
+
         runtimeCaching: [
           // Cache para chamadas de API - Network First
           {

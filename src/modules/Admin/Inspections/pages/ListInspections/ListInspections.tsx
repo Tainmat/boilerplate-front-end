@@ -19,8 +19,9 @@ import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
+import { useOnlineStatus } from "@shared/hooks/useOnlineStatus";
 import { useCallback, useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row, Alert } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
 import {
@@ -46,6 +47,7 @@ export function ListInspections() {
   const { addToast, handleApiRejection } = useToastContext();
   const { showLoader, hideLoader } = useLoaderContext();
   const { fetchInspection } = useInspection();
+  const isOnline = useOnlineStatus();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -274,10 +276,24 @@ export function ListInspections() {
             </Col>
           </Row>
 
+          {!isOnline && (
+            <Row className="mb-3">
+              <Col>
+                <Alert variant="warning">
+                  <Alert.Heading>Você está offline</Alert.Heading>
+                  <p className="mb-0">
+                    Não é possível carregar a lista de inspeções sem conexão com a internet.
+                    Conecte-se à internet e tente novamente.
+                  </p>
+                </Alert>
+              </Col>
+            </Row>
+          )}
+
           <Row className="mb-3">
             <Table
               $bordered
-              $isLoading={result === null}
+              $isLoading={result === null && isOnline}
               $hover={!!result?.data.length}
               $responsive
             >
@@ -330,6 +346,8 @@ export function ListInspections() {
                   ) : (
                     <Empty columns={7} />
                   )
+                ) : !isOnline ? (
+                  <Empty columns={7} />
                 ) : (
                   <LoadingLines lines={params ? Number(params.items) : 10} columns={7} />
                 )}
