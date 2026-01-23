@@ -25,7 +25,7 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
     setParams({
       searchIn: "name",
       value: searchValue,
-      status: "active", // Sempre buscar apenas equipamentos ativos
+      status: "active",
       items: 10,
       page: 1,
       order: "name",
@@ -45,7 +45,9 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
           />
         </Col>
         <Col md={4} className="d-flex align-items-end">
-          <small className="text-muted d-none d-md-block">Apenas equipamentos ativos são exibidos</small>
+          <small className="text-muted d-none d-md-block">
+            Apenas equipamentos ativos são exibidos
+          </small>
         </Col>
       </Row>
 

@@ -15,12 +15,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 import { IInspectionCreateData, useInspection } from "@shared/hooks/services/Admin/useInspection";
 
+import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import { get } from "@/shared/services/api/api.service";
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
 import { InspectionRegisterForm } from "./components/RegisterForm";
 import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
 
 export function CreateInspection() {
+  const isOnline = useOnlineStatus();
+  const { addNewInspection } = useOfflineInspections();
   const navigate = useNavigate();
   const { showLoader, hideLoader } = useLoaderContext();
   const { addToast, handleApiRejection } = useToastContext();
@@ -298,20 +302,34 @@ export function CreateInspection() {
           description: "Inspeção atualizada com sucesso!",
         });
       } else {
-        // Modo criação - POST
-        const createdInspection = await createInspection(apiData);
-        inspectionId = createdInspection?.id || createdInspection;
+        if (isOnline) {
+          const createdInspection = await createInspection(apiData);
+          inspectionId = createdInspection?.id || createdInspection;
 
-        // Se há imagens para anexar e temos o ID da inspeção, enviar attachments
-        if (imageDataToUpload.images.length > 0 && inspectionId) {
-          await uploadInspectionAttachments(inspectionId, imageDataToUpload);
+          // Se há imagens para anexar e temos o ID da inspeção, enviar attachments
+          if (imageDataToUpload.images.length > 0 && inspectionId) {
+            await uploadInspectionAttachments(inspectionId, imageDataToUpload);
+          }
+
+          addToast({
+            type: "success",
+            title: "Sucesso!",
+            description: "Inspeção criada com sucesso!",
+          });
+        } else {
+          console.log("Offline");
+          try {
+            await addNewInspection(formValues);
+
+            addToast({
+              type: "helper",
+              title: "Atenção!",
+              description: "Inspeção criada em modo offline.",
+            });
+          } catch (error) {
+            handleApiRejection();
+          }
         }
-
-        addToast({
-          type: "success",
-          title: "Sucesso!",
-          description: "Inspeção criada com sucesso!",
-        });
       }
 
       navigate(-1);

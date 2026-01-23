@@ -21,7 +21,7 @@ import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dr
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
 import { useOnlineStatus } from "@shared/hooks/useOnlineStatus";
 import { useCallback, useEffect, useState } from "react";
-import { Col, Container, Row, Alert } from "react-bootstrap";
+import { Alert, Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
 import {
@@ -100,7 +100,7 @@ export function ListInspections() {
     documentTitle: `Relatorio_${inspectionToPrint?.reportNumber || ""}`,
     pageStyle: `
       @page {
-        size: A4;
+        size: A4 portrait;
         margin: 0;
       }
       @media print {
