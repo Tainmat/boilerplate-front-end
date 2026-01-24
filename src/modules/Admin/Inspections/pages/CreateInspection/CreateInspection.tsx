@@ -16,14 +16,15 @@ import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspe
 import { IInspectionCreateData, useInspection } from "@shared/hooks/services/Admin/useInspection";
 
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
-import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
+
+import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { get } from "@/shared/services/api/api.service";
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
 import { InspectionRegisterForm } from "./components/RegisterForm";
 import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
 
 export function CreateInspection() {
-  const isOnline = useOnlineStatus();
+  const { isOnline } = useOnlineStatus();
   const { addNewInspection } = useOfflineInspections();
   const navigate = useNavigate();
   const { showLoader, hideLoader } = useLoaderContext();

@@ -1,7 +1,17 @@
-import { useEffect, useRef, useState } from "react";
-import { useToastContext } from "../contexts/Toast";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useToastContext } from "../Toast";
 
-export function useOnlineStatus() {
+interface IOnlineStatusContextData {
+  isOnline: boolean;
+}
+
+const Context = createContext<IOnlineStatusContextData>({} as IOnlineStatusContextData);
+
+interface Props {
+  children: ReactNode;
+}
+
+function OnlineStatusContext({ children }: Props) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { addToast } = useToastContext();
   const isFirstRender = useRef(true);
@@ -22,8 +32,8 @@ export function useOnlineStatus() {
       setIsOnline(false);
       if (!isFirstRender.current) {
         addToast({
-          title: "Sem Internet",
-          description: "Sem conexão com a internet.",
+          title: "Sem conexão",
+          description: "Modo offline ativado.",
           type: "warning",
         });
       }
@@ -40,7 +50,20 @@ export function useOnlineStatus() {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []);
+  }, [addToast]);
 
-  return isOnline;
+  const providerValue = useMemo(
+    () => ({
+      isOnline,
+    }),
+    [isOnline],
+  );
+
+  return <Context.Provider value={providerValue}>{children}</Context.Provider>;
 }
+
+function useOnlineStatus(): IOnlineStatusContextData {
+  return useContext(Context);
+}
+
+export { OnlineStatusContext, useOnlineStatus };

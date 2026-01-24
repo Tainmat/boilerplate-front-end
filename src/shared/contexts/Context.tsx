@@ -10,6 +10,7 @@ import { RefreshKeyContext } from "@shared/contexts/Refresh";
 import { ToastContext } from "@shared/contexts/Toast";
 import { ReactNode } from "react";
 import { CustomerContext } from "./Customer";
+import { OnlineStatusContext } from "./OnlineStatus";
 
 interface Props {
   children: ReactNode;
@@ -26,9 +27,11 @@ export function Contexts({ children }: Props) {
                 <SideMenuContext>
                   <ContentContext>
                     <ToastContext>
-                      <CustomerContext>
-                        <AlertContext>{children}</AlertContext>
-                      </CustomerContext>
+                      <OnlineStatusContext>
+                        <CustomerContext>
+                          <AlertContext>{children}</AlertContext>
+                        </CustomerContext>
+                      </OnlineStatusContext>
                     </ToastContext>
                   </ContentContext>
                 </SideMenuContext>
