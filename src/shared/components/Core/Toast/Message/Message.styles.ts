@@ -1,6 +1,6 @@
+import { animated } from "@react-spring/web";
 import { IToastType } from "@shared/contexts/Toast/Toast.interface";
 import { rgba } from "polished";
-import { animated } from "@react-spring/web";
 import styled, { css } from "styled-components";
 
 interface Props {
@@ -65,6 +65,15 @@ export const Container = styled(animated.div)<Props>`
 
         > span {
           color: ${props.theme.colors.feedback.warning.medium};
+        }
+      `}
+
+      ${props.type === "info" &&
+      css`
+        background-color: ${props.theme.colors.feedback.neutral.pure};
+
+        > span {
+          color: ${props.theme.colors.feedback.neutral.medium};
         }
       `}
     }

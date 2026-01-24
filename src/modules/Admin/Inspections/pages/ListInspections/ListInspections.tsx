@@ -19,7 +19,7 @@ import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
-import { useOnlineStatus } from "@shared/hooks/useOnlineStatus";
+
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -34,6 +34,7 @@ import {
   ROUTE_UPDATE_INSPECTION,
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 
+import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { put } from "@/shared/services/api/api.service";
@@ -47,7 +48,7 @@ export function ListInspections() {
   const { addToast, handleApiRejection } = useToastContext();
   const { showLoader, hideLoader } = useLoaderContext();
   const { fetchInspection } = useInspection();
-  const isOnline = useOnlineStatus();
+  const { isOnline } = useOnlineStatus();
 
   const [searchParams, setSearchParams] = useSearchParams();
 

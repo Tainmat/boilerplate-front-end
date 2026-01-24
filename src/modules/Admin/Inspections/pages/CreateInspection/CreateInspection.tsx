@@ -19,6 +19,7 @@ import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspecti
 
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { get } from "@/shared/services/api/api.service";
+import { getStorageSize } from "@/shared/services/indexedDB/inspectionsDB";
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
 import { InspectionRegisterForm } from "./components/RegisterForm";
 import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
@@ -318,21 +319,25 @@ export function CreateInspection() {
             description: "Inspeção criada com sucesso!",
           });
         } else {
-          console.log("Offline");
-          try {
-            await addNewInspection(formValues);
-
+          const storageSize = await getStorageSize();
+          if (storageSize > 45) {
             addToast({
-              type: "helper",
-              title: "Atenção!",
-              description: "Inspeção criada em modo offline.",
+              type: "warning",
+              title: "Armazenamento cheio",
+              description: "Espaço insuficiente. Conecte-se para sincronizar.",
             });
-          } catch (error) {
-            handleApiRejection();
+            hideLoader();
+            return;
           }
+          await addNewInspection(formValues);
+
+          addToast({
+            type: "info",
+            title: "Salvo offline",
+            description: `Espaço usado: ${storageSize.toFixed(1)}MB`,
+          });
         }
       }
-
       navigate(-1);
     } catch (error) {
       handleApiRejection();
