@@ -1,16 +1,16 @@
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import { useToastContext } from "@/shared/contexts/Toast";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { get } from "@/shared/services/api/api.service";
-import { IEquipmentDropdown, setAllDropdowns } from "@/shared/store/modules/Dropdowns";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { removeEmptyEntries } from "@/shared/utils/generic";
 import { useCallback } from "react";
-import { useDispatch } from "react-redux";
 import { IEquipment } from "../useEquipments";
 import { ICustomerDropdown } from "./useCustomersDropdown";
 import { IPartInspectionStatusDropdown } from "./usePartInspectionStatusDropdown";
 
 export function useLoadAllDropdowns() {
-  const dispatch = useDispatch();
+  const { setAllDropdownsAction } = useDropdownsRedux();
   const { addToast } = useToastContext();
 
   const loadDropdowns = useCallback(async () => {
@@ -54,21 +54,17 @@ export function useLoadAllDropdowns() {
         },
       );
 
-      dispatch(
-        setAllDropdowns({
-          inspectionStatus: statusDropdown,
-          customers: customersDropdown,
-          equipments: equipmentsDropdown,
-        }),
-      );
+      setAllDropdownsAction({
+        inspectionStatus: statusDropdown,
+        customers: customersDropdown,
+        equipments: equipmentsDropdown,
+      });
     } catch {
-      dispatch(
-        setAllDropdowns({
-          inspectionStatus: [],
-          customers: [],
-          equipments: [],
-        }),
-      );
+      setAllDropdownsAction({
+        inspectionStatus: [],
+        customers: [],
+        equipments: [],
+      });
 
       addToast({
         description:
@@ -77,7 +73,7 @@ export function useLoadAllDropdowns() {
         type: "warning",
       });
     }
-  }, [dispatch]);
+  }, []);
 
   return { loadDropdowns };
 }
