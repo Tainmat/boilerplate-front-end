@@ -35,19 +35,15 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
   return (
     <div>
       <Row className="mb-4">
-        <Col md={8}>
+        <Col lg={8} md={12}>
           <InputText
             name="search"
             label="Buscar equipamento"
             placeholder="Digite o nome do equipamento"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
+            helperText="Apenas equipamentos ativos são exibidos"
           />
-        </Col>
-        <Col md={4} className="d-flex align-items-end">
-          <small className="text-muted d-none d-md-block">
-            Apenas equipamentos ativos são exibidos
-          </small>
         </Col>
       </Row>
 

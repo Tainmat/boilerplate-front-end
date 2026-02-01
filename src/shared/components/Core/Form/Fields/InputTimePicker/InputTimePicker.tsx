@@ -96,7 +96,7 @@ export function InputTimePicker({
         aria-hidden="true"
       ></div>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

@@ -198,7 +198,7 @@ export function SelectSearch({
 
       {handleIcon()}
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

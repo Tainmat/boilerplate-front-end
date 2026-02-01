@@ -244,7 +244,7 @@ export function Select({
         onClose={() => setIsShowingOptions(false)}
       />
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

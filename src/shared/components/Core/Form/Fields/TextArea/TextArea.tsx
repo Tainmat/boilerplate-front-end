@@ -70,7 +70,7 @@ export function TextArea({
       </div>
 
       <S.Footer error={error} readOnly={readOnly} disabled={disabled}>
-        {helperText && <HelperText text={helperText} />}
+        {helperText && <HelperText text={helperText} error={error} />}
         <Caption size="sm" className={textAreaValue.length === maxlength ? "text-area-size" : ""}>
           {textAreaValue.length}/{maxlength}
         </Caption>

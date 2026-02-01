@@ -184,7 +184,7 @@ export function InputText({
         )}
       </div>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

@@ -93,7 +93,7 @@ export function InputDatePicker({
         <Icon size={`${!size || size === "lg" ? "md" : "sm"}`} icon="date_range" />
       </div>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }
