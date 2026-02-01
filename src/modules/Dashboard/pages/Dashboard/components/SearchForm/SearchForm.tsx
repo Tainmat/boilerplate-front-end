@@ -37,7 +37,7 @@ export function DashboardSearchForm({
     <>
       <Row className="mb-4">
         {/* Filtro de período */}
-        <Col md={2} sm={12} className="mb-3 mb-md-0">
+        <Col lg={2} md={3} sm={12} className="mb-3 mb-md-0">
           <InputDatePicker
             value={initialReportStartDate}
             label="Data Inicial"
@@ -53,7 +53,7 @@ export function DashboardSearchForm({
             }}
           />
         </Col>
-        <Col md={2} sm={12} className="mb-3 mb-md-0">
+        <Col lg={2} md={3} sm={12} className="mb-3 mb-md-0">
           <InputDatePicker
             value={finalReportStartDate}
             label="Data Final"
@@ -69,7 +69,7 @@ export function DashboardSearchForm({
             }}
           />
         </Col>
-        <Col md={4} sm={12} className="mb-3 mb-md-0">
+        <Col lg={4} md={6} sm={12} className="mb-3 mb-md-0">
           <Select
             value={
               CUSTOMER_OPTIONS.length < 2 ? CUSTOMER_OPTIONS[0]?.value : initialValues?.customerId

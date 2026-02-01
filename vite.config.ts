@@ -107,9 +107,6 @@ export default defineConfig({
     host: "0.0.0.0",
     strictPort: false,
     allowedHosts: [".ngrok-free.app", ".ngrok.io", "localhost"],
-    hmr: {
-      clientPort: 443,
-    },
     proxy: {
       "/api": {
         target: "https://qas-usincheck.jometto.com.br/",
