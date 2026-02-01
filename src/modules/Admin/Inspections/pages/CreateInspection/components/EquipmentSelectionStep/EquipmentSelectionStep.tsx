@@ -1,18 +1,11 @@
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { Button } from "@shared/components/Core/Buttons/Button";
-import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
-import { Table, Tbody, Td, Th, Thead, Tr } from "@shared/components/Core/Table";
-import { Empty } from "@shared/components/Core/Table/Empty";
-import { LoadingLines } from "@shared/components/Core/Table/LoadingLines";
-import { Tag } from "@shared/components/Core/Tag";
-import { Tooltip } from "@shared/components/Core/Tooltip";
-import { Heading } from "@shared/components/Core/Typography/Heading";
-import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Col, Row } from "react-bootstrap";
+import { CardEquipment } from "./components/CardEquipment";
 
 interface Props {
   onEquipmentSelect: (equipment: IEquipmentDropdown) => void;
@@ -20,20 +13,14 @@ interface Props {
 }
 
 export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
-  // const { result, setParams } = useEquipments();
   const { equipmentsDropdown } = useDropdownsRedux();
   const [searchValue, setSearchValue] = useState("");
 
-  // useEffect(() => {
-  //   setParams({
-  //     searchIn: "name",
-  //     value: searchValue,
-  //     status: "active",
-  //     items: 10,
-  //     page: 1,
-  //     order: "name",
-  //   });
-  // }, [searchValue, setParams]);
+  const filteredEquipments = useMemo(() => {
+    return equipmentsDropdown.filter((equipment) =>
+      equipment.name.toLowerCase().includes(searchValue.toLowerCase()),
+    );
+  }, [equipmentsDropdown, searchValue]);
 
   return (
     <div>
@@ -50,74 +37,17 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
         </Col>
       </Row>
 
-      <Table $responsive>
-        <Thead>
-          <Tr>
-            <Th>
-              <Heading size="xs">Nome</Heading>
-            </Th>
-            <Th className="d-none d-lg-table-cell">
-              <div className="d-flex justify-content-center">
-                <Heading size="xs">Pontos de Inspeção</Heading>
-              </div>
-            </Th>
-            <Th className="d-none d-sm-table-cell">
-              <div className="d-flex justify-content-center">
-                <Heading size="xs">Status</Heading>
-              </div>
-            </Th>
-            <Th>
-              <div className="d-flex justify-content-center">
-                <Heading size="xs">Ações</Heading>
-              </div>
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {!equipmentsDropdown ? (
-            <LoadingLines lines={4} columns={4} />
-          ) : equipmentsDropdown.length > 0 ? (
-            equipmentsDropdown.map((equipment) => (
-              <Tr key={equipment.id}>
-                <Td>
-                  <div>
-                    <Paragraph size="sm" title={equipment.name}>
-                      {equipment.name}
-                    </Paragraph>
-                  </div>
-                </Td>
-                <Td className="d-none d-lg-table-cell">
-                  <div className="d-flex justify-content-center">
-                    <Paragraph size="sm" title={equipment.totalInspectionPoints.toString()}>
-                      {equipment.totalInspectionPoints}
-                    </Paragraph>
-                  </div>
-                </Td>
-                <Td className="d-none d-sm-table-cell">
-                  <div className="d-flex justify-content-center">
-                    <Tag size="lg" status="success">
-                      Ativo
-                    </Tag>
-                  </div>
-                </Td>
-                <Td>
-                  <div className="d-flex justify-content-center">
-                    <Tooltip title="Selecionar equipamento" place="top-start">
-                      <ButtonIcon
-                        size="sm"
-                        icon="check"
-                        onClick={() => onEquipmentSelect(equipment)}
-                      />
-                    </Tooltip>
-                  </div>
-                </Td>
-              </Tr>
-            ))
-          ) : (
-            <Empty columns={4} />
-          )}
-        </Tbody>
-      </Table>
+      <Row>
+        {filteredEquipments.map((item) => (
+          <Col lg={4} md={6} xs={12} className="mb-4">
+            <CardEquipment
+              equipment={item}
+              onSelect={() => onEquipmentSelect(item)}
+              key={item.id}
+            />
+          </Col>
+        ))}
+      </Row>
 
       <Row className="justify-content-end mt-4">
         <Col xs="auto">
