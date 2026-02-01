@@ -1,7 +1,6 @@
 import { ROUTE_LOGIN } from "@modules/Auth/routes/Login.paths";
 import { authRoutes } from "@modules/Auth/routes/Login.routes";
 import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
-import { IApiLogin } from "@shared/services/api/api.service.interface";
 import { getAuthorizationToken } from "@shared/services/api/token";
 import { clearLocalStorage } from "@shared/utils/storage/local";
 import axios from "axios";
@@ -103,7 +102,7 @@ export async function login(
   }
 }
 
-export async function post<T>(
+export async function post(
   path: string,
   body?: any,
   header?: Record<string, unknown>,
@@ -129,7 +128,7 @@ export async function post<T>(
   }
 }
 
-export async function put<T>(
+export async function put(
   path: string,
   body?: any,
   header?: Record<string, unknown>,
@@ -155,7 +154,7 @@ export async function put<T>(
   }
 }
 
-export async function get<T>(
+export async function get(
   path: string,
   params?: Record<string, any>,
   controller?: AbortController,

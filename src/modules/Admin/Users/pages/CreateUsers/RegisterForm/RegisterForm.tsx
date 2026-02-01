@@ -1,7 +1,3 @@
-import { MultiSelect } from "@/shared/components/Core/Form/Fields/MultiSelect";
-import { IMultiSelectOption } from "@/shared/components/Core/Form/Fields/MultiSelect/MultiSelect.interface";
-import { useCustomersDropdown } from "@/shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
-import { useProfileNotAssociatedDropdown } from "@/shared/hooks/services/Admin/Dropdown/useProfileNotAssociatedDropdown";
 import {
   IUserRegisterForm,
   usersValidationSchema,
@@ -19,6 +15,11 @@ import { Field, Form, Formik } from "formik";
 import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+
+import { MultiSelect } from "@/shared/components/Core/Form/Fields/MultiSelect";
+import { IMultiSelectOption } from "@/shared/components/Core/Form/Fields/MultiSelect/MultiSelect.interface";
+import { useCustomersDropdown } from "@/shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
+import { useProfileNotAssociatedDropdown } from "@/shared/hooks/services/Admin/Dropdown/useProfileNotAssociatedDropdown";
 
 interface Props {
   initialValues: IUserRegisterForm | null;
@@ -250,7 +251,7 @@ export function UserRegisterForm({ initialValues, onSubmit }: Props) {
                         });
 
                         setFieldValue("signature", compressedBase64);
-                      } catch (error) {
+                      } catch {
                         // Em caso de erro, usar o método original
                         const reader = new FileReader();
                         reader.onload = (event) => {

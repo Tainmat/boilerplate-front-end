@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { useField, useFormikContext } from "formik";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 import { Container } from "@shared/components/Core/Form/Fields/InputText/InputText.styles";
-import { Label } from "@shared/components/Core/Form/Label";
 import { HelperText } from "@shared/components/Core/Form/HelperText";
+import { Label } from "@shared/components/Core/Form/Label";
 import { Icon } from "@shared/components/Core/Icons/Icon";
+import { useField, useFormikContext } from "formik";
+import { useEffect, useRef, useState } from "react";
+import ReactQuill from "react-quill";
 
 interface Props {
   size?: "sm" | "lg";
@@ -28,8 +28,6 @@ export function InputRichText({
   placeholder,
   readOnly,
   disabled,
-  error,
-  helperText,
 }: Props) {
   const [field, meta] = useField(name);
   const { setFieldValue } = useFormikContext();
@@ -43,7 +41,7 @@ export function InputRichText({
     if (field.value !== value) {
       setValue(field.value);
     }
-  }, [field.value]);
+  }, [field.value, value]);
 
   function handleChange(content: string) {
     setValue(content);

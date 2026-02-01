@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { Card } from "react-bootstrap";
+
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 import { ButtonLink } from "@/shared/components/Core/Buttons/ButtonLink";
 import { Skeleton } from "@/shared/components/Core/Skeleton";
@@ -7,8 +10,6 @@ import { Heading } from "@/shared/components/Core/Typography/Heading";
 import { Paragraph } from "@/shared/components/Core/Typography/Paragraph";
 import { Subtitle } from "@/shared/components/Core/Typography/Subtitle";
 
-import { useEffect } from "react";
-import { Card } from "react-bootstrap";
 import { IDashboardParams } from "../../../useDashboardRules";
 import { useLatestInspectionsRules } from "./useLatestInspectionsRules";
 

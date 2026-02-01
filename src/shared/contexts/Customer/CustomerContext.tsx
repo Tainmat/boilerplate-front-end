@@ -28,7 +28,9 @@ function CustomerContext({ children }: Props) {
   useEffect(() => {
     const storedCustomer = getLocalStorageItem("Usincheck@JOmetto:customer");
 
-    storedCustomer && setCustomer(storedCustomer);
+    if (storedCustomer) {
+      setCustomer(storedCustomer);
+    }
   }, []);
 
   const selectCustomer = useCallback((customer: ICustomer) => {

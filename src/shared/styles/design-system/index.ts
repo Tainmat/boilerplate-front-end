@@ -3,7 +3,7 @@ import { createGlobalStyle, css } from "styled-components";
 export default createGlobalStyle`
   ${(props) => css`
     .text-neutral-high-pure {
-      color: ${props.theme.colors.neutral.high.medium};
+      color: ${props.theme.colors.neutral.high.pure};
     }
     .text-neutral-high-medium {
       color: ${props.theme.colors.neutral.high.medium};

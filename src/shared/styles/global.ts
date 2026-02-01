@@ -56,16 +56,16 @@ export default createGlobalStyle`
       .breadcrumb-link {
         text-decoration: none;
         transition: opacity 0.2s ease;
-        
+
         &:hover {
           opacity: 0.8;
         }
       }
-      
+
       &.is-smartphone {
         font-size: ${props.theme.font.size.xxs};
       }
-      
+
       &.is-tablet {
         font-size: ${props.theme.font.size.xs};
       }
@@ -107,26 +107,26 @@ export default createGlobalStyle`
       flex-direction: column;
       flex: 1;
     }
-    
+
     /* Responsive utility classes */
     .d-xs-none {
       @media (max-width: 767px) {
         display: none !important;
       }
     }
-    
+
     .d-sm-none {
       @media (min-width: 768px) and (max-width: 1023px) {
         display: none !important;
       }
     }
-    
+
     .d-md-none {
       @media (min-width: 1024px) and (max-width: 1399px) {
         display: none !important;
       }
     }
-    
+
     .d-lg-none {
       @media (min-width: 1400px) {
         display: none !important;

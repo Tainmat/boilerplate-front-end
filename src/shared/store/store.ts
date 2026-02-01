@@ -1,7 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
 import { encryptionMiddleware, preloadedState } from "./middleware/encryptionMiddleware";
-
 import dropdownsData from "./modules/Dropdowns";
 import offlineInspectionsData from "./modules/OfflineInspection";
 

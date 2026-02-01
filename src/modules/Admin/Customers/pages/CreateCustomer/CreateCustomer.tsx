@@ -8,12 +8,10 @@ import { TITLE_PROCCESSES_CLIENTS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
-import { ICustomer } from "@shared/hooks/services/Admin/useCustomers";
 import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-/* import { customers } from "@shared/hooks/services/Admin/useCustomers"; */
 
 import { ROUTE_LIST_CUSTOMERS } from "@/modules/Admin/Customers/routes/Customer.paths";
 
@@ -40,7 +38,7 @@ export function CreateCustomer() {
     ]);
 
     if (uuid) {
-      get<ICustomer>(`${"parametrizations/customers"}/${uuid}`)
+      get(`${"parametrizations/customers"}/${uuid}`)
         .then((data) => {
           if (data.data) {
             const response = data.data.data;
@@ -106,10 +104,7 @@ export function CreateCustomer() {
       showLoader();
 
       if (uuid) {
-        const { data, message } = await put<ICustomer>(
-          `${"parametrizations/customers"}/${uuid}`,
-          payload,
-        );
+        const { data, message } = await put(`${"parametrizations/customers"}/${uuid}`, payload);
 
         if (data) {
           addToast({
@@ -119,7 +114,7 @@ export function CreateCustomer() {
           });
         }
       } else {
-        const { data, message } = await post<ICustomer>("parametrizations/customers", payload);
+        const { data, message } = await post("parametrizations/customers", payload);
 
         if (data) {
           addToast({
@@ -131,7 +126,7 @@ export function CreateCustomer() {
       }
 
       navigate(-1);
-    } catch (error) {
+    } catch {
       handleApiRejection();
     } finally {
       hideLoader();

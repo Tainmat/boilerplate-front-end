@@ -18,7 +18,7 @@ export const comprimirImagem = async (input, options = {}) => {
       alwaysKeepResolution: false, // Permitir redimensionar
       exifOrientation: 1, // Manter orientação
       fileType: "image/jpeg", // Sempre salvar como JPEG
-      ...options // Sobrescrever com opções customizadas
+      ...options, // Sobrescrever com opções customizadas
     };
 
     let fileToCompress;
@@ -41,10 +41,7 @@ export const comprimirImagem = async (input, options = {}) => {
     }
 
     // Comprimir imagem
-    const compressedFile = await imageCompression(
-      fileToCompress,
-      defaultOptions
-    );
+    const compressedFile = await imageCompression(fileToCompress, defaultOptions);
 
     // Converter resultado para DataURI
     const dataURI = await fileToDataURI(compressedFile);
@@ -85,10 +82,10 @@ const dataURItoFile = (dataURI, filename = "image.jpg") => {
  * @param {File} file
  * @returns {Promise<string>}
  */
-const fileToDataURI = file => {
+const fileToDataURI = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
+    reader.onload = (e) => resolve(e.target.result);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -99,47 +96,47 @@ const fileToDataURI = file => {
 /**
  * Preset para documentos (RG, CNH, etc.)
  */
-export const comprimirDocumento = input => {
+export const comprimirDocumento = (input) => {
   return comprimirImagem(input, {
     maxSizeMB: 1.5,
     maxWidthOrHeight: 1920,
     quality: 0.85,
-    fileType: "image/jpeg"
+    fileType: "image/jpeg",
   });
 };
 
 /**
  * Preset para foto de perfil
  */
-export const comprimirFotoPerfil = input => {
+export const comprimirFotoPerfil = (input) => {
   return comprimirImagem(input, {
     maxSizeMB: 0.5,
     maxWidthOrHeight: 800,
     quality: 0.8,
-    fileType: "image/jpeg"
+    fileType: "image/jpeg",
   });
 };
 
 /**
  * Preset para comprovante de residência
  */
-export const comprimirComprovante = input => {
+export const comprimirComprovante = (input) => {
   return comprimirImagem(input, {
     maxSizeMB: 2,
     maxWidthOrHeight: 1920,
     quality: 0.9, // Maior qualidade para textos
-    fileType: "image/jpeg"
+    fileType: "image/jpeg",
   });
 };
 
 /**
  * Preset para upload rápido (conexão lenta)
  */
-export const comprimirUploadRapido = input => {
+export const comprimirUploadRapido = (input) => {
   return comprimirImagem(input, {
     maxSizeMB: 0.3,
     maxWidthOrHeight: 1280,
     quality: 0.7,
-    fileType: "image/jpeg"
+    fileType: "image/jpeg",
   });
 };

@@ -15,14 +15,14 @@ export function useDeviceDetection() {
   else if (isTablet) deviceDetection = "tablet";
   else if (isNotebook) deviceDetection = "notebook";
 
-  return { 
-    isSmartphone, 
-    isTablet, 
-    isNotebook, 
-    isDesktop, 
+  return {
+    isSmartphone,
+    isTablet,
+    isNotebook,
+    isDesktop,
     isMediumScreen,
     isSmallScreen,
-    deviceDetection 
+    deviceDetection,
   };
 }
 export type DeviceDetection = ReturnType<typeof useDeviceDetection>;

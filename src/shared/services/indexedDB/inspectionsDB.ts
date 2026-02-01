@@ -1,5 +1,6 @@
-import { IOfflineInspection } from "@/shared/store/modules/OfflineInspection";
 import { DBSchema, IDBPDatabase, openDB } from "idb";
+
+import { IOfflineInspection } from "@/shared/store/modules/OfflineInspection";
 
 interface InspectionDB extends DBSchema {
   inspections: {

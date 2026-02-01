@@ -13,7 +13,6 @@ interface Props {
 export function AuthLayout({ children, deviceType }: Props) {
   const deviceDetection = useDeviceDetection();
   const isSmartphone = deviceType === "smartphone" || deviceDetection.isSmartphone;
-  const isTablet = deviceType === "tablet" || deviceDetection.isTablet;
 
   return (
     <>

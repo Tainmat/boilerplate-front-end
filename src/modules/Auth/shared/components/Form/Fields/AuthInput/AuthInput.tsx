@@ -44,7 +44,7 @@ export function AuthInput({
   function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
     setInputValue(e.target.value);
 
-    onChange && onChange(e);
+    onChange?.(e);
   }
 
   function handlePasswordIcon() {
@@ -87,7 +87,7 @@ export function AuthInput({
         )}
       </div>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </S.Container>
   );
 }

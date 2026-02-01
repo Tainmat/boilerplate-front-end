@@ -51,7 +51,7 @@ export function useInspections() {
         customerId: params?.customerId,
       });
 
-      const { data } = await get<IInspection>("/operational/parts-inspection", queryParams);
+      const { data } = await get("/operational/parts-inspection", queryParams);
 
       if (data.data.length > 0) {
         setResult({
@@ -78,11 +78,15 @@ export function useInspections() {
   }, []);
 
   function refetch() {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }
 
   useEffect(() => {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }, [params, fetchData]);
 
   return { result, params, refetch, setParams, loading };

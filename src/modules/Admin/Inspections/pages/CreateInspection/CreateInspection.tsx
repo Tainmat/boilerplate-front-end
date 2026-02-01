@@ -8,18 +8,18 @@ import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
+import { IInspectionCreateData, useInspection } from "@shared/hooks/services/Admin/useInspection";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
-import { IInspectionCreateData, useInspection } from "@shared/hooks/services/Admin/useInspection";
-
-import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
-
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
+import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
 import { get } from "@/shared/services/api/api.service";
 import { getStorageSize } from "@/shared/services/indexedDB/inspectionsDB";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
+
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
 import { InspectionRegisterForm } from "./components/RegisterForm";
 import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
@@ -151,7 +151,7 @@ export function CreateInspection() {
             updated_at: new Date().toISOString(),
           });
         }
-      } catch (error) {
+      } catch {
         handleApiRejection();
         navigate(-1);
       } finally {
@@ -168,9 +168,9 @@ export function CreateInspection() {
     handleApiRejection,
   ]);
 
-  async function handleEquipmentSelection(equipment: IEquipment) {
+  async function handleEquipmentSelection(equipment: IEquipmentDropdown) {
     try {
-      const partType = await get<IEquipment>(`parametrizations/part-types/${equipment.id}`);
+      const partType = await get(`parametrizations/part-types/${equipment.id}`);
 
       setSelectedEquipment(partType.data.data);
 
@@ -339,7 +339,7 @@ export function CreateInspection() {
         }
       }
       navigate(-1);
-    } catch (error) {
+    } catch {
       handleApiRejection();
     } finally {
       hideLoader();

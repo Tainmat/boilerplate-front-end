@@ -31,11 +31,11 @@ export function useAuthRoles() {
 
   const isRegister = useCallback((): boolean => {
     return isAdministrator() || isSystemAdmin();
-  }, [checkIfUserHasRole]);
+  }, [isAdministrator, isSystemAdmin]);
 
   const isInspectionChanger = useCallback((): boolean => {
     return isSystemAdmin() || isInspector();
-  }, [checkIfUserHasRole]);
+  }, [isSystemAdmin, isInspector]);
 
   const handleUserRoles = useCallback((roles: Array<{ sigla: string }>): string[] => {
     if (!roles || !roles.length) return [];

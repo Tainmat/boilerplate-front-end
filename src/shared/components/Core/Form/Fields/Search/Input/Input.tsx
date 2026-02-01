@@ -59,11 +59,13 @@ export function InputSearch({
   const [inputValue, setInputValue] = useState(initialValue || "");
 
   useEffect(() => {
-    typeof value === "string" && setInputValue(value);
+    if (typeof value === "string") {
+      setInputValue(value);
+    }
   }, [value]);
 
   function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange && onChange(e);
+    onChange?.(e);
 
     setInputValue(e.target.value);
   }

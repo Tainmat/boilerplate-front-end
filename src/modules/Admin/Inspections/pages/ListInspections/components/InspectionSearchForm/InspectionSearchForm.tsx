@@ -1,4 +1,3 @@
-import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { InputSearch } from "@shared/components/Core/Form/Fields/Search/Input";
 import { SelectSearch } from "@shared/components/Core/Form/Fields/Search/Select";
@@ -9,25 +8,23 @@ import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
+
+import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
+
 import { IInspectionSearchForm, initialInspectionSearchValues } from "./InspectionSearchForm.form";
 
 interface Props {
   searchOptions: IOption[];
-  statusOptions?: IOption[];
   defaultValues?: IInspectionSearchForm | null;
   onSubmit?: (data: IInspectionSearchForm) => void;
   onAdd?: () => void;
 }
 
-export function InspectionSearchForm({
-  searchOptions,
-  statusOptions = [],
-  defaultValues,
-  onSubmit,
-  onAdd,
-}: Props) {
-  const { isDesktop, isSmartphone, isTablet, isNotebook } = useDeviceDetection();
+export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, onAdd }: Props) {
+  useDeviceDetection();
   const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
+  const { inspectionStatusDropdown } = useDropdownsRedux();
 
   useEffect(() => {
     if (initialValues === null) {
@@ -86,24 +83,22 @@ export function InspectionSearchForm({
                     />
                   </Col>
 
-                  {statusOptions.length > 0 && (
-                    <Col xs={12} md={3}>
-                      <Field
-                        as={SelectSearch}
-                        name="inspectionStatusId"
-                        placeholder="Status da Inspeção"
-                        value={values.inspectionStatusId}
-                        options={statusOptions}
-                        onChange={({ value }: IOption) => {
-                          setFieldValue("inspectionStatusId", value);
-                          submitForm();
-                        }}
-                        onReset={() => {
-                          setFieldValue("inspectionStatusId", "");
-                        }}
-                      />
-                    </Col>
-                  )}
+                  <Col xs={12} md={3}>
+                    <Field
+                      as={SelectSearch}
+                      name="inspectionStatusId"
+                      placeholder="Status da Inspeção"
+                      value={values.inspectionStatusId}
+                      options={[{ label: "Todos", value: "" }, ...inspectionStatusDropdown]}
+                      onChange={({ value }: IOption) => {
+                        setFieldValue("inspectionStatusId", value);
+                        submitForm();
+                      }}
+                      onReset={() => {
+                        setFieldValue("inspectionStatusId", "");
+                      }}
+                    />
+                  </Col>
 
                   <Col xs={12} md={2} className="d-flex align-items-center justify-content-end ">
                     <div className="d-flex gap-2">

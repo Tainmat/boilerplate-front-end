@@ -1,10 +1,17 @@
-import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
+import { IEquipment } from "@/shared/hooks/services/Admin/useEquipments";
+
+export type IEquipmentDropdown = Pick<
+  IEquipment,
+  "id" | "name" | "totalInspectionPoints" | "croqui"
+>;
 
 interface IDropdownsState {
   inspectionStatusDropdown: IOption[];
   customersDropdown: IOption[];
-  equipmentsDropdown: IOption[];
+  equipmentsDropdown: IEquipmentDropdown[];
   lastUpdated: string | null;
 }
 
@@ -25,7 +32,7 @@ const dropdownStateData = createSlice({
     setCustomersDropdown: (_state, action: PayloadAction<IOption[]>) => {
       return { ..._state, customersDropdown: action.payload };
     },
-    setEquipmentsDropdown: (_state, action: PayloadAction<IOption[]>) => {
+    setEquipmentsDropdown: (_state, action: PayloadAction<IEquipmentDropdown[]>) => {
       return { ..._state, equipmentsDropdown: action.payload };
     },
     setAllDropdowns: (
@@ -33,7 +40,7 @@ const dropdownStateData = createSlice({
       action: PayloadAction<{
         inspectionStatus: IOption[];
         customers: IOption[];
-        equipments: IOption[];
+        equipments: IEquipmentDropdown[];
       }>,
     ) => {
       state.inspectionStatusDropdown = action.payload.inspectionStatus;

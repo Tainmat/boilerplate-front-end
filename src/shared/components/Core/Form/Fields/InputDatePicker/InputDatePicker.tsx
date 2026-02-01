@@ -85,15 +85,13 @@ export function InputDatePicker({
 
       <div
         className="icon"
-        onClick={() => {
-          !readOnly && setOpen((open) => !open);
-        }}
+        onClick={() => !readOnly && setOpen((open) => !open)}
         aria-hidden="true"
       >
         <Icon size={`${!size || size === "lg" ? "md" : "sm"}`} icon="date_range" />
       </div>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

@@ -1,4 +1,3 @@
-import { IEquipment } from "@/shared/hooks/services/Admin/useEquipments";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { Td, Tr } from "@shared/components/Core/Table";
 import { Tag } from "@shared/components/Core/Tag";
@@ -6,6 +5,8 @@ import { Tooltip } from "@shared/components/Core/Tooltip";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Col, Row } from "react-bootstrap";
+
+import { IEquipment } from "@/shared/hooks/services/Admin/useEquipments";
 
 interface Props {
   data: IEquipment;

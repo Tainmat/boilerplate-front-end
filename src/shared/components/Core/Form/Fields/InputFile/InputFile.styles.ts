@@ -198,7 +198,8 @@ export const Container = styled.div.withConfig({
 `;
 
 export const DropZone = styled.div.withConfig({
-  shouldForwardProp: (prop) => !["isDragging", "hasFile", "error", "disabled", "readOnly"].includes(prop),
+  shouldForwardProp: (prop) =>
+    !["isDragging", "hasFile", "error", "disabled", "readOnly"].includes(prop),
 })<DropZoneProps>`
   ${(props) => css`
     position: relative;

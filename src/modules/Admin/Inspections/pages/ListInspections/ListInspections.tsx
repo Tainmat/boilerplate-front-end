@@ -1,6 +1,3 @@
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
-
 import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
 import { Section } from "@shared/components/Core/Containers/Section";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
@@ -17,28 +14,28 @@ import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
-import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
-
+import { useRef } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
-import {
-  IInspectionSearchForm,
-  initialInspectionSearchValues,
-} from "./components/InspectionSearchForm/InspectionSearchForm.form";
+import { useReactToPrint } from "react-to-print";
 
 import {
   ROUTE_SAVE_INSPECTION,
   ROUTE_UPDATE_INSPECTION,
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
-
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { put } from "@/shared/services/api/api.service";
+
 import { InspectionPDFReport } from "./components/InspectionPDFReport ";
+import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
+import {
+  IInspectionSearchForm,
+  initialInspectionSearchValues,
+} from "./components/InspectionSearchForm/InspectionSearchForm.form";
 import { InspectionsTable } from "./components/InspectionsTable";
 
 export function ListInspections() {
@@ -53,8 +50,6 @@ export function ListInspections() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { result, params, setParams, refetch } = useInspections();
-  const { result: inspectionStatusOptions, loading: loadingStatuses } =
-    usePartInspectionStatusDropdown();
 
   const [loaded, setLoaded] = useState(false);
 
@@ -74,9 +69,6 @@ export function ListInspections() {
       label: "Nome do Cliente",
     },
   ];
-
-  // Preparar opções de status com "Todos" como primeira opção
-  const statusOptionsWithAll = [{ value: "", label: "Todos" }, ...inspectionStatusOptions];
 
   const pdfRef = useRef<HTMLDivElement>(null);
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
@@ -218,7 +210,7 @@ export function ListInspections() {
           handlePrint();
         }, 3000);
       }
-    } catch (error) {
+    } catch {
       hideLoader();
       handleApiRejection();
       addToast({
@@ -261,7 +253,6 @@ export function ListInspections() {
             <Col>
               <InspectionSearchForm
                 searchOptions={SEARCH_OPTIONS}
-                statusOptions={statusOptionsWithAll}
                 defaultValues={
                   params
                     ? {

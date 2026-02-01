@@ -22,15 +22,15 @@ export const usersValidationSchema = Yup.object().shape({
   socialName: Yup.string().max(50, "O campo deve conter no máximo 50 caracteres!"),
   birthDate: Yup.string(),
   profileId: Yup.string().required("Selecione um perfil!"),
-  password: Yup.string()
-    .when('id', {
-      is: (id: string | undefined) => !id,
-      then: (schema) => schema
+  password: Yup.string().when("id", {
+    is: (id: string | undefined) => !id,
+    then: (schema) =>
+      schema
         .required("O campo é obrigatório!")
         .min(6, "A senha deve conter no mínimo 6 caracteres!")
         .max(20, "A senha deve conter no máximo 20 caracteres!"),
-      otherwise: (schema) => schema.optional()
-    }),
+    otherwise: (schema) => schema.optional(),
+  }),
   email: Yup.string()
     .email("E-mail inválido!")
     .test({

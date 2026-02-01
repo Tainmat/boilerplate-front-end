@@ -7,15 +7,16 @@ import {
   BarElement,
   CategoryScale,
   Chart as ChartJS,
-  Tooltip as ChartTooltip,
   Filler,
   Legend,
   LinearScale,
   LineElement,
   PointElement,
   Title,
+  Tooltip as ChartTooltip,
 } from "chart.js";
 import { Col, Container, Row } from "react-bootstrap";
+
 import { InspectionByType } from "./components/Charts/InspectionByType";
 import { LatestInspections } from "./components/Charts/LatestInspections";
 import { StatusPieChart } from "./components/Charts/StatusPieChart";

@@ -1,3 +1,4 @@
+import { ROUTE_LOGIN, ROUTE_RECOVER_PASSWORD } from "@modules/Auth/routes/Login.paths";
 import {
   createContext,
   ReactNode,
@@ -7,10 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-
 import { useLocation } from "react-router-dom";
-
-import { ROUTE_LOGIN, ROUTE_RECOVER_PASSWORD } from "@modules/Auth/routes/Login.paths";
 
 interface SideMenuContextData {
   visible: boolean;

@@ -1,15 +1,18 @@
+import { useCallback } from "react";
+
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import { useToastContext } from "@/shared/contexts/Toast";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { get } from "@/shared/services/api/api.service";
-import { setAllDropdowns } from "@/shared/store/modules/Dropdowns";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { removeEmptyEntries } from "@/shared/utils/generic";
-import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+
+import { IEquipment } from "../useEquipments";
 import { ICustomerDropdown } from "./useCustomersDropdown";
 import { IPartInspectionStatusDropdown } from "./usePartInspectionStatusDropdown";
 
 export function useLoadAllDropdowns() {
-  const dispatch = useDispatch();
+  const { setAllDropdownsAction } = useDropdownsRedux();
   const { addToast } = useToastContext();
 
   const loadDropdowns = useCallback(async () => {
@@ -21,7 +24,9 @@ export function useLoadAllDropdowns() {
       const [statusRes, customersRes, equipmentsRes] = await Promise.all([
         get("parametrizations/part-inspection-status/dropdown", queryParams),
         get("parametrizations/customers/dropdown", queryParams),
-        get("parametrizations/part-types/dropdown", queryParams),
+        get("parametrizations/part-types", {
+          status: "active",
+        }),
       ]);
 
       const statusDropdown: IOption[] = statusRes.data.data.map(
@@ -40,30 +45,28 @@ export function useLoadAllDropdowns() {
         };
       });
 
-      const equipmentsDropdown: IOption[] = equipmentsRes.data.data.map(
-        (item: { id: string; name: string }) => {
+      const equipmentsDropdown: IEquipmentDropdown[] = equipmentsRes.data.data.map(
+        (item: IEquipment) => {
           return {
-            label: item.name,
-            value: item.id,
+            id: item.id,
+            name: item.name,
+            totalInspectionPoints: item.totalInspectionPoints,
+            croqui: item.croqui,
           };
         },
       );
 
-      dispatch(
-        setAllDropdowns({
-          inspectionStatus: statusDropdown,
-          customers: customersDropdown,
-          equipments: equipmentsDropdown,
-        }),
-      );
+      setAllDropdownsAction({
+        inspectionStatus: statusDropdown,
+        customers: customersDropdown,
+        equipments: equipmentsDropdown,
+      });
     } catch {
-      dispatch(
-        setAllDropdowns({
-          inspectionStatus: [],
-          customers: [],
-          equipments: [],
-        }),
-      );
+      setAllDropdownsAction({
+        inspectionStatus: [],
+        customers: [],
+        equipments: [],
+      });
 
       addToast({
         description:
@@ -72,7 +75,7 @@ export function useLoadAllDropdowns() {
         type: "warning",
       });
     }
-  }, [dispatch]);
+  }, [addToast, setAllDropdownsAction]);
 
   return { loadDropdowns };
 }

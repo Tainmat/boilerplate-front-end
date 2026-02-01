@@ -84,7 +84,9 @@ export function Alert() {
                 </Col>
               </Row>
 
-              <Heading size="sm" className="mb-2 mb-md-3">{alert.title}</Heading>
+              <Heading size="sm" className="mb-2 mb-md-3">
+                {alert.title}
+              </Heading>
 
               {alert.subtitle && (
                 <Paragraph size="sm" className="mt-1 mt-md-2">
@@ -103,7 +105,7 @@ export function Alert() {
                     styles="tertiary"
                     display="block"
                     onClick={() => {
-                      alert.onCancel && alert.onCancel();
+                      alert.onCancel?.();
                       removeAlert();
                     }}
                   >
@@ -118,8 +120,7 @@ export function Alert() {
                     mode={alert.buttonType}
                     display="block"
                     onClick={() => {
-                      alert.onConfirm && alert.onConfirm();
-
+                      alert.onConfirm?.();
                       removeAlert();
                     }}
                   >

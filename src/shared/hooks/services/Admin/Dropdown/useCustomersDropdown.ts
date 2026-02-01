@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useAuthContext } from "@/shared/contexts/Auth";
 import { removeEmptyEntries } from "@/shared/utils/generic";
+
 import { useAuthRoles } from "../../Rules/Auth/useRoles";
 
 export interface ICustomerDropdown {
@@ -36,10 +37,7 @@ export function useCustomersDropdown({ onlyActive }: Props) {
       if (isCustomer()) {
         customers = user?.customers || [];
       } else {
-        const { data } = await get<{ data: ICustomerDropdown[] }>(
-          "parametrizations/customers/dropdown",
-          queryParams,
-        );
+        const { data } = await get("parametrizations/customers/dropdown", queryParams);
 
         customers = data.data;
       }
@@ -54,12 +52,12 @@ export function useCustomersDropdown({ onlyActive }: Props) {
       } else {
         setResult([]);
       }
-    } catch (error) {
+    } catch {
       setResult([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isCustomer, onlyActive, user?.customers]);
 
   useEffect(() => {
     fetchData();

@@ -15,12 +15,19 @@ export const Container = styled.div`
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    
+
     /* Ensure text truncation works inside cards */
-    p, h1, h2, h3, h4, h5, h6, div:not(.d-flex) {
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    div:not(.d-flex) {
       max-width: 100%;
     }
-    
+
     /* Mobile */
     @media (max-width: 767px) {
       padding: 1rem;

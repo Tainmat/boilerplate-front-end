@@ -1,7 +1,8 @@
-import { removeEmptyEntries } from "@/shared/utils/generic";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { get } from "@shared/services/api/api.service";
 import { useCallback, useEffect, useState } from "react";
+
+import { removeEmptyEntries } from "@/shared/utils/generic";
 
 export interface IUserDropdown {
   id: string;
@@ -21,10 +22,7 @@ export function useUsersDropdown() {
         isActive: true,
       });
 
-      const { data } = await get<{ data: IUserDropdown[] }>(
-        "parametrizations/profile-management/users/dropdown",
-        queryParams,
-      );
+      const { data } = await get("parametrizations/profile-management/users/dropdown", queryParams);
 
       if (Array.isArray(data.data) && data.data.length > 0) {
         const users = data.data.map((item: IUserDropdown) => ({
@@ -36,7 +34,7 @@ export function useUsersDropdown() {
       } else {
         setResult([]);
       }
-    } catch (error) {
+    } catch {
       setResult([]);
     } finally {
       setLoading(false);

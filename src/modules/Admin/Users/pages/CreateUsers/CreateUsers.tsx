@@ -12,7 +12,6 @@ import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 /* import { usuarios } from "@shared/hooks/services/Admin/useUsers"; */
-import { IUsers } from "@shared/hooks/services/Admin/useUsers";
 import { get, post, put } from "@shared/services/api/api.service";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
@@ -38,7 +37,7 @@ export function CreateUsers() {
     ]);
 
     if (uuid) {
-      get<IUsers>(`${"/parametrizations/profile-management/users"}/${uuid}`)
+      get(`${"/parametrizations/profile-management/users"}/${uuid}`)
         .then((data) => {
           if (data.data) {
             const response = data.data.data;
@@ -150,7 +149,7 @@ export function CreateUsers() {
       showLoader();
 
       if (uuid) {
-        const { data, message } = await put<IUsers>(
+        const { data, message } = await put(
           `${"/parametrizations/profile-management/users"}/${uuid}`,
           payload,
         );
@@ -163,10 +162,7 @@ export function CreateUsers() {
           });
         }
       } else {
-        const { data, message } = await post<IUsers>(
-          "/parametrizations/profile-management/users",
-          payload,
-        );
+        const { data, message } = await post("/parametrizations/profile-management/users", payload);
         if (data) {
           addToast({
             type: "success",
@@ -176,7 +172,7 @@ export function CreateUsers() {
         }
       }
       navigate(-1);
-    } catch (error) {
+    } catch {
       handleApiRejection();
     } finally {
       hideLoader();

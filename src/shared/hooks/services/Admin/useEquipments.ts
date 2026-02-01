@@ -31,7 +31,7 @@ export function useEquipments() {
         page: params?.page,
       });
 
-      const { data } = await get<IEquipment>("/parametrizations/part-types", queryParams);
+      const { data } = await get("/parametrizations/part-types", queryParams);
 
       if (data.data.length > 0) {
         setResult({
@@ -56,11 +56,15 @@ export function useEquipments() {
   }, []);
 
   function refetch() {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }
 
   useEffect(() => {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }, [params, fetchData]);
 
   return { result, params, refetch, setParams };

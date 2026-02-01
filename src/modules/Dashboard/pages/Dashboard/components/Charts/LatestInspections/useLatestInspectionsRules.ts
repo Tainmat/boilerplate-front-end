@@ -1,7 +1,8 @@
-import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
-
-import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
 import { useEffect } from "react";
+
+import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
+import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
+
 import { IDashboardParams } from "../../../useDashboardRules";
 
 interface Props {

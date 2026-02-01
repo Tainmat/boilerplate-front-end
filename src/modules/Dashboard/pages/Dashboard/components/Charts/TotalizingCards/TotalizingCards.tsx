@@ -1,9 +1,11 @@
+import { Card, Col, Row } from "react-bootstrap";
+
 import { Icon } from "@/shared/components/Core/Icons/Icon";
 import { Skeleton } from "@/shared/components/Core/Skeleton";
 import { Heading } from "@/shared/components/Core/Typography/Heading";
 import { Subtitle } from "@/shared/components/Core/Typography/Subtitle";
 import { ITotalizingCardData } from "@/shared/hooks/services/Dashboard/useTotalizingCards";
-import { Card, Col, Row } from "react-bootstrap";
+
 import { useTotalizingCardRules } from "./useTotalizingCardRules";
 
 interface Props {

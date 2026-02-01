@@ -1,12 +1,13 @@
+import { parseISO } from "date-fns";
+import { Col, Row } from "react-bootstrap";
+
 import { InputDatePicker } from "@/shared/components/Core/Form/Fields/InputDatePicker";
 import { Select } from "@/shared/components/Core/Form/Fields/Select";
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
-import { useCustomersDropdown } from "@/shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
-
 import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
 import { Paragraph } from "@/shared/components/Core/Typography/Paragraph";
-import { parseISO } from "date-fns";
-import { Col, Row } from "react-bootstrap";
+import { useCustomersDropdown } from "@/shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
+
 import { IDashboardParams } from "../../useDashboardRules";
 
 export interface Props {
@@ -37,7 +38,7 @@ export function DashboardSearchForm({
     <>
       <Row className="mb-4">
         {/* Filtro de período */}
-        <Col md={2} sm={12} className="mb-3 mb-md-0">
+        <Col lg={2} md={3} sm={12} className="mb-3 mb-md-0">
           <InputDatePicker
             value={initialReportStartDate}
             label="Data Inicial"
@@ -53,7 +54,7 @@ export function DashboardSearchForm({
             }}
           />
         </Col>
-        <Col md={2} sm={12} className="mb-3 mb-md-0">
+        <Col lg={2} md={3} sm={12} className="mb-3 mb-md-0">
           <InputDatePicker
             value={finalReportStartDate}
             label="Data Final"
@@ -69,7 +70,7 @@ export function DashboardSearchForm({
             }}
           />
         </Col>
-        <Col md={4} sm={12} className="mb-3 mb-md-0">
+        <Col lg={4} md={6} sm={12} className="mb-3 mb-md-0">
           <Select
             value={
               CUSTOMER_OPTIONS.length < 2 ? CUSTOMER_OPTIONS[0]?.value : initialValues?.customerId

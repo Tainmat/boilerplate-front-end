@@ -1,7 +1,7 @@
 import { Button } from "@shared/components/Core/Buttons/Button";
+import { InputPhone } from "@shared/components/Core/Form/Fields/InputPhone";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
 import { Select } from "@shared/components/Core/Form/Fields/Select";
-import { InputPhone } from "@shared/components/Core/Form/Fields/InputPhone";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { useAlertContext } from "@shared/contexts/Alert";
@@ -9,8 +9,7 @@ import { Field, Form, Formik } from "formik";
 import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
-import { cnpjMask, cpfMask, phoneNumberMask, cepMask } from "@/shared/utils/masks";
+import { cepMask, cnpjMask, phoneNumberMask } from "@/shared/utils/masks";
 
 import { customerValidationSchema, ICustomerRegisterForm } from "./RegisterForm.form";
 

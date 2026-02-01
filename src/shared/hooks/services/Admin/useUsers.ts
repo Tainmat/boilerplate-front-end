@@ -1,5 +1,4 @@
-/* import { URL_LIST_USUA } from "@shared/constants/urls"; */
-import { fakeRequest, get } from "@shared/services/api/api.service";
+import { get } from "@shared/services/api/api.service";
 import { IApiResponse } from "@shared/services/api/api.service.interface";
 import { removeEmptyEntries } from "@shared/utils/generic";
 import { useCallback, useEffect, useState } from "react";
@@ -40,7 +39,7 @@ export function useUsers() {
         status: params?.status,
       });
 
-      const { data } = await get<IUsers>("/parametrizations/profile-management/users", queryParams);
+      const { data } = await get("/parametrizations/profile-management/users", queryParams);
 
       if (data.data.length > 0) {
         setResult({
@@ -65,11 +64,15 @@ export function useUsers() {
   }, []);
 
   function refetch() {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }
 
   useEffect(() => {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }, [params, fetchData]);
 
   return { result, params, refetch, setParams, setResult };
