@@ -1,3 +1,5 @@
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { Button } from "@shared/components/Core/Buttons/Button";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
@@ -8,29 +10,30 @@ import { Tag } from "@shared/components/Core/Tag";
 import { Tooltip } from "@shared/components/Core/Tooltip";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
-import { IEquipment, useEquipments } from "@shared/hooks/services/Admin/useEquipments";
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 interface Props {
-  onEquipmentSelect: (equipment: IEquipment) => void;
+  onEquipmentSelect: (equipment: IEquipmentDropdown) => void;
   onCancel: () => void;
 }
 
 export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
-  const { result, setParams } = useEquipments();
+  // const { result, setParams } = useEquipments();
+  const { equipmentsDropdown } = useDropdownsRedux();
   const [searchValue, setSearchValue] = useState("");
 
-  useEffect(() => {
-    setParams({
-      searchIn: "name",
-      value: searchValue,
-      status: "active",
-      items: 10,
-      page: 1,
-      order: "name",
-    });
-  }, [searchValue, setParams]);
+  // useEffect(() => {
+  //   setParams({
+  //     searchIn: "name",
+  //     value: searchValue,
+  //     status: "active",
+  //     items: 10,
+  //     page: 1,
+  //     order: "name",
+  //   });
+  // }, [searchValue, setParams]);
 
   return (
     <div>
@@ -53,9 +56,6 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
             <Th>
               <Heading size="xs">Nome</Heading>
             </Th>
-            <Th className="d-none d-md-table-cell">
-              <Heading size="xs">Descrição</Heading>
-            </Th>
             <Th className="d-none d-lg-table-cell">
               <div className="d-flex justify-content-center">
                 <Heading size="xs">Pontos de Inspeção</Heading>
@@ -74,25 +74,17 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
           </Tr>
         </Thead>
         <Tbody>
-          {!result ? (
-            <LoadingLines lines={5} columns={5} />
-          ) : result.data.length > 0 ? (
-            result.data.map((equipment) => (
+          {!equipmentsDropdown ? (
+            <LoadingLines lines={4} columns={4} />
+          ) : equipmentsDropdown.length > 0 ? (
+            equipmentsDropdown.map((equipment) => (
               <Tr key={equipment.id}>
                 <Td>
                   <div>
                     <Paragraph size="sm" title={equipment.name}>
                       {equipment.name}
                     </Paragraph>
-                    <small className="text-muted d-md-none">
-                      {equipment.description || "Nenhuma descrição"}
-                    </small>
                   </div>
-                </Td>
-                <Td className="d-none d-md-table-cell">
-                  <Paragraph size="sm" title={equipment.description}>
-                    {equipment.description || "Nenhuma descrição"}
-                  </Paragraph>
                 </Td>
                 <Td className="d-none d-lg-table-cell">
                   <div className="d-flex justify-content-center">
@@ -122,7 +114,7 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
               </Tr>
             ))
           ) : (
-            <Empty columns={5} />
+            <Empty columns={4} />
           )}
         </Tbody>
       </Table>
