@@ -94,7 +94,7 @@ export function SelectSearch({
 
     setIsShowingOptions(false);
 
-    onReset && onReset();
+    onReset?.();
   }
 
   function handleIcon() {

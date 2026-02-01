@@ -1,10 +1,12 @@
+import { useCallback } from "react";
+
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import { useToastContext } from "@/shared/contexts/Toast";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { get } from "@/shared/services/api/api.service";
 import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { removeEmptyEntries } from "@/shared/utils/generic";
-import { useCallback } from "react";
+
 import { IEquipment } from "../useEquipments";
 import { ICustomerDropdown } from "./useCustomersDropdown";
 import { IPartInspectionStatusDropdown } from "./usePartInspectionStatusDropdown";
@@ -73,7 +75,7 @@ export function useLoadAllDropdowns() {
         type: "warning",
       });
     }
-  }, []);
+  }, [addToast, setAllDropdownsAction]);
 
   return { loadDropdowns };
 }

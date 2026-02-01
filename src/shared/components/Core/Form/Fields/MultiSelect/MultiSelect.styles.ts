@@ -1,16 +1,15 @@
-import styled, { css } from 'styled-components'
-
-import { rgba } from 'polished'
+import { rgba } from "polished";
+import styled, { css } from "styled-components";
 
 interface Props {
-  size?: 'sm' | 'lg'
-  error?: boolean
-  readOnly?: boolean
-  disabled?: boolean
+  size?: "sm" | "lg";
+  error?: boolean;
+  readOnly?: boolean;
+  disabled?: boolean;
 }
 
 export const Container = styled.div<Props>`
-  ${props => css`
+  ${(props) => css`
     position: relative;
     width: 100%;
 
@@ -33,7 +32,7 @@ export const Container = styled.div<Props>`
       font-family: ${props.theme.font.family.base};
       font-weight: ${props.theme.font.weight.regular};
 
-      ${props.size === 'sm' &&
+      ${props.size === "sm" &&
       css`
         font-size: ${props.theme.font.size.xxs};
         line-height: ${props.theme.line.height.md};
@@ -41,7 +40,7 @@ export const Container = styled.div<Props>`
         padding: 0.5rem 2rem 0.5rem 1rem;
       `}
 
-      ${(!props.size || props.size === 'lg') &&
+      ${(!props.size || props.size === "lg") &&
       css`
         font-size: ${props.theme.font.size.xs};
         line-height: ${props.theme.line.height.default};
@@ -57,22 +56,21 @@ export const Container = styled.div<Props>`
 
       width: 100%;
 
-      transition: all 0.6s cubic-bezier(0.37, 0, 0.63, 1), padding 1ms;
+      transition:
+        all 0.6s cubic-bezier(0.37, 0, 0.63, 1),
+        padding 1ms;
 
       ${props.readOnly &&
       css`
         background-color: ${rgba(
           props.theme.colors.neutral.low.pure,
-          props.theme.opacity.level.semitransparent
+          props.theme.opacity.level.semitransparent,
         )};
         border-color: ${rgba(
           props.theme.colors.neutral.low.pure,
-          props.theme.opacity.level.medium
+          props.theme.opacity.level.medium,
         )};
-        color: ${rgba(
-          props.theme.colors.neutral.low.pure,
-          props.theme.opacity.level.semiopaque
-        )};
+        color: ${rgba(props.theme.colors.neutral.low.pure, props.theme.opacity.level.semiopaque)};
 
         cursor: default;
       `}
@@ -83,27 +81,24 @@ export const Container = styled.div<Props>`
         css`
           background-color: ${rgba(
             props.theme.colors.neutral.low.pure,
-            props.theme.opacity.level.semitransparent
+            props.theme.opacity.level.semitransparent,
           )};
         `}
       }
 
       & > div {
         & > span {
-          color: ${rgba(
-            props.theme.colors.neutral.low.pure,
-            props.theme.opacity.level.semiopaque
-          )};
+          color: ${rgba(props.theme.colors.neutral.low.pure, props.theme.opacity.level.semiopaque)};
           font-family: ${props.theme.font.family.base};
           font-weight: ${props.theme.font.weight.regular};
 
-          ${props.size === 'sm' &&
+          ${props.size === "sm" &&
           css`
             font-size: ${props.theme.font.size.xxs};
             line-height: ${props.theme.line.height.md};
           `}
 
-          ${(!props.size || props.size === 'lg') &&
+          ${(!props.size || props.size === "lg") &&
           css`
             font-size: ${props.theme.font.size.xs};
             line-height: ${props.theme.line.height.default};
@@ -149,12 +144,12 @@ export const Container = styled.div<Props>`
             outline: unset;
             width: 100%;
 
-            ${props.size === 'sm' &&
+            ${props.size === "sm" &&
             css`
               padding: 0.5rem 1rem;
             `}
 
-            ${(!props.size || props.size === 'lg') &&
+            ${(!props.size || props.size === "lg") &&
             css`
               padding: 1rem;
             `}
@@ -196,4 +191,4 @@ export const Container = styled.div<Props>`
       `}
     }
   `}
-`
+`;

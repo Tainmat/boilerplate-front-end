@@ -1,7 +1,7 @@
+import { useTransition } from "@react-spring/web";
 import { Message } from "@shared/components/Core/Toast/Message/Message";
 import { Container } from "@shared/components/Core/Toast/Toast.styles";
 import { IToastMessage } from "@shared/contexts/Toast/Toast.interface";
-import { useTransition } from "@react-spring/web";
 
 interface Props {
   messages: IToastMessage[];

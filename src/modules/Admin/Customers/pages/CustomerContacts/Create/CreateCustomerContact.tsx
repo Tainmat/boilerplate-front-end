@@ -13,6 +13,7 @@ import { useLoaderContext } from "@/shared/contexts/Loader";
 import { useToastContext } from "@/shared/contexts/Toast";
 import { ICustomerContacts } from "@/shared/hooks/services/Admin/useCustomerContacts";
 import { get, post, put } from "@/shared/services/api/api.service";
+
 import { ROUTE_LIST_CUSTOMERS } from "../../../routes/Customer.paths";
 import { CustomerContactRegisterForm } from "./components/RegisterForm";
 import { ICustomerContatcRegisterForm } from "./components/RegisterForm/RegisterForm.form";
@@ -129,7 +130,7 @@ export function CreateCustomerContact() {
       }
 
       navigate(-1);
-    } catch (error) {
+    } catch {
       handleApiRejection();
     } finally {
       hideLoader();

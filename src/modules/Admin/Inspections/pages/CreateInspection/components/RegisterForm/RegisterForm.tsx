@@ -20,9 +20,9 @@ import ReactQuill from "react-quill-new";
 import { useNavigate } from "react-router-dom";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
 
-import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { IInspectionRegisterForm, inspectionValidationSchema } from "./RegisterForm.form";
 
 interface Props {
@@ -929,7 +929,7 @@ export function InspectionRegisterForm({
                                   className="d-flex flex-column align-items-center justify-content-center h-100 p-3"
                                   style={{
                                     opacity: !isInspectionChanger() ? 0.5 : 1,
-                                    cursor: !isInspectionChanger() ? 'not-allowed' : 'default'
+                                    cursor: !isInspectionChanger() ? "not-allowed" : "default",
                                   }}
                                 >
                                   <div className="text-center mb-3">
@@ -996,7 +996,7 @@ export function InspectionRegisterForm({
 
                                           // Limpar o input para permitir selecionar a mesma imagem novamente
                                           e.target.value = "";
-                                        } catch (error) {
+                                        } catch {
                                           alert("Erro ao processar a imagem. Tente novamente.");
                                           e.target.value = "";
                                         }
@@ -1005,11 +1005,11 @@ export function InspectionRegisterForm({
                                   />
                                   <label
                                     htmlFor={`image-upload-${slotIndex}`}
-                                    className={`btn btn-sm w-100 ${isInspectionChanger() ? 'btn-outline-success' : 'btn-outline-secondary'}`}
+                                    className={`btn btn-sm w-100 ${isInspectionChanger() ? "btn-outline-success" : "btn-outline-secondary"}`}
                                     style={{
                                       cursor: isInspectionChanger() ? "pointer" : "not-allowed",
                                       opacity: isInspectionChanger() ? 1 : 0.6,
-                                      pointerEvents: isInspectionChanger() ? "auto" : "none"
+                                      pointerEvents: isInspectionChanger() ? "auto" : "none",
                                     }}
                                   >
                                     Selecionar Imagem
@@ -1152,7 +1152,13 @@ export function InspectionRegisterForm({
                             mode="success"
                             disabled={!dirty || !isValid}
                             className="action-btn"
-                            title={!dirty ? "Nenhuma alteração para salvar" : !isValid ? "Preencha todos os campos obrigatórios" : "Salvar inspeção"}
+                            title={
+                              !dirty
+                                ? "Nenhuma alteração para salvar"
+                                : !isValid
+                                  ? "Preencha todos os campos obrigatórios"
+                                  : "Salvar inspeção"
+                            }
                           >
                             <span className="btn-icon">✓</span>
                             <span className="btn-text">Salvar</span>

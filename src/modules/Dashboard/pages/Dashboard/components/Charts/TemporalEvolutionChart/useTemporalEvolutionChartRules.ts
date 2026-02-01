@@ -1,8 +1,9 @@
-import { ITemporalEvolutionData } from "@/shared/hooks/services/Dashboard/useTemporalEvolution";
-import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useMemo } from "react";
+
+import { ITemporalEvolutionData } from "@/shared/hooks/services/Dashboard/useTemporalEvolution";
+import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
 
 interface Props {
   data: ITemporalEvolutionData[] | null;

@@ -1,4 +1,3 @@
-import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { UsersTable } from "@modules/Admin/Users/pages/ListUsers/components/UsersTable";
 import { ROUTE_SAVE_USER, ROUTE_UPDATE_USER } from "@modules/Admin/Users/routes/Users.paths";
 import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
@@ -26,9 +25,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+
 export function ListUsers() {
   const navigate = useNavigate();
-  const { isSmartphone, isTablet } = useDeviceDetection();
+  const { isSmartphone } = useDeviceDetection();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const { result, params, setParams } = useUsers();

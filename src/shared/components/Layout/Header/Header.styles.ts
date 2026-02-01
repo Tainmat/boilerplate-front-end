@@ -92,19 +92,19 @@ export const Container = styled(defaultContainerProps)<ContainerProps>`
       height: 3.5rem;
       width: 100%;
       padding: 0 0.75rem;
-      
+
       .col1 {
         gap: 0.375rem;
-        
+
         .username {
           gap: 0.25rem;
-          
+
           .hello {
             font-size: ${props.theme.font.size.xxs};
           }
         }
       }
-      
+
       .col2 {
         gap: 0.25rem;
         margin-right: 0.5rem;
@@ -115,19 +115,19 @@ export const Container = styled(defaultContainerProps)<ContainerProps>`
     @media (min-width: 768px) and (max-width: 1023px) {
       height: 3.75rem;
       width: 100%;
-      
+
       .col1 {
         gap: 0.4375rem;
-        
+
         .username {
           gap: 0.375rem;
-          
+
           .hello {
             font-size: ${props.theme.font.size.xs};
           }
         }
       }
-      
+
       .col2 {
         gap: 0.3125rem;
         margin-right: 0.75rem;
@@ -143,7 +143,9 @@ export const BreadcrumbContainer = styled(defaultContainerProps)`
     position: fixed;
     z-index: 1070;
     background-color: transparent;
-    transition: margin-top 0.3s ease, padding 0.3s ease;
+    transition:
+      margin-top 0.3s ease,
+      padding 0.3s ease;
 
     /* Mobile */
     @media (max-width: 767px) {
@@ -204,16 +206,18 @@ export const Avatar = styled.div`
   position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
-  
+
   img {
     border-radius: 50%;
     height: 2.5rem;
     width: 2.5rem;
-    transition: height 0.3s ease, width 0.3s ease;
+    transition:
+      height 0.3s ease,
+      width 0.3s ease;
     border: 2px solid transparent;
-    
+
     &:hover {
-      border-color: ${props => props.theme.colors.brand.primary.pure};
+      border-color: ${(props) => props.theme.colors.brand.primary.pure};
     }
 
     /* Mobile */

@@ -1,6 +1,7 @@
-import { Card } from "@/shared/components/Core/Card";
 import { rgba } from "polished";
 import styled from "styled-components";
+
+import { Card } from "@/shared/components/Core/Card";
 
 export const CardEquipmentContainer = styled(Card)`
   cursor: pointer;

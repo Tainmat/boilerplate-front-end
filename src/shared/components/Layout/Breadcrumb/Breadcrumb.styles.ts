@@ -17,7 +17,7 @@ export const Container = styled.div`
   @media (max-width: 767px) {
     padding: 0.5rem 0;
     width: 100%;
-    
+
     &::-webkit-scrollbar {
       height: 0.25rem;
     }
@@ -33,7 +33,7 @@ export const Container = styled.div`
     }
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Tablet */
   @media (min-width: 768px) and (max-width: 1023px) {
     padding: 0.4375rem 0;

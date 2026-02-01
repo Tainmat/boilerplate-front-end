@@ -1,9 +1,12 @@
-import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
-import { IEquipment } from "@/shared/hooks/services/Admin/useEquipments";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface IEquipmentDropdown
-  extends Pick<IEquipment, "id" | "name" | "totalInspectionPoints" | "croqui"> {}
+import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
+import { IEquipment } from "@/shared/hooks/services/Admin/useEquipments";
+
+export type IEquipmentDropdown = Pick<
+  IEquipment,
+  "id" | "name" | "totalInspectionPoints" | "croqui"
+>;
 
 interface IDropdownsState {
   inspectionStatusDropdown: IOption[];

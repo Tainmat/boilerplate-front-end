@@ -1,5 +1,3 @@
-import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
-import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { InputSearch } from "@shared/components/Core/Form/Fields/Search/Input";
 import { SelectSearch } from "@shared/components/Core/Form/Fields/Search/Select";
@@ -10,6 +8,10 @@ import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
+
+import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
+
 import { IInspectionSearchForm, initialInspectionSearchValues } from "./InspectionSearchForm.form";
 
 interface Props {
@@ -20,7 +22,7 @@ interface Props {
 }
 
 export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, onAdd }: Props) {
-  const { isDesktop, isSmartphone, isTablet, isNotebook } = useDeviceDetection();
+  useDeviceDetection();
   const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
   const { inspectionStatusDropdown } = useDropdownsRedux();
 

@@ -26,9 +26,8 @@ export function ButtonLink({
   const navigate = useNavigate();
 
   function handleOnClick() {
-    route && navigate(route);
-
-    onClick && onClick();
+    if (route) navigate(route);
+    onClick?.();
   }
 
   return !externalLink ? (

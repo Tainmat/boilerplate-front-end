@@ -55,6 +55,8 @@ module.exports = {
     },
   ],
   rules: {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "prettier/prettier": ["error", {}, { usePrettierrc: true }],
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
@@ -62,6 +64,5 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": "off",
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
-    "react-hooks/exhaustive-deps": "warn",
   },
 };

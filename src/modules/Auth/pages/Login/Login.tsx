@@ -1,4 +1,3 @@
-import { useLoadAllDropdowns } from "@/shared/hooks/services/Admin/Dropdown/useLoadAllDropdowns";
 import {
   ILoginForm,
   initialValuesSchema,
@@ -20,6 +19,8 @@ import { Field, Form, Formik, FormikHelpers } from "formik";
 import { useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
+import { useLoadAllDropdowns } from "@/shared/hooks/services/Admin/Dropdown/useLoadAllDropdowns";
 
 export function Login() {
   const { loadDropdowns } = useLoadAllDropdowns();

@@ -176,7 +176,7 @@ export function CreateUsers() {
         }
       }
       navigate(-1);
-    } catch (error) {
+    } catch {
       handleApiRejection();
     } finally {
       hideLoader();

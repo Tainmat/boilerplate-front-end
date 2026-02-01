@@ -1,3 +1,5 @@
+import { useDispatch, useSelector } from "react-redux";
+
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import {
   IEquipmentDropdown,
@@ -7,7 +9,6 @@ import {
   setInspectionStatusDropdown,
 } from "@/shared/store/modules/Dropdowns";
 import { RootState } from "@/shared/store/store";
-import { useDispatch, useSelector } from "react-redux";
 
 export function useDropdownsRedux() {
   const dispatch = useDispatch();

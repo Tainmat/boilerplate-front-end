@@ -1,6 +1,7 @@
+import { useMemo } from "react";
+
 import { ITotalizingCardData } from "@/shared/hooks/services/Dashboard/useTotalizingCards";
 import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
-import { useMemo } from "react";
 
 interface Props {
   data: ITotalizingCardData | null;

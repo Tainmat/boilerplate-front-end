@@ -24,24 +24,22 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
-  ROUTE_LIST_CUSTOMERS,
   ROUTE_SAVE_CUSTOMER,
   ROUTE_UPDATE_CUSTOMER,
 } from "@/modules/Admin/Customers/routes/Customer.paths";
-
-import { CustomerContext, useCustomerContext } from "@/shared/contexts/Customer/CustomerContext";
+import { CustomerContext } from "@/shared/contexts/Customer/CustomerContext";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+
 import { CustomersTable } from "./components/CustomersTable";
 
 export function ListCustomers() {
   const navigate = useNavigate();
-  const { isSmartphone, isTablet } = useDeviceDetection();
+  const { isSmartphone } = useDeviceDetection();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const { result, params, setParams } = useCustomers();
   const [loaded, setLoaded] = useState(false);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const { selectCustomer } = useCustomerContext();
   const { isRegister } = useAuthRoles();
 
   const SEARCH_OPTIONS: IOption[] = [
@@ -231,10 +229,6 @@ export function ListCustomers() {
                           expanded={expandedRow === item.id}
                           onToggleExpand={() => toggleRowExpand(item.id)}
                           isSmartphone={isSmartphone}
-                          onOpenContacts={() => {
-                            selectCustomer(item);
-                            navigate(`${ROUTE_LIST_CUSTOMERS}/${item.id}/contacts`);
-                          }}
                           isRegister={isRegister()}
                         />
                       ))

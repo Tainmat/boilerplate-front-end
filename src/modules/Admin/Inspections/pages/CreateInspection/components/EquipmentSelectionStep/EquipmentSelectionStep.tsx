@@ -1,11 +1,12 @@
-import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
-import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { Button } from "@shared/components/Core/Buttons/Button";
 import { InputText } from "@shared/components/Core/Form/Fields/InputText";
-
-import { EmptyResult } from "@/shared/components/Core/EmptyResult";
 import { useMemo, useState } from "react";
 import { Col, Row } from "react-bootstrap";
+
+import { EmptyResult } from "@/shared/components/Core/EmptyResult";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
+
 import { CardEquipment } from "./components/CardEquipment";
 
 interface Props {
@@ -41,12 +42,8 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
       <Row>
         {filteredEquipments.length > 0 ? (
           filteredEquipments.map((item) => (
-            <Col lg={4} md={6} xs={12} className="mb-4">
-              <CardEquipment
-                equipment={item}
-                onSelect={() => onEquipmentSelect(item)}
-                key={item.id}
-              />
+            <Col lg={4} md={6} xs={12} className="mb-4" key={item.id}>
+              <CardEquipment equipment={item} onSelect={() => onEquipmentSelect(item)} />
             </Col>
           ))
         ) : (

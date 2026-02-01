@@ -1,8 +1,8 @@
 import { Order } from "@shared/components/Core/Table/Order";
 import { IOrder } from "@shared/components/Core/Table/Order/Order.interface";
 import { Container, Scrollable, Wrapper } from "@shared/components/Core/Table/Table.styles";
-import { ReactNode, useState, useEffect } from "react";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
+import { ReactNode, useState } from "react";
 
 interface Props {
   innerRef?: any;
@@ -118,17 +118,17 @@ function Tfoot({ innerRef, size, children, ...props }: TfootProps) {
   );
 }
 
-function Tr({ 
-  innerRef, 
-  stroke, 
-  highlight, 
-  style, 
-  className, 
-  children, 
+function Tr({
+  innerRef,
+  stroke,
+  highlight,
+  style,
+  className,
+  children,
   expandable,
   expanded,
   onToggleExpand,
-  ...props 
+  ...props
 }: TrProps) {
   const classes = `${className || ""} 
     ${highlight ? `highlight-${highlight}` : ""}
@@ -140,39 +140,33 @@ function Tr({
     if (expandable && onToggleExpand) {
       onToggleExpand();
     }
-    
+
     if (props.onClick) {
       props.onClick(e);
     }
   };
 
   return (
-    <tr 
-      ref={innerRef} 
-      style={style} 
-      className={classes} 
-      onClick={handleClick}
-      {...props}
-    >
+    <tr ref={innerRef} style={style} className={classes} onClick={handleClick} {...props}>
       {children}
     </tr>
   );
 }
 
-function Th({ 
-  colSpan, 
-  order, 
-  orderBy, 
-  onChange, 
-  innerRef, 
+function Th({
+  colSpan,
+  order,
+  orderBy,
+  onChange,
+  innerRef,
   children,
   hideOnMobile,
   hideOnTablet,
-  ...props 
+  ...props
 }: ThProps) {
   const [currentOrder, setCurrentOrder] = useState<IOrder>(order);
   const { isSmartphone, isTablet } = useDeviceDetection();
-  
+
   // Hide column based on screen size
   if ((hideOnMobile && isSmartphone) || (hideOnTablet && isTablet)) {
     return null;
@@ -218,50 +212,52 @@ function Th({
   );
 }
 
-function Td({ 
-  colSpan, 
-  showOnHover, 
-  style, 
-  innerRef, 
+function Td({
+  colSpan,
+  showOnHover,
+  style,
+  innerRef,
   children,
   hideOnMobile,
   hideOnTablet,
-  ...props 
+  ...props
 }: TdProps) {
   const { isSmartphone, isTablet } = useDeviceDetection();
-  
+
   // Hide column based on screen size
   if ((hideOnMobile && isSmartphone) || (hideOnTablet && isTablet)) {
     return null;
   }
-  
+
   return showOnHover ? (
     <td
       ref={innerRef}
       colSpan={colSpan}
-      style={{ 
-        whiteSpace: "nowrap", 
-        overflow: "hidden", 
-        textOverflow: "ellipsis", 
-        maxWidth: "250px", 
-        ...style 
+      style={{
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        maxWidth: "250px",
+        ...style,
       }}
       {...props}
     >
-      <div className="show-on-hover" title={typeof children === 'string' ? children : undefined}>{children}</div>
+      <div className="show-on-hover" title={typeof children === "string" ? children : undefined}>
+        {children}
+      </div>
     </td>
   ) : (
     <td
       ref={innerRef}
       colSpan={colSpan}
-      style={{ 
-        whiteSpace: "nowrap", 
-        overflow: "hidden", 
-        textOverflow: "ellipsis", 
-        maxWidth: "250px", 
-        ...style 
+      style={{
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        maxWidth: "250px",
+        ...style,
       }}
-      title={typeof children === 'string' ? children : undefined}
+      title={typeof children === "string" ? children : undefined}
       {...props}
     >
       {children}

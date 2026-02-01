@@ -40,7 +40,7 @@ export function InputNumber({
   onChange,
 }: Props) {
   function handleOnValueChange(values: NumberFormatValues) {
-    onChange && onChange(values.floatValue || "");
+    onChange?.(values.floatValue || "");
   }
 
   return (

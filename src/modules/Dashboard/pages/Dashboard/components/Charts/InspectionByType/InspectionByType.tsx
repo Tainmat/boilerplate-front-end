@@ -1,9 +1,11 @@
+import { Card } from "react-bootstrap";
+import { Bar } from "react-chartjs-2";
+
 import { Skeleton } from "@/shared/components/Core/Skeleton";
 import { Paragraph } from "@/shared/components/Core/Typography/Paragraph";
 import { Subtitle } from "@/shared/components/Core/Typography/Subtitle";
 import { IInspectionPartType } from "@/shared/hooks/services/Dashboard/useInspectionPartType";
-import { Card } from "react-bootstrap";
-import { Bar } from "react-chartjs-2";
+
 import { useInspectionByTypeRules } from "./useInspectionByTypeRules";
 
 interface Props {

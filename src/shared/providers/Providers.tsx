@@ -1,6 +1,7 @@
 import { ReactQueryProvider } from "@shared/providers/ReactQuery";
 import { ThemeProvider } from "@shared/providers/Theme";
 import { ReactNode } from "react";
+
 import { ReduxProvider } from "./Redux";
 
 interface Props {

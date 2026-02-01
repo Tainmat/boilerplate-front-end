@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Options } from "./Options";
-
 import { Icon } from "../../../Icons/Icon";
 import { HelperText } from "../../HelperText";
 import { Label } from "../../Label";
 import { IMultiSelectOption } from "./MultiSelect.interface";
 import { Container } from "./MultiSelect.styles";
+import { Options } from "./Options";
 
 interface Props {
   size?: "sm" | "lg";
@@ -96,7 +95,7 @@ export function MultiSelect({
 
     setIsShowingOptions(false);
 
-    onReset && onReset();
+    onReset?.();
   }
 
   function handleIcon() {

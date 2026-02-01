@@ -1,7 +1,8 @@
+import { useCallback, useEffect, useState } from "react";
+
 import { IDashboardParams } from "@/modules/Dashboard/pages/Dashboard/useDashboardRules";
 import { get } from "@/shared/services/api/api.service";
 import { removeEmptyEntries } from "@/shared/utils/generic";
-import { useCallback, useEffect, useState } from "react";
 
 export interface ITemporalEvolutionData {
   month: number;
@@ -33,7 +34,7 @@ export function useTemporalEvolution() {
       } else {
         setData(null);
       }
-    } catch (error) {
+    } catch {
       setData(null);
     } finally {
       setLoading(false);

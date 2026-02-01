@@ -1,5 +1,6 @@
-import { IInspectionRegisterForm } from "@/modules/Admin/Inspections/pages/CreateInspection/components/RegisterForm/RegisterForm.form";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import { IInspectionRegisterForm } from "@/modules/Admin/Inspections/pages/CreateInspection/components/RegisterForm/RegisterForm.form";
 
 export interface IOfflineInspectionCard {
   id: string;

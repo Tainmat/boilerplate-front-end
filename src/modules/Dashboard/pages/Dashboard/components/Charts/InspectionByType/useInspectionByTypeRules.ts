@@ -1,6 +1,7 @@
+import { useMemo } from "react";
+
 import { IInspectionPartType } from "@/shared/hooks/services/Dashboard/useInspectionPartType";
 import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
-import { useMemo } from "react";
 
 interface Props {
   data: IInspectionPartType[] | null;

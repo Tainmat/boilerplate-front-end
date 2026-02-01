@@ -2,9 +2,10 @@ import { Skeleton } from "@shared/components/Core/Skeleton";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Subtitle } from "@shared/components/Core/Typography/Subtitle";
 import { ITotalizingCardData } from "@shared/hooks/services/Dashboard/useTotalizingCards";
-import { Chart as ChartJS, ArcElement, Tooltip as ChartTooltip, Legend } from "chart.js";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip as ChartTooltip } from "chart.js";
 import { Card } from "react-bootstrap";
 import { Pie } from "react-chartjs-2";
+
 import { useStatusPieChartRules } from "./useStatusPieChartRules";
 
 // Registrar componentes necessários do Chart.js
@@ -33,7 +34,10 @@ export function StatusPieChart({ data, loading }: StatusPieChartProps) {
             <Pie data={pieChartData} options={pieChartOptions} />
           </div>
         ) : (
-          <div className="d-flex justify-content-center align-items-center" style={{ height: "300px" }}>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "300px" }}
+          >
             <Paragraph size="sm">Sem dados disponíveis</Paragraph>
           </div>
         )}

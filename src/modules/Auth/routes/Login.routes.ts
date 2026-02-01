@@ -1,7 +1,7 @@
 import {
+  ROUTE_CHANGE_PASSWORD,
   ROUTE_LOGIN,
   ROUTE_RECOVER_PASSWORD,
-  ROUTE_CHANGE_PASSWORD,
 } from "@modules/Auth/routes/Login.paths";
 import { IRouteProps } from "@shared/routes/routes.interface";
 import { lazy } from "react";

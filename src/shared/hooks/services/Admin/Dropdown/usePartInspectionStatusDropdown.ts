@@ -1,7 +1,8 @@
-import { removeEmptyEntries } from "@/shared/utils/generic";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { get } from "@shared/services/api/api.service";
 import { useCallback, useEffect, useState } from "react";
+
+import { removeEmptyEntries } from "@/shared/utils/generic";
 
 export interface IPartInspectionStatusDropdown {
   id: string;
@@ -37,7 +38,7 @@ export function usePartInspectionStatusDropdown() {
       } else {
         setResult([]);
       }
-    } catch (error) {
+    } catch {
       setResult([]);
     } finally {
       setLoading(false);

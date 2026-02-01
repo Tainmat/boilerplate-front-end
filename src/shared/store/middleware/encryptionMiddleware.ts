@@ -1,4 +1,5 @@
 import type { Middleware } from "@reduxjs/toolkit";
+
 import { decrypt, encrypt } from "./criptografia";
 
 const whitelistState = (state: any, whitelist: string[]) => {

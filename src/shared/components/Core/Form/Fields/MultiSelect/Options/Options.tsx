@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { IMultiSelectOption } from "../MultiSelect.interface";
-
 import { Icon } from "@/shared/components/Core/Icons/Icon";
+
+import { IMultiSelectOption } from "../MultiSelect.interface";
 import { List, Option, Text, Wrapper } from "./Options.styles";
 
 interface Props {

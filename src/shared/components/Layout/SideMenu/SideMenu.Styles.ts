@@ -37,9 +37,11 @@ export const Container = styled.nav<ContainerProps>`
       max-width: 320px;
       padding: 1.25rem 0;
       transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+      transition:
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.3s ease;
       box-shadow: ${props.$hover ? "8px 0 25px rgba(0, 0, 0, 0.25)" : "none"};
-      
+
       ${props.$hover &&
       css`
         transform: translateX(0) !important;
@@ -53,10 +55,11 @@ export const Container = styled.nav<ContainerProps>`
       width: 280px;
       padding: 1.75rem 0;
       transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                  box-shadow 0.3s ease;
+      transition:
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.3s ease;
       box-shadow: ${props.$hover ? "8px 0 25px rgba(0, 0, 0, 0.25)" : "none"};
-      
+
       ${props.$hover &&
       css`
         transform: translateX(0) !important;
@@ -70,10 +73,11 @@ export const Container = styled.nav<ContainerProps>`
       width: 280px;
       padding: 2rem 0;
       transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                  box-shadow 0.3s ease;
+      transition:
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.3s ease;
       box-shadow: ${props.$hover ? "6px 0 20px rgba(0, 0, 0, 0.15)" : "none"};
-      
+
       ${props.$hover &&
       css`
         transform: translateX(0) !important;
@@ -87,10 +91,11 @@ export const Container = styled.nav<ContainerProps>`
       width: 320px;
       padding: 2rem 0;
       transform: ${props.$hover ? "translateX(0)" : "translateX(-100%)"};
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                  box-shadow 0.3s ease;
+      transition:
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.3s ease;
       box-shadow: ${props.$hover ? "4px 0 15px rgba(0, 0, 0, 0.1)" : "none"};
-      
+
       ${props.$hover &&
       css`
         transform: translateX(0) !important;
@@ -102,7 +107,7 @@ export const Container = styled.nav<ContainerProps>`
        ================================= */
     @media (min-width: 1400px) {
       width: 350px;
-      
+
       ${props.$hover &&
       css`
         transform: translateX(0) !important;
@@ -162,11 +167,11 @@ export const List = styled.ul`
     &::-webkit-scrollbar {
       width: 4px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: transparent;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background-color: ${props.theme.colors.neutral.low.light};
       border-radius: ${props.theme.border.radius.sm};
@@ -606,7 +611,9 @@ export const MenuOverlay = styled.div<{ $visible: boolean }>`
     z-index: ${props.theme.zindex.nine};
     opacity: ${props.$visible ? 1 : 0};
     visibility: ${props.$visible ? "visible" : "hidden"};
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    transition:
+      opacity 0.3s ease-in-out,
+      visibility 0.3s ease-in-out;
     backdrop-filter: blur(2px);
 
     /* Different overlay opacity for different screen sizes */

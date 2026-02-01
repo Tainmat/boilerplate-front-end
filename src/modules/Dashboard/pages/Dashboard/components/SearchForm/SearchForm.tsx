@@ -1,12 +1,13 @@
+import { parseISO } from "date-fns";
+import { Col, Row } from "react-bootstrap";
+
 import { InputDatePicker } from "@/shared/components/Core/Form/Fields/InputDatePicker";
 import { Select } from "@/shared/components/Core/Form/Fields/Select";
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
-import { useCustomersDropdown } from "@/shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
-
 import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
 import { Paragraph } from "@/shared/components/Core/Typography/Paragraph";
-import { parseISO } from "date-fns";
-import { Col, Row } from "react-bootstrap";
+import { useCustomersDropdown } from "@/shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
+
 import { IDashboardParams } from "../../useDashboardRules";
 
 export interface Props {

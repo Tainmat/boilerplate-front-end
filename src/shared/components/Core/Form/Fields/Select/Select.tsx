@@ -112,7 +112,7 @@ export function Select({
 
     setIsShowingOptions(false);
 
-    onReset && onReset();
+    onReset?.();
   }
 
   function handleIcon() {
@@ -239,7 +239,7 @@ export function Select({
 
           setFilter("");
 
-          onChange && onChange(option);
+          onChange?.(option);
         }}
         onClose={() => setIsShowingOptions(false)}
       />

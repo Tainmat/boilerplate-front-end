@@ -40,11 +40,13 @@ export function TextArea({
   const [textAreaValue, setTextAreaValue] = useState(initialValue || "");
 
   useEffect(() => {
-    typeof value === "string" && setTextAreaValue(value);
+    if (typeof value === "string") {
+      setTextAreaValue(value);
+    }
   }, [value]);
 
   function handleOnChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    onChange && onChange(e);
+    onChange?.(e);
 
     setTextAreaValue(e.target.value);
   }

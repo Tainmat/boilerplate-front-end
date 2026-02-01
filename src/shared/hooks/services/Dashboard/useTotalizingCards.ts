@@ -1,7 +1,8 @@
+import { useCallback, useEffect, useState } from "react";
+
 import { IDashboardParams } from "@/modules/Dashboard/pages/Dashboard/useDashboardRules";
 import { get } from "@/shared/services/api/api.service";
 import { removeEmptyEntries } from "@/shared/utils/generic";
-import { useCallback, useEffect, useState } from "react";
 
 export interface ITotalizingCardData {
   em_analise: {
@@ -34,7 +35,7 @@ export function useTotalizingCards() {
     setData(null);
     try {
       const payload = removeEmptyEntries(params);
-      const { data } = await get<ITotalizingCardData>(
+      const { data } = await get(
         "/operational/parts-inspection/dashboard/totalizing-cards",
         payload,
       );
@@ -44,7 +45,7 @@ export function useTotalizingCards() {
       } else {
         setData(null);
       }
-    } catch (error) {
+    } catch {
       setData(null);
     } finally {
       setLoading(false);
@@ -59,7 +60,9 @@ export function useTotalizingCards() {
   );
 
   useEffect(() => {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }, [fetchData, params]);
 
   return {

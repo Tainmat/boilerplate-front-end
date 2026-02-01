@@ -1,4 +1,9 @@
 //src/shared/hooks/offline/useOfflineInspections.ts
+import * as inspectionsDB from "@shared/services/indexedDB/inspectionsDB";
+import { useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+
 import { IInspectionRegisterForm } from "@/modules/Admin/Inspections/pages/CreateInspection/components/RegisterForm/RegisterForm.form";
 import {
   addCard,
@@ -11,10 +16,6 @@ import {
   updateCard,
 } from "@/shared/store/modules/OfflineInspection";
 import { RootState } from "@/shared/store/store";
-import * as inspectionsDB from "@shared/services/indexedDB/inspectionsDB";
-import { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { v4 as uuidv4 } from "uuid";
 
 export function useOfflineInspections() {
   const dispatch = useDispatch();
@@ -24,10 +25,6 @@ export function useOfflineInspections() {
     (state: RootState) => state.offlineInspectionsData.currentInspection,
   );
   const isSync = useSelector((state: RootState) => state.offlineInspectionsData.isSync);
-
-  useEffect(() => {
-    loadCards();
-  }, []);
 
   const loadCards = useCallback(async () => {
     try {
@@ -51,6 +48,10 @@ export function useOfflineInspections() {
       console.error("❌ Erro ao carregar cards do IndexedDB:", error);
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    loadCards();
+  }, [loadCards]);
 
   const loadFullInspection = useCallback(
     async (id: string) => {

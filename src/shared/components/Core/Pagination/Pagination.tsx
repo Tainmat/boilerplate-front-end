@@ -52,7 +52,7 @@ export function Pagination({ defaultCurrent, pageSize, total, onChange }: Props)
   useEffect(() => {
     handleRender(currentPage);
 
-    onChange && onChange(currentPage);
+    onChange?.(currentPage);
   }, [handleRender, currentPage, onChange, defaultCurrent]);
 
   function handlePrevious() {

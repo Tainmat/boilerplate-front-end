@@ -6,18 +6,18 @@
 export const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = () => {
       const result = reader.result as string;
       // Remove o prefixo "data:image/...;base64," para enviar apenas o base64
-      const base64 = result.split(',')[1];
+      const base64 = result.split(",")[1];
       resolve(base64);
     };
-    
+
     reader.onerror = (error) => {
       reject(error);
     };
-    
+
     reader.readAsDataURL(file);
   });
 };
@@ -28,7 +28,7 @@ export const fileToBase64 = (file: File): Promise<string> => {
  * @returns Promise<string[]> - Array de strings base64
  */
 export const filesToBase64 = async (files: File[]): Promise<string[]> => {
-  const base64Promises = files.map(file => fileToBase64(file));
+  const base64Promises = files.map((file) => fileToBase64(file));
   return Promise.all(base64Promises);
 };
 
@@ -41,14 +41,14 @@ export const filesToBase64 = async (files: File[]): Promise<string[]> => {
  */
 export const formatBase64ForImage = (
   base64String: string | undefined | null,
-  mimeType: string = 'image/png'
+  mimeType: string = "image/png",
 ): string | undefined => {
   if (!base64String) {
     return undefined;
   }
 
   // Se já tem o prefixo data:image, retorna como está
-  if (base64String.startsWith('data:')) {
+  if (base64String.startsWith("data:")) {
     return base64String;
   }
 

@@ -26,15 +26,15 @@ export function cnpjMask(value: string | number | undefined): string {
 }
 
 export {
-  phoneInputMask,
-  phoneNumberMask,
+  legacyCellPhoneNumberMask as cellPhoneNumberMask_legacy,
   cleanPhoneNumber,
   formatPhoneNumber,
-  validatePhoneNumber,
   getPhoneType,
   getPhoneTypeDescription,
+  phoneInputMask,
+  phoneNumberMask,
   legacyPhoneNumberMask as phoneNumberMask_legacy,
-  legacyCellPhoneNumberMask as cellPhoneNumberMask_legacy,
+  validatePhoneNumber,
 } from "./phoneMask";
 
 export function cellPhoneNumberMask(value: string): string {

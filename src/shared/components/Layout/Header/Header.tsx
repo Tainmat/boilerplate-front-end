@@ -8,14 +8,12 @@ import { useState } from "react";
 
 import { useAuthContext } from "@/shared/contexts/Auth";
 
-import { ButtonIcon } from "../../Core/Buttons/ButtonIcon";
-import { Tooltip } from "../../Core/Tooltip";
-import { Paragraph } from "../../Core/Typography/Paragraph";
 import { Icon } from "../../Core/Icons/Icon";
+import { Paragraph } from "../../Core/Typography/Paragraph";
 import { UserDropdown } from "./Dropdown";
 
 export function Header() {
-  const { hover, toggleMenu, isSmartphone, isTablet } = useSideMenuOpenContext();
+  const { hover, toggleMenu, isSmartphone } = useSideMenuOpenContext();
   const { user } = useAuthContext();
   const { visible } = useHeaderContext();
   const { breadcrumb } = useBreadcrumbContext();

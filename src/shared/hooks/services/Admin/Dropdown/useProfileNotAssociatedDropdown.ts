@@ -1,8 +1,8 @@
-import { removeEmptyEntries } from "@/shared/utils/generic";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { get } from "@shared/services/api/api.service";
-import { I } from "framer-motion/dist/types.d-CtuPurYT";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
+import { removeEmptyEntries } from "@/shared/utils/generic";
 
 export interface IProfiles {
   id: string;
@@ -36,7 +36,7 @@ export function useProfileNotAssociatedDropdown() {
         } else {
           setResult([]);
         }
-      } catch (error) {
+      } catch {
         setResult([]);
       }
     }

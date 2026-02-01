@@ -1,6 +1,3 @@
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
-
 import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
 import { Section } from "@shared/components/Core/Containers/Section";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
@@ -18,26 +15,27 @@ import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
-
+import { useRef } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
-import {
-  IInspectionSearchForm,
-  initialInspectionSearchValues,
-} from "./components/InspectionSearchForm/InspectionSearchForm.form";
+import { useReactToPrint } from "react-to-print";
 
 import {
   ROUTE_SAVE_INSPECTION,
   ROUTE_UPDATE_INSPECTION,
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
-
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { put } from "@/shared/services/api/api.service";
+
 import { InspectionPDFReport } from "./components/InspectionPDFReport ";
+import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
+import {
+  IInspectionSearchForm,
+  initialInspectionSearchValues,
+} from "./components/InspectionSearchForm/InspectionSearchForm.form";
 import { InspectionsTable } from "./components/InspectionsTable";
 
 export function ListInspections() {
@@ -212,7 +210,7 @@ export function ListInspections() {
           handlePrint();
         }, 3000);
       }
-    } catch (error) {
+    } catch {
       hideLoader();
       handleApiRejection();
       addToast({

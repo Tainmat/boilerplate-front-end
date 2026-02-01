@@ -11,7 +11,9 @@ export const Container = styled.div<Props>`
     min-height: calc(100vh - 9rem);
     height: auto;
     overflow: visible;
-    transition: padding 0.3s ease, border-radius 0.3s ease;
+    transition:
+      padding 0.3s ease,
+      border-radius 0.3s ease;
 
     ${props.size === "sm" &&
     css`

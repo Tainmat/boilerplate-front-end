@@ -2,12 +2,12 @@ import { Container } from "@shared/components/Core/Form/Fields/InputText/InputTe
 import { HelperText } from "@shared/components/Core/Form/HelperText";
 import { Label } from "@shared/components/Core/Form/Label";
 import { Icon } from "@shared/components/Core/Icons/Icon";
-import { 
-  phoneInputMask, 
-  phoneNumberMask, 
+import {
+  getPhoneTypeDescription,
+  phoneInputMask,
   type PhoneNumberConfig,
+  phoneNumberMask,
   type PhoneNumberResult,
-  getPhoneTypeDescription 
 } from "@shared/utils/masks/phoneMask";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
@@ -27,7 +27,7 @@ interface Props {
   helperText?: string;
   readOnly?: boolean;
   disabled?: boolean;
-  country?: PhoneNumberConfig['country'];
+  country?: PhoneNumberConfig["country"];
   showValidation?: boolean;
   showPhoneType?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>, phoneData: PhoneNumberResult) => void;
@@ -50,7 +50,7 @@ export function InputPhone({
   helperText,
   readOnly,
   disabled,
-  country = 'BR',
+  country = "BR",
   showValidation = true,
   showPhoneType = false,
   onChange,
@@ -60,22 +60,22 @@ export function InputPhone({
   const inputField = useRef<HTMLInputElement | null>(null);
   const [inputValue, setInputValue] = useState(initialValue || "");
   const [phoneData, setPhoneData] = useState<PhoneNumberResult>({
-    formatted: '',
-    raw: '',
+    formatted: "",
+    raw: "",
     isValid: false,
-    type: 'UNKNOWN',
-    country: country || 'BR'
+    type: "UNKNOWN",
+    country: country || "BR",
   });
 
   useEffect(() => {
     if (typeof value === "string" || typeof value === "number") {
       const newValue = String(value);
       setInputValue(newValue);
-      
+
       // Validate and format the phone number
       const result = phoneNumberMask(newValue, { country });
       setPhoneData(result);
-      
+
       if (onValidationChange) {
         onValidationChange(result.isValid, result);
       }
@@ -84,23 +84,23 @@ export function InputPhone({
 
   function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
     const rawValue = e.target.value;
-    
+
     // Apply input mask for real-time formatting
     const maskedValue = phoneInputMask(rawValue, { country });
     setInputValue(maskedValue);
-    
+
     // Update the input field value
     e.target.value = maskedValue;
-    
+
     // Validate the phone number
     const result = phoneNumberMask(rawValue, { country });
     setPhoneData(result);
-    
+
     // Call validation callback
     if (onValidationChange) {
       onValidationChange(result.isValid, result);
     }
-    
+
     // Call onChange callback
     if (onChange) {
       onChange(e, result);
@@ -109,25 +109,25 @@ export function InputPhone({
 
   function getValidationIcon() {
     if (!showValidation || !inputValue) return null;
-    
+
     if (phoneData.isValid) {
       return <Icon size="sm" icon="check_circle" mode="success" />;
     } else if (inputValue.length > 3) {
       return <Icon size="sm" icon="error" mode="warning" />;
     }
-    
+
     return null;
   }
 
   function getPhoneTypeText() {
-    if (!showPhoneType || !phoneData.isValid) return '';
+    if (!showPhoneType || !phoneData.isValid) return "";
     return getPhoneTypeDescription(phoneData.type, phoneData.country);
   }
 
   const validationIcon = getValidationIcon();
   const phoneTypeText = getPhoneTypeText();
-  const finalHelperText = phoneTypeText 
-    ? `${helperText || ''} ${phoneTypeText}`.trim()
+  const finalHelperText = phoneTypeText
+    ? `${helperText || ""} ${phoneTypeText}`.trim()
     : helperText;
 
   return (
@@ -145,11 +145,7 @@ export function InputPhone({
         </Label>
       )}
 
-      {validationIcon && (
-        <div className="icon">
-          {validationIcon}
-        </div>
-      )}
+      {validationIcon && <div className="icon">{validationIcon}</div>}
 
       <div className="input">
         {addonText && <div className="addon">{addonText}</div>}
@@ -159,8 +155,8 @@ export function InputPhone({
           name={name}
           type="tel"
           value={inputValue}
-          placeholder={placeholder || (country === 'BR' ? '(11) 99999-9999' : '(555) 123-4567')}
-          maxLength={maxLength || (country === 'BR' ? 15 : 14)}
+          placeholder={placeholder || (country === "BR" ? "(11) 99999-9999" : "(555) 123-4567")}
+          maxLength={maxLength || (country === "BR" ? 15 : 14)}
           readOnly={readOnly}
           disabled={disabled}
           autoComplete="tel"

@@ -114,12 +114,12 @@ export function useInspection() {
   const fetchInspection = useCallback(async (id: string) => {
     try {
       setLoading(true);
-      const { data } = await get<IInspectionDetail>(`/operational/parts-inspection/${id}`);
+      const { data } = await get(`/operational/parts-inspection/${id}`);
       setInspection(data.data);
       return data.data;
     } catch (error) {
       setInspection(null);
-      throw error;
+      throw error; // Aqui o catch é mantido porque você faz setInspection(null)
     } finally {
       setLoading(false);
     }
@@ -128,16 +128,10 @@ export function useInspection() {
   const createInspection = useCallback(async (inspectionData: IInspectionCreateData) => {
     try {
       setLoading(true);
-      const { data } = await post<IInspectionDetail>(
-        "/operational/parts-inspection",
-        inspectionData,
-      );
-
+      const { data } = await post("/operational/parts-inspection", inspectionData);
       return data.data || data;
-    } catch (error) {
-      throw error;
     } finally {
-      setLoading(false);
+      setLoading(false); // Removido o catch inútil, o erro sobe sozinho
     }
   }, []);
 
@@ -145,65 +139,42 @@ export function useInspection() {
     async (id: string, inspectionData: IInspectionCreateData) => {
       try {
         setLoading(true);
-        const { data } = await put<IInspectionDetail>(
-          `/operational/parts-inspection/${id}`,
-          inspectionData,
-        );
+        const { data } = await put(`/operational/parts-inspection/${id}`, inspectionData);
         const inspectionResult = data.data || data;
         setInspection(inspectionResult);
         return inspectionResult;
-      } catch (error) {
-        throw error;
       } finally {
-        setLoading(false);
+        setLoading(false); // Removido o catch inútil
       }
     },
     [],
   );
 
   const fetchInspectionAttachments = useCallback(async (id: string) => {
-    try {
-      const { data } = await get<IInspectionAttachment[]>(
-        `/operational/parts-inspection/${id}/attachments`,
-      );
-      return data.data || data;
-    } catch (error) {
-      throw error;
-    }
+    const { data } = await get(`/operational/parts-inspection/${id}/attachments`);
+    return data.data || data;
   }, []);
 
   const uploadInspectionAttachments = useCallback(
     async (id: string, imageData: { images: string[]; imagesToDel: string[] }) => {
-      try {
-        const payload = {
-          images: imageData.images,
-          imagesToDel: imageData.imagesToDel,
-        };
+      const payload = {
+        images: imageData.images,
+        imagesToDel: imageData.imagesToDel,
+      };
 
-        const { data } = await post<IInspectionAttachment[]>(
-          `/operational/parts-inspection/${id}/attachments`,
-          payload,
-          {
-            "Content-Type": "application/json",
-          },
-        );
-        return data.data || data;
-      } catch (error) {
-        throw error;
-      }
+      const { data } = await post(`/operational/parts-inspection/${id}/attachments`, payload, {
+        "Content-Type": "application/json",
+      });
+      return data.data || data;
     },
     [],
   );
 
   const deleteInspectionAttachment = useCallback(
     async (inspectionId: string, attachmentId: string) => {
-      try {
-        await post(
-          `/operational/parts-inspection/${inspectionId}/attachments/${attachmentId}/delete`,
-        );
-      } catch (error) {
-        throw error;
-      }
+      await post(
+        `/operational/parts-inspection/${inspectionId}/attachments/${attachmentId}/delete`,
+      );
     },
     [],
   );

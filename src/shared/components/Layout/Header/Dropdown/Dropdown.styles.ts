@@ -28,7 +28,7 @@ export const Container = styled.div`
       border-left: 1px solid ${props.theme.colors.neutral.low.light};
       border-top: 1px solid ${props.theme.colors.neutral.low.light};
     }
-    
+
     /* Mobile */
     @media (max-width: 767px) {
       top: 2.75rem;

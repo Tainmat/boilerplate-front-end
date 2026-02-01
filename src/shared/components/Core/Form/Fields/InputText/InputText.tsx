@@ -97,7 +97,7 @@ export function InputText({
 
     setInputValue(e.target.value);
 
-    onChange && onChange(e);
+    onChange?.(e);
   }
 
   function handlePasswordIcon() {

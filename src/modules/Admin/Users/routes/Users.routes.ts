@@ -1,4 +1,3 @@
-import { ROLE_ADMINISTRATOR, ROLE_SYSTEM_ADMIN } from "@/shared/constants/user.roles";
 import {
   ROUTE_LIST_USERS,
   ROUTE_SAVE_USER,
@@ -6,6 +5,8 @@ import {
 } from "@modules/Admin/Users/routes/Users.paths";
 import { IRouteProps } from "@shared/routes/routes.interface";
 import { lazy } from "react";
+
+import { ROLE_ADMINISTRATOR, ROLE_SYSTEM_ADMIN } from "@/shared/constants/user.roles";
 
 const ListUsers = lazy(() =>
   import("@modules/Admin/Users/pages/ListUsers").then((module) => ({
