@@ -14,13 +14,14 @@ export const CardEquipmentContainer = styled(Card)`
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: auto;
   }
 `;
 
 export const ImageWrapper = styled.div`
   width: 100%;
   /* aspect-ratio: 1 / 1; */
-  background: ${(props) => rgba(props.theme.colors.neutral.high.dark, 0.05)};
+  background: #fff;
 
   overflow: hidden;
   display: flex;
@@ -30,7 +31,7 @@ export const ImageWrapper = styled.div`
 
 export const CardEquipmentImage = styled.img`
   width: 100%;
-  height: 100%;
+  height: 20rem;
   object-fit: contain;
   display: block;
 `;
