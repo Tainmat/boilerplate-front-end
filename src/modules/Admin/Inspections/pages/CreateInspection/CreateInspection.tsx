@@ -20,6 +20,7 @@ import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspecti
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { get } from "@/shared/services/api/api.service";
 import { getStorageSize } from "@/shared/services/indexedDB/inspectionsDB";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
 import { InspectionRegisterForm } from "./components/RegisterForm";
 import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
@@ -168,7 +169,7 @@ export function CreateInspection() {
     handleApiRejection,
   ]);
 
-  async function handleEquipmentSelection(equipment: IEquipment) {
+  async function handleEquipmentSelection(equipment: IEquipmentDropdown) {
     try {
       const partType = await get<IEquipment>(`parametrizations/part-types/${equipment.id}`);
 
