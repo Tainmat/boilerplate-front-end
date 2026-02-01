@@ -17,7 +17,6 @@ import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
-import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useInspections } from "@shared/hooks/services/Admin/useInspections";
 
 import { useCallback, useEffect, useState } from "react";
@@ -53,8 +52,6 @@ export function ListInspections() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { result, params, setParams, refetch } = useInspections();
-  const { result: inspectionStatusOptions, loading: loadingStatuses } =
-    usePartInspectionStatusDropdown();
 
   const [loaded, setLoaded] = useState(false);
 
@@ -74,9 +71,6 @@ export function ListInspections() {
       label: "Nome do Cliente",
     },
   ];
-
-  // Preparar opções de status com "Todos" como primeira opção
-  const statusOptionsWithAll = [{ value: "", label: "Todos" }, ...inspectionStatusOptions];
 
   const pdfRef = useRef<HTMLDivElement>(null);
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
@@ -261,7 +255,6 @@ export function ListInspections() {
             <Col>
               <InspectionSearchForm
                 searchOptions={SEARCH_OPTIONS}
-                statusOptions={statusOptionsWithAll}
                 defaultValues={
                   params
                     ? {
