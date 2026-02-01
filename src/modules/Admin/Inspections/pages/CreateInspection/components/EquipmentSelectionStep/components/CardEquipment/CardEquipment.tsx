@@ -17,7 +17,7 @@ export function CardEquipment({ equipment, onSelect }: CardEquipmentProps) {
         <S.CardEquipmentImage src={croqui} alt={name} loading="lazy" />
       </S.ImageWrapper>
       <div>
-        <Heading size="sm" className="text-neutral-high-pure">
+        <Heading size="xs" className="text-neutral-high-pure">
           {name}
         </Heading>
       </div>

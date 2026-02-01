@@ -42,7 +42,7 @@ export function EquipmentSelectionStep({ onEquipmentSelect, onCancel }: Props) {
       <Row>
         {filteredEquipments.length > 0 ? (
           filteredEquipments.map((item) => (
-            <Col lg={4} md={6} xs={12} className="mb-4" key={item.id}>
+            <Col xxl={3} xl={4} lg={4} md={6} xs={12} className="mb-4" key={item.id}>
               <CardEquipment equipment={item} onSelect={() => onEquipmentSelect(item)} />
             </Col>
           ))
