@@ -21,7 +21,7 @@ export function useProfileNotAssociatedDropdown() {
           isActive: true,
         });
 
-        const { data } = await get<{ data: IProfiles[] }>(
+        const { data } = await get(
           `${"parametrizations/profile-management/profiles/dropdown"}`,
           queryParams,
         );

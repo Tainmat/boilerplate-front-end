@@ -170,7 +170,7 @@ export function CreateInspection() {
 
   async function handleEquipmentSelection(equipment: IEquipmentDropdown) {
     try {
-      const partType = await get<IEquipment>(`parametrizations/part-types/${equipment.id}`);
+      const partType = await get(`parametrizations/part-types/${equipment.id}`);
 
       setSelectedEquipment(partType.data.data);
 

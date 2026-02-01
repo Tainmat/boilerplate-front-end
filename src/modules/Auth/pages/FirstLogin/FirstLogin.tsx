@@ -41,7 +41,7 @@ export function FirstLogin() {
         /* confirmaPasswordUsuario: formValues.confirmaPasswordUsuario, */
       };
 
-      const response = await put<any>(`${"auth/change-password"}/${user!.id}`, params);
+      const response = await put(`${"auth/change-password"}/${user!.id}`, params);
 
       if (response.data) {
         addToast({

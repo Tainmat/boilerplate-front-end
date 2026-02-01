@@ -23,10 +23,7 @@ export function usePartInspectionStatusDropdown() {
         isActive: true,
       });
 
-      const { data } = await get<{ data: IPartInspectionStatusDropdown[] }>(
-        "parametrizations/part-inspection-status/dropdown",
-        queryParams,
-      );
+      const { data } = await get("parametrizations/part-inspection-status/dropdown", queryParams);
 
       if (Array.isArray(data.data) && data.data.length > 0) {
         const statuses = data.data.map((item: IPartInspectionStatusDropdown) => ({

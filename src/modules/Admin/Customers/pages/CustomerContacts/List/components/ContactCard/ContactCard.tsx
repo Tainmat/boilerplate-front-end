@@ -28,7 +28,7 @@ export function ContactCard({ item, onRefetch, onEdit }: Props) {
 
   async function handleOnActive(id: string) {
     try {
-      await put<ICustomerContacts>(`${"parametrizations/customers/contacts"}/${id}`, {
+      await put(`${"parametrizations/customers/contacts"}/${id}`, {
         ...item,
         isActive: true,
       });
@@ -40,7 +40,7 @@ export function ContactCard({ item, onRefetch, onEdit }: Props) {
 
   async function handleOnInactive(id: string) {
     try {
-      await put<ICustomerContacts>(`${"parametrizations/customers/contacts"}/${id}`, {
+      await put(`${"parametrizations/customers/contacts"}/${id}`, {
         ...item,
         isActive: false,
       });

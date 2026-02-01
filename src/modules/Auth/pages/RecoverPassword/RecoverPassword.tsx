@@ -39,7 +39,7 @@ export function RecoverPassword() {
         email: formValues.emailUsuario,
       };
 
-      const response = await post<any>("/auth/forgot-password", payload);
+      const response = await post("/auth/forgot-password", payload);
 
       if (response.data) {
         addToast({

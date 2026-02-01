@@ -22,10 +22,7 @@ export function useUsersDropdown() {
         isActive: true,
       });
 
-      const { data } = await get<{ data: IUserDropdown[] }>(
-        "parametrizations/profile-management/users/dropdown",
-        queryParams,
-      );
+      const { data } = await get("parametrizations/profile-management/users/dropdown", queryParams);
 
       if (Array.isArray(data.data) && data.data.length > 0) {
         const users = data.data.map((item: IUserDropdown) => ({

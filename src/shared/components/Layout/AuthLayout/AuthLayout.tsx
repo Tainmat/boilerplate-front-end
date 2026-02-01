@@ -7,4 +7,4 @@ interface Props {
   deviceType?: DeviceType;
 }
 
-export { Props as AuthLayoutProps };
+export type { Props as AuthLayoutProps };

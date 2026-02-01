@@ -11,7 +11,6 @@ import { TITLE_PROCCESSES_CUSTOMER_CONTACTS } from "@/shared/constants/title.bro
 import { useBreadcrumbContext } from "@/shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@/shared/contexts/Loader";
 import { useToastContext } from "@/shared/contexts/Toast";
-import { ICustomerContacts } from "@/shared/hooks/services/Admin/useCustomerContacts";
 import { get, post, put } from "@/shared/services/api/api.service";
 
 import { ROUTE_LIST_CUSTOMERS } from "../../../routes/Customer.paths";
@@ -40,7 +39,7 @@ export function CreateCustomerContact() {
     if (uuidContato) {
       showLoader();
 
-      get<ICustomerContacts>(`${"parametrizations/customers/contacts"}/${uuidContato}`)
+      get(`${"parametrizations/customers/contacts"}/${uuidContato}`)
         .then((data) => {
           if (data.data) {
             const response = data.data.data;
@@ -102,7 +101,7 @@ export function CreateCustomerContact() {
       showLoader();
 
       if (uuidContato) {
-        const { data, message } = await put<ICustomerContacts>(
+        const { data, message } = await put(
           `${"parametrizations/customers/contacts"}/${uuidContato}`,
           payload,
         );
@@ -115,7 +114,7 @@ export function CreateCustomerContact() {
           });
         }
       } else {
-        const { data, message } = await post<ICustomerContacts>(
+        const { data, message } = await post(
           `${"parametrizations/customers"}/${uuidCliente}/contacts`,
           payload,
         );

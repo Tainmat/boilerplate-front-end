@@ -24,7 +24,7 @@ export function useTemporalEvolution() {
     setData(null);
     try {
       const payload = removeEmptyEntries(params);
-      const { data: response } = await get<ITemporalEvolutionData[]>(
+      const { data: response } = await get(
         "/operational/parts-inspection/dashboard/temporal-evolution",
         payload,
       );
