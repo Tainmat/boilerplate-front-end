@@ -30,10 +30,10 @@ export function SideMenu() {
 
   // Close menu when route changes on mobile
   useEffect(() => {
-    if ((isSmartphone || isTablet) && hover) {
+    if (isSmartphone || isTablet) {
       closeMenu();
     }
-  }, [location.pathname, isSmartphone, isTablet, closeMenu, hover]);
+  }, [location.pathname, isSmartphone, isTablet, closeMenu]);
 
   if (!visible) return null;
 
