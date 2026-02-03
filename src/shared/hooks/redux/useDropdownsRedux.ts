@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import {
+  ICustomerOffline,
   IEquipmentDropdown,
+  IInpectionStatusOffline,
   setAllDropdowns,
   setCustomersDropdown,
   setEquipmentsDropdown,
@@ -16,19 +17,19 @@ export function useDropdownsRedux() {
   const { customersDropdown, equipmentsDropdown, inspectionStatusDropdown, lastUpdated } =
     useSelector((state: RootState) => state.dropdownsData);
 
-  const setCustomersDropdownAction = (dropdown: IOption[]) =>
+  const setCustomersDropdownAction = (dropdown: ICustomerOffline[]) =>
     dispatch(setCustomersDropdown(dropdown));
 
   const setEquipmentsDropdownAction = (dropdown: IEquipmentDropdown[]) =>
     dispatch(setEquipmentsDropdown(dropdown));
 
-  const setInspectionStatusDropdownAction = (dropdown: IOption[]) =>
+  const setInspectionStatusDropdownAction = (dropdown: IInpectionStatusOffline[]) =>
     dispatch(setInspectionStatusDropdown(dropdown));
 
   const setAllDropdownsAction = (dropdowns: {
-    customers: IOption[];
+    customers: ICustomerOffline[];
     equipments: IEquipmentDropdown[];
-    inspectionStatus: IOption[];
+    inspectionStatus: IInpectionStatusOffline[];
   }) => dispatch(setAllDropdowns(dropdowns));
 
   return {
