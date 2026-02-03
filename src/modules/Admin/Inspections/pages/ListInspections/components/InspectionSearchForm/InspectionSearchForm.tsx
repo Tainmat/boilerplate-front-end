@@ -26,6 +26,13 @@ export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, o
   const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
   const { inspectionStatusDropdown } = useDropdownsRedux();
 
+  const inspectionStatusOptions: IOption[] = inspectionStatusDropdown.map((item) => {
+    return {
+      label: item.description,
+      value: item.id,
+    };
+  });
+
   useEffect(() => {
     if (initialValues === null) {
       if (defaultValues) {
@@ -89,7 +96,7 @@ export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, o
                       name="inspectionStatusId"
                       placeholder="Status da Inspeção"
                       value={values.inspectionStatusId}
-                      options={[{ label: "Todos", value: "" }, ...inspectionStatusDropdown]}
+                      options={[{ label: "Todos", value: "" }, ...inspectionStatusOptions]}
                       onChange={({ value }: IOption) => {
                         setFieldValue("inspectionStatusId", value);
                         submitForm();
