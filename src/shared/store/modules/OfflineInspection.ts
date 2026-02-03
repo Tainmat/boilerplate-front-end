@@ -4,13 +4,16 @@ import { IInspectionRegisterForm } from "@/modules/Admin/Inspections/pages/Creat
 
 interface IOfflineInspectionAdditionalData {
   customer: {
+    id: string;
     fantasyName: string;
     corporateName: string;
   };
   inspectorUser: {
+    id: string;
     name: string;
   };
   inspectionStatus: {
+    id: string;
     description: string;
   };
   isActive: boolean;
@@ -20,8 +23,6 @@ export interface IOfflineInspectionCard extends IOfflineInspectionAdditionalData
   id: string;
   reportNumber: string;
   revisionNumber: string;
-  customerId: string;
-  partTypeId: string;
   createdAt: string;
   updatedAt: string;
   isSyncing: boolean;

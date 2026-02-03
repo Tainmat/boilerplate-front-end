@@ -83,6 +83,7 @@ export function ListInspections() {
                   handleOnChangeStatusInspection={(id: string, inStatus: boolean) =>
                     handleOnChangeStatusInspection(id, inStatus)
                   }
+                  offline={false}
                 />
               </Row>
             </Tab>
@@ -95,6 +96,7 @@ export function ListInspections() {
                   handleOnChangeStatusInspection={(id: string, inStatus: boolean) =>
                     handleOnChangeStatusInspection(id, inStatus)
                   }
+                  offline={true}
                 />
               </Row>
             </Tab>

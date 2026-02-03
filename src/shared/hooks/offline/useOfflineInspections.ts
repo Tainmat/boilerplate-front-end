@@ -85,13 +85,16 @@ export function useOfflineInspections() {
         const newInspection: IOfflineInspection = {
           ...data,
           customer: {
+            id: data.customer.id,
             corporateName: data.customer.corporateName,
             fantasyName: data.customer.fantasyName,
           },
           inspectorUser: {
+            id: data.inspectorUser.id,
             name: data.inspectorUser.name,
           },
           inspectionStatus: {
+            id: data.inspectionStatus.id,
             description: data.inspectionStatus.description,
           },
           id,
@@ -104,8 +107,6 @@ export function useOfflineInspections() {
         const card: IOfflineInspectionCard = {
           id,
           reportNumber: data.reportNumber,
-          customerId: data.customerId,
-          partTypeId: data.partTypeId,
           revisionNumber: data.revisionNumber,
           customer: data.customer,
           inspectorUser: data.inspectorUser,
@@ -149,8 +150,10 @@ export function useOfflineInspections() {
 
         const updatedCard: Partial<IOfflineInspectionCard> = {
           reportNumber: updatedInspection.reportNumber,
-          customerId: updatedInspection.customerId,
-          partTypeId: updatedInspection.partTypeId,
+          revisionNumber: updatedInspection.revisionNumber,
+          customer: updatedInspection.customer,
+          inspectorUser: updatedInspection.inspectorUser,
+          inspectionStatus: updatedInspection.inspectionStatus,
           updatedAt: now,
           quantityPhotos:
             updatedInspection.additionalImages?.images?.filter((img) => img !== null).length || 0,
