@@ -77,7 +77,7 @@ export function useOfflineInspections() {
   );
 
   const addNewInspection = useCallback(
-    async (data: IOfflineInspection) => {
+    async (data: Omit<IOfflineInspection, "id" | "createdAt" | "updatedAt">) => {
       try {
         const id = uuidv4();
         const now = new Date().toISOString();
