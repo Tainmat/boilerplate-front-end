@@ -29,6 +29,9 @@ export function ListInspections() {
     result,
     params,
 
+    // Hook offline inspections
+    offlineInspections,
+
     // PDF
     pdfRef,
     inspectionToPrint,
@@ -86,7 +89,7 @@ export function ListInspections() {
             <Tab eventKey="offline" title="Offline">
               <Row className="mb-3">
                 <InspectionsTable
-                  data={result?.data || null}
+                  data={offlineInspections || null}
                   onEdit={(id: string) => addNew(id)}
                   onGeneratePdf={(id: string) => handleGeneratePdf(id)}
                   handleOnChangeStatusInspection={(id: string, inStatus: boolean) =>

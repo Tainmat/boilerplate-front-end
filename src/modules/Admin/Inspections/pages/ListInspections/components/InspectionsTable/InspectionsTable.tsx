@@ -7,14 +7,23 @@ import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Empty } from "@/shared/components/Core/Table/Empty";
 import { LoadingLines } from "@/shared/components/Core/Table/LoadingLines";
 import { Heading } from "@/shared/components/Core/Typography/Heading";
-import { IInspection } from "@/shared/hooks/services/Admin/useInspections";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+import { IOfflineInspectionCard } from "@/shared/store/modules/OfflineInspection";
+
+interface IInspectionTable
+  extends Omit<IOfflineInspectionCard, "isSyncing" | "syncAttempts" | "quantityPhotos"> {
+  isSyncing?: boolean;
+  erroSync?: string | undefined;
+  syncAttempts?: number;
+  quantityPhotos?: number;
+}
 
 interface Props {
-  data: IInspection[] | null;
+  data: IInspectionTable[] | null;
   onEdit: (id: string) => void;
   onGeneratePdf: (id: string) => void;
   handleOnChangeStatusInspection: (id: string, inStatus: boolean) => void;
+  offline: boolean;
 }
 
 function getStatusColor(
@@ -43,6 +52,7 @@ export function InspectionsTable({
   onEdit,
   handleOnChangeStatusInspection,
   onGeneratePdf,
+  offline,
 }: Props) {
   const { isSystemAdmin } = useAuthRoles();
   const { isInspectionChanger } = useAuthRoles();
@@ -143,33 +153,37 @@ export function InspectionsTable({
                       />
                     </Tooltip>
 
-                    <Tooltip title="Gerar PDF" place="top-start">
-                      <ButtonIcon
-                        disabled={!item.isActive}
-                        size="sm"
-                        icon="picture_as_pdf"
-                        onClick={() => onGeneratePdf(item.id)}
-                      />
-                    </Tooltip>
+                    {!offline && (
+                      <>
+                        <Tooltip title="Gerar PDF" place="top-start">
+                          <ButtonIcon
+                            disabled={!item.isActive}
+                            size="sm"
+                            icon="picture_as_pdf"
+                            onClick={() => onGeneratePdf(item.id)}
+                          />
+                        </Tooltip>
 
-                    <Tooltip title={item.isActive ? "Desativar" : "Ativar"} place="top-start">
-                      <ButtonIcon
-                        disabled={!isSystemAdmin()}
-                        size="sm"
-                        icon={item.isActive ? "toggle_on" : "toggle_off"}
-                        mode={item.isActive ? "success" : "warning"}
-                        onClick={() => handleOnChangeStatusInspection(item.id, item.isActive)}
-                      />
-                    </Tooltip>
+                        <Tooltip title={item.isActive ? "Desativar" : "Ativar"} place="top-start">
+                          <ButtonIcon
+                            disabled={!isSystemAdmin()}
+                            size="sm"
+                            icon={item.isActive ? "toggle_on" : "toggle_off"}
+                            mode={item.isActive ? "success" : "warning"}
+                            onClick={() => handleOnChangeStatusInspection(item.id, item.isActive)}
+                          />
+                        </Tooltip>
+                      </>
+                    )}
                   </div>
                 </Td>
               </Tr>
             ))
           ) : (
-            <Empty columns={7} />
+            <Empty columns={6} />
           )
         ) : (
-          <LoadingLines lines={10} columns={7} />
+          <LoadingLines lines={10} columns={6} />
         )}
       </Tbody>
     </Table>
