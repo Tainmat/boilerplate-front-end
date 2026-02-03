@@ -32,11 +32,16 @@ export function useOfflineInspections() {
 
       const cards: IOfflineInspectionCard[] = inspectionsOffline.map((i) => ({
         id: i.id,
-        reportNumber: i.reportNumber,
         customerId: i.customerId,
+        reportNumber: i.reportNumber,
         partTypeId: i.partTypeId,
         createdAt: i.createdAt,
         updatedAt: i.updatedAt,
+        revisionNumber: i.revisionNumber,
+        customer: i.customer,
+        inspectorUser: i.inspectorUser,
+        inspectionStatus: i.inspectionStatus,
+        isActive: i.isActive,
         isSyncing: false,
         erroSync: undefined,
         syncAttempts: 0,
@@ -72,13 +77,23 @@ export function useOfflineInspections() {
   );
 
   const addNewInspection = useCallback(
-    async (data: IInspectionRegisterForm) => {
+    async (data: IOfflineInspection) => {
       try {
         const id = uuidv4();
         const now = new Date().toISOString();
 
         const newInspection: IOfflineInspection = {
           ...data,
+          customer: {
+            corporateName: data.customer.corporateName,
+            fantasyName: data.customer.fantasyName,
+          },
+          inspectorUser: {
+            name: data.inspectorUser.name,
+          },
+          inspectionStatus: {
+            description: data.inspectionStatus.description,
+          },
           id,
           createdAt: now,
           updatedAt: now,
@@ -91,6 +106,11 @@ export function useOfflineInspections() {
           reportNumber: data.reportNumber,
           customerId: data.customerId,
           partTypeId: data.partTypeId,
+          revisionNumber: data.revisionNumber,
+          customer: data.customer,
+          inspectorUser: data.inspectorUser,
+          inspectionStatus: data.inspectionStatus,
+          isActive: data.isActive,
           createdAt: now,
           updatedAt: now,
           isSyncing: false,

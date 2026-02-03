@@ -10,6 +10,7 @@ import { useBreadcrumbContext } from "@/shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@/shared/contexts/Loader";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { useToastContext } from "@/shared/contexts/Toast";
+import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
@@ -35,6 +36,7 @@ export function useInspectionsRules() {
   // Hooks de dados
   const { fetchInspection } = useInspection();
   const { result, params, setParams, refetch } = useInspections();
+  const { cardsList: offlineInspections } = useOfflineInspections();
 
   // Permissões
   const { isInspectionChanger } = useAuthRoles();
@@ -252,6 +254,9 @@ export function useInspectionsRules() {
     params,
     setParams,
     refetch,
+
+    // Hook offline inspections
+    offlineInspections,
 
     // PDF
     pdfRef,
