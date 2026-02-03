@@ -27,6 +27,8 @@ export interface IInspection {
     id: string;
     description: string;
   };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export function useInspections() {

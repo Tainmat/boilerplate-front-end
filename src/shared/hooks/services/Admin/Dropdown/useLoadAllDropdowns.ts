@@ -1,10 +1,13 @@
 import { useCallback } from "react";
 
-import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import { useToastContext } from "@/shared/contexts/Toast";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { get } from "@/shared/services/api/api.service";
-import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
+import {
+  ICustomerOffline,
+  IEquipmentDropdown,
+  IInpectionStatusOffline,
+} from "@/shared/store/modules/Dropdowns";
 import { removeEmptyEntries } from "@/shared/utils/generic";
 
 import { IEquipment } from "../useEquipments";
@@ -29,21 +32,24 @@ export function useLoadAllDropdowns() {
         }),
       ]);
 
-      const statusDropdown: IOption[] = statusRes.data.data.map(
+      const statusDropdown: IInpectionStatusOffline[] = statusRes.data.data.map(
         (item: IPartInspectionStatusDropdown) => {
           return {
-            label: item.description,
-            value: item.id,
+            description: item.description,
+            id: item.id,
           };
         },
       );
 
-      const customersDropdown: IOption[] = customersRes.data.data.map((item: ICustomerDropdown) => {
-        return {
-          label: item.fantasyName,
-          value: item.id,
-        };
-      });
+      const customersDropdown: ICustomerOffline[] = customersRes.data.data.map(
+        (item: ICustomerDropdown) => {
+          return {
+            fantasyName: item.fantasyName,
+            corporateName: item.corporateName,
+            id: item.id,
+          };
+        },
+      );
 
       const equipmentsDropdown: IEquipmentDropdown[] = equipmentsRes.data.data.map(
         (item: IEquipment) => {

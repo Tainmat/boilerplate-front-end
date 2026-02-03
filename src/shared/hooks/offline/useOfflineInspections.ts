@@ -32,11 +32,16 @@ export function useOfflineInspections() {
 
       const cards: IOfflineInspectionCard[] = inspectionsOffline.map((i) => ({
         id: i.id,
-        reportNumber: i.reportNumber,
         customerId: i.customerId,
+        reportNumber: i.reportNumber,
         partTypeId: i.partTypeId,
         createdAt: i.createdAt,
         updatedAt: i.updatedAt,
+        revisionNumber: i.revisionNumber,
+        customer: i.customer,
+        inspectorUser: i.inspectorUser,
+        inspectionStatus: i.inspectionStatus,
+        isActive: i.isActive,
         isSyncing: false,
         erroSync: undefined,
         syncAttempts: 0,
@@ -72,13 +77,26 @@ export function useOfflineInspections() {
   );
 
   const addNewInspection = useCallback(
-    async (data: IInspectionRegisterForm) => {
+    async (data: Omit<IOfflineInspection, "id" | "createdAt" | "updatedAt">) => {
       try {
         const id = uuidv4();
         const now = new Date().toISOString();
 
         const newInspection: IOfflineInspection = {
           ...data,
+          customer: {
+            id: data.customer.id,
+            corporateName: data.customer.corporateName,
+            fantasyName: data.customer.fantasyName,
+          },
+          inspectorUser: {
+            id: data.inspectorUser.id,
+            name: data.inspectorUser.name,
+          },
+          inspectionStatus: {
+            id: data.inspectionStatus.id,
+            description: data.inspectionStatus.description,
+          },
           id,
           createdAt: now,
           updatedAt: now,
@@ -89,8 +107,11 @@ export function useOfflineInspections() {
         const card: IOfflineInspectionCard = {
           id,
           reportNumber: data.reportNumber,
-          customerId: data.customerId,
-          partTypeId: data.partTypeId,
+          revisionNumber: data.revisionNumber,
+          customer: data.customer,
+          inspectorUser: data.inspectorUser,
+          inspectionStatus: data.inspectionStatus,
+          isActive: data.isActive,
           createdAt: now,
           updatedAt: now,
           isSyncing: false,
@@ -129,8 +150,10 @@ export function useOfflineInspections() {
 
         const updatedCard: Partial<IOfflineInspectionCard> = {
           reportNumber: updatedInspection.reportNumber,
-          customerId: updatedInspection.customerId,
-          partTypeId: updatedInspection.partTypeId,
+          revisionNumber: updatedInspection.revisionNumber,
+          customer: updatedInspection.customer,
+          inspectorUser: updatedInspection.inspectorUser,
+          inspectionStatus: updatedInspection.inspectionStatus,
           updatedAt: now,
           quantityPhotos:
             updatedInspection.additionalImages?.images?.filter((img) => img !== null).length || 0,

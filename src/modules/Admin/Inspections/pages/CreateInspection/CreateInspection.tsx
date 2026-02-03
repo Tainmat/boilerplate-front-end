@@ -14,8 +14,10 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
+import { useAuthContext } from "@/shared/contexts/Auth";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { get } from "@/shared/services/api/api.service";
 import { getStorageSize } from "@/shared/services/indexedDB/inspectionsDB";
 import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
@@ -25,6 +27,7 @@ import { InspectionRegisterForm } from "./components/RegisterForm";
 import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/RegisterForm.form";
 
 export function CreateInspection() {
+  const { user } = useAuthContext();
   const { isOnline } = useOnlineStatus();
   const { addNewInspection } = useOfflineInspections();
   const navigate = useNavigate();
@@ -38,6 +41,8 @@ export function CreateInspection() {
   const [inspection, setInspection] = useState<IInspectionRegisterForm | null>(null);
   const [currentStep, setCurrentStep] = useState<"equipment" | "form">("equipment");
   const [selectedEquipment, setSelectedEquipment] = useState<IEquipment | null>(null);
+
+  const { customersDropdown, inspectionStatusDropdown } = useDropdownsRedux();
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -329,7 +334,17 @@ export function CreateInspection() {
             hideLoader();
             return;
           }
-          await addNewInspection(formValues);
+          await addNewInspection({
+            ...formValues,
+            customer: customersDropdown.find((c) => c.id === formValues.customerId)!,
+            inspectionStatus: inspectionStatusDropdown.find(
+              (i) => i.id === formValues.inspectionStatusId,
+            )!,
+            inspectorUser: {
+              id: user?.id || "",
+              name: user?.socialName || "",
+            },
+          });
 
           addToast({
             type: "info",

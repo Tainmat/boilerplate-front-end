@@ -2,11 +2,27 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { IInspectionRegisterForm } from "@/modules/Admin/Inspections/pages/CreateInspection/components/RegisterForm/RegisterForm.form";
 
-export interface IOfflineInspectionCard {
+interface IOfflineInspectionAdditionalData {
+  customer: {
+    id: string;
+    fantasyName: string;
+    corporateName: string;
+  };
+  inspectorUser: {
+    id: string;
+    name: string;
+  };
+  inspectionStatus: {
+    id: string;
+    description: string;
+  };
+  isActive: boolean;
+}
+
+export interface IOfflineInspectionCard extends IOfflineInspectionAdditionalData {
   id: string;
   reportNumber: string;
-  customerId: string;
-  partTypeId: string;
+  revisionNumber: string;
   createdAt: string;
   updatedAt: string;
   isSyncing: boolean;
@@ -15,7 +31,9 @@ export interface IOfflineInspectionCard {
   quantityPhotos: number;
 }
 
-export interface IOfflineInspection extends IInspectionRegisterForm {
+interface IOfflineRegisterForm extends IInspectionRegisterForm, IOfflineInspectionAdditionalData {}
+
+export interface IOfflineInspection extends IOfflineRegisterForm {
   id: string;
   createdAt: string;
   updatedAt: string;
