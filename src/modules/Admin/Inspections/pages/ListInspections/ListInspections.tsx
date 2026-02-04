@@ -31,6 +31,7 @@ export function ListInspections() {
 
     // Hook offline inspections
     offlineInspections,
+    errorsCount,
 
     // PDF
     pdfRef,
@@ -87,7 +88,18 @@ export function ListInspections() {
                 />
               </Row>
             </Tab>
-            <Tab eventKey="offline" title="Offline">
+            <Tab
+              eventKey="offline"
+              title={
+                <span>
+                  Offline
+                  {offlineInspections && offlineInspections.length > 0 && (
+                    <span className="badge bg-info ms-2">{offlineInspections.length}</span>
+                  )}
+                  {errorsCount > 0 && <span className="badge bg-danger ms-2">{errorsCount}</span>}
+                </span>
+              }
+            >
               <Row className="mb-3">
                 <InspectionsTable
                   data={offlineInspections || null}

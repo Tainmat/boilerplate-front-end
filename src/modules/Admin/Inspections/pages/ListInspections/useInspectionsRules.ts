@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 
@@ -61,6 +61,10 @@ export function useInspectionsRules() {
 
     setLoaded(true);
   }, [setPageBreadcrumb]);
+
+  const errorsCount = useMemo(() => {
+    return offlineInspections?.filter((i) => i.erroSync).length || 0;
+  }, [offlineInspections]);
 
   const handleSearchParams = useCallback(
     (params: Record<string, any>) => {
@@ -257,6 +261,7 @@ export function useInspectionsRules() {
 
     // Hook offline inspections
     offlineInspections,
+    errorsCount,
 
     // PDF
     pdfRef,
