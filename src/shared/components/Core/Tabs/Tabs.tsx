@@ -32,7 +32,7 @@ Tabs.defaultProps = {
 
 interface TabProps {
   eventKey: string;
-  title: string;
+  title: ReactNode;
   disabled?: boolean;
   children: ReactNode;
 }
