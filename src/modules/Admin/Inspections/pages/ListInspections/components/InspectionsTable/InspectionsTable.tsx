@@ -5,6 +5,7 @@ import { Tooltip } from "@shared/components/Core/Tooltip";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Col, Row } from "react-bootstrap";
 
+import { Icon } from "@/shared/components/Core/Icons/Icon";
 import { Empty } from "@/shared/components/Core/Table/Empty";
 import { LoadingLines } from "@/shared/components/Core/Table/LoadingLines";
 import { Heading } from "@/shared/components/Core/Typography/Heading";
@@ -26,6 +27,7 @@ interface Props {
   onEdit: (id: string) => void;
   onGeneratePdf: (id: string) => void;
   handleOnChangeStatusInspection: (id: string, inStatus: boolean) => void;
+  onRetrySync?: (id: string) => void;
   offline: boolean;
 }
 
@@ -55,6 +57,7 @@ export function InspectionsTable({
   onEdit,
   handleOnChangeStatusInspection,
   onGeneratePdf,
+  onRetrySync,
   offline,
 }: Props) {
   const { isSystemAdmin } = useAuthRoles();
@@ -151,7 +154,51 @@ export function InspectionsTable({
                   </Td>
 
                   <Td>
-                    <div className="d-flex justify-content-center gap-2">
+                    <div className="d-flex justify-content-center gap-2 align-items-center">
+                      {offline && (
+                        <>
+                          {item.isSyncing ? (
+                            <Tooltip title="Sincronizando..." place="top">
+                              <div
+                                className="spinner-border spinner-border-sm text-primary"
+                                role="status"
+                                style={{ width: "1rem", height: "1rem" }}
+                              >
+                                <span className="visually-hidden">Sincronizando...</span>
+                              </div>
+                            </Tooltip>
+                          ) : item.erroSync ? (
+                            <Tooltip
+                              title={`Erro: ${item.erroSync} (${item.syncAttempts || 0} tentativas)`}
+                              place="top"
+                            >
+                              <Icon icon="error" size="sm" mode="warning" />
+                            </Tooltip>
+                          ) : (
+                            <Tooltip
+                              title={`Aguardando sincronização (${item.syncAttempts || 0} tentativas)`}
+                              place="top"
+                            >
+                              <Icon icon="schedule" size="sm" mode="helper" />
+                            </Tooltip>
+                          )}
+                        </>
+                      )}
+
+                      {offline && item.erroSync && (
+                        <Tooltip title="Tentar Sincronizar Novamente" place="top">
+                          <ButtonIcon
+                            size="sm"
+                            icon="sync"
+                            mode="warning"
+                            onClick={() => {
+                              if (onRetrySync) onRetrySync(item.id);
+                            }}
+                            disabled={item.isSyncing}
+                          />
+                        </Tooltip>
+                      )}
+
                       <Tooltip
                         title={isInspectionChanger() ? "Editar" : "Visualizar"}
                         place="top-start"
