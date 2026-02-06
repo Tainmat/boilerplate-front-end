@@ -334,6 +334,7 @@ export function CreateInspection() {
             hideLoader();
             return;
           }
+
           await addNewInspection({
             ...formValues,
             customer: customersDropdown.find((c) => c.id === formValues.customerId)!,

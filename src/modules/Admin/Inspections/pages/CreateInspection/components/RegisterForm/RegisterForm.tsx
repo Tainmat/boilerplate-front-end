@@ -8,7 +8,6 @@ import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.inter
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { useAlertContext } from "@shared/contexts/Alert";
-import { useCustomersDropdown } from "@shared/hooks/services/Admin/Dropdown/useCustomersDropdown";
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useUsersDropdown } from "@shared/hooks/services/Admin/Dropdown/useUsersDropdown";
 import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
@@ -20,6 +19,7 @@ import ReactQuill from "react-quill-new";
 import { useNavigate } from "react-router-dom";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
 
@@ -93,7 +93,7 @@ export function InspectionRegisterForm({
   };
 
   // Buscar dados para os selects
-  const { result: customersOptions, loading: loadingCustomers } = useCustomersDropdown({});
+  const { customersDropdown } = useDropdownsRedux();
   const { result: usersOptions, loading: loadingUsers } = useUsersDropdown();
   const { result: inspectionStatusOptions } = usePartInspectionStatusDropdown();
 
@@ -345,26 +345,27 @@ export function InspectionRegisterForm({
                     </div>
                     <Row className="g-3">
                       <Col md={6}>
-                        {loadingCustomers ? (
-                          <Skeleton />
-                        ) : (
-                          <Field
-                            as={Select}
-                            readOnly={!isInspectionChanger()}
-                            label="Cliente *"
-                            name="customerId"
-                            placeholder="Selecione o cliente"
-                            options={customersOptions}
-                            error={touched.customerId && !!errors.customerId}
-                            helperText={
-                              touched.customerId && !!errors.customerId ? errors.customerId : ""
-                            }
-                            onChange={({ value }: IOption) => {
-                              setFieldTouched("customerId");
-                              setFieldValue("customerId", value);
-                            }}
-                          />
-                        )}
+                        <Field
+                          as={Select}
+                          readOnly={!isInspectionChanger()}
+                          label="Cliente *"
+                          name="customerId"
+                          placeholder="Selecione o cliente"
+                          options={customersDropdown.map((i) => {
+                            return {
+                              label: i.fantasyName,
+                              value: i.id,
+                            };
+                          })}
+                          error={touched.customerId && !!errors.customerId}
+                          helperText={
+                            touched.customerId && !!errors.customerId ? errors.customerId : ""
+                          }
+                          onChange={({ value }: IOption) => {
+                            setFieldTouched("customerId");
+                            setFieldValue("customerId", value);
+                          }}
+                        />
                       </Col>
                       <Col md={6}>
                         <Field
