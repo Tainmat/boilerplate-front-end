@@ -44,8 +44,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}"],
 
-        navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallback: null,
+        navigateFallbackDenylist: [/.*/],
 
         // Desabilita a página de offline padrão do workbox
         offlineGoogleAnalytics: false,
