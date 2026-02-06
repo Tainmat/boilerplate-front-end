@@ -1957,6 +1957,11 @@
   dependencies:
     undici-types "~6.21.0"
 
+"@types/progressbar.js@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.npmjs.org/@types/progressbar.js/-/progressbar.js-1.1.7.tgz#34598e3884b8a80e075dda178e4e46502e7e7db6"
+  integrity sha512-ZdRMStiN7GC8uMsQ4dU2Scn0lzTUF4wZDe1+8X/IKYmjQ7lpHEVXKO5qEK12Z1TLJ9fo5+H351SyrxqtdZ/Zew==
+
 "@types/prop-types@*", "@types/prop-types@^15.7.12":
   version "15.7.14"
   resolved "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.7.14.tgz"
@@ -5843,6 +5848,14 @@ process-nextick-args@~2.0.0:
   resolved "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
 
+progressbar.js@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/progressbar.js/-/progressbar.js-1.1.1.tgz#8c7dc52ce4cc8845c4f3055da75afc366a0543e9"
+  integrity sha512-FBsw3BKsUbb+hNeYfiP3xzvAAQrPi4DnGDw66bCmfuRCDLcslxyxv2GyYUdBSKFGSIBa73CUP5WMcl6F8AAXlw==
+  dependencies:
+    lodash.merge "^4.6.2"
+    shifty "^2.8.3"
+
 promise@^8.3.0:
   version "8.3.0"
   resolved "https://registry.npmjs.org/promise/-/promise-8.3.0.tgz"
@@ -6634,6 +6647,13 @@ shell-quote@^1.6.1:
   version "1.8.3"
   resolved "https://registry.npmjs.org/shell-quote/-/shell-quote-1.8.3.tgz"
   integrity sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==
+
+shifty@^2.8.3:
+  version "2.20.4"
+  resolved "https://registry.npmjs.org/shifty/-/shifty-2.20.4.tgz#fb2ec81697b808b250024fa9548b5b93fadd78cf"
+  integrity sha512-4Y0qRkg8ME5XN8yGNAwmFOmsIURGFKT9UQfNL6DDJQErYtN5HsjyoBuJn41ZQfTkuu2rIbRMn9qazjKsDpO2TA==
+  optionalDependencies:
+    fsevents "^2.3.2"
 
 side-channel-list@^1.0.0:
   version "1.0.0"
