@@ -67,6 +67,7 @@ export function ListInspections() {
                 }
                 onSubmit={(search) => handleOnSearch(search)}
                 onAdd={isInspectionChanger() ? addNew : undefined}
+                offline={tableMode === "offline"}
               />
             </Col>
           </Row>
@@ -114,25 +115,29 @@ export function ListInspections() {
             </Tab>
           </Tabs>
 
-          <Row>
-            <Col xs={9}>
-              <ItemsPerPage onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))} />
-            </Col>
-
-            <Col xs={3} className="d-flex justify-content-end ">
-              {params && result ? (
-                <Pagination
-                  key={params.page}
-                  defaultCurrent={params.page}
-                  pageSize={Number(params.records)}
-                  total={result.total}
-                  onChange={(page) => handleOnChangePage(page)}
+          {tableMode === "online" && (
+            <Row>
+              <Col xs={9}>
+                <ItemsPerPage
+                  onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))}
                 />
-              ) : (
-                <Skeleton />
-              )}
-            </Col>
-          </Row>
+              </Col>
+
+              <Col xs={3} className="d-flex justify-content-end ">
+                {params && result ? (
+                  <Pagination
+                    key={params.page}
+                    defaultCurrent={params.page}
+                    pageSize={Number(params.records)}
+                    total={result.total}
+                    onChange={(page) => handleOnChangePage(page)}
+                  />
+                ) : (
+                  <Skeleton />
+                )}
+              </Col>
+            </Row>
+          )}
         </Container>
         {inspectionToPrint && (
           <div
