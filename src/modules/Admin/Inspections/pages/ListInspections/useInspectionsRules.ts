@@ -30,7 +30,7 @@ export function useInspectionsRules() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Contextos
-  const { isOnline } = useOnlineStatus();
+  const { isOnline, syncInspection } = useOnlineStatus();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { addToast, handleApiRejection } = useToastContext();
   const { showLoader, hideLoader } = useLoaderContext();
@@ -247,6 +247,25 @@ export function useInspectionsRules() {
     });
   };
 
+  const handleSyncInspection = useCallback(
+    async (id: string) => {
+      addAlert({
+        iconModal: "success",
+        iconType: "success",
+        buttonType: "success",
+        title: "Reenviar inspeção",
+        description: "Deseja reenviar inspeção para o servidor?",
+        cancelTxt: "Cancelar",
+        confirmTxt: "Reenviar inspeção",
+        onConfirm: async () => {
+          await syncInspection(id);
+          await recalculate();
+        },
+      });
+    },
+    [syncInspection, recalculate, addAlert],
+  );
+
   const SEARCH_OPTIONS: IOption[] = [
     {
       value: "reportNumber",
@@ -302,5 +321,6 @@ export function useInspectionsRules() {
     addNew,
     handleOnChangeStatusInspection,
     handleDeleteInspection,
+    handleSyncInspection,
   };
 }

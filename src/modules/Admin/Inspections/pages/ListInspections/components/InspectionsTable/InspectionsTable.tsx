@@ -12,6 +12,7 @@ import { Heading } from "@/shared/components/Core/Typography/Heading";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { IOfflineInspectionCard } from "@/shared/store/modules/OfflineInspection";
 
+import { useInspectionsRules } from "../../useInspectionsRules";
 import { StorageBar } from "../StorageBar";
 
 interface IInspectionTable
@@ -74,6 +75,7 @@ export function InspectionsTable({
 }: Props) {
   const { isSystemAdmin } = useAuthRoles();
   const { isInspectionChanger } = useAuthRoles();
+  const { isOnline } = useInspectionsRules();
 
   return (
     <>
@@ -167,7 +169,7 @@ export function InspectionsTable({
 
                   <Td>
                     <div className="d-flex justify-content-center gap-2 align-items-center">
-                      {offline && item.erroSync && (
+                      {offline && item.erroSync && isOnline && (
                         <Tooltip title="Tentar Sincronizar Novamente" place="top">
                           <ButtonIcon
                             size="sm"

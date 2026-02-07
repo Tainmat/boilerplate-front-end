@@ -341,8 +341,16 @@ export function CreateInspection() {
         }
       }
       navigate(-1);
-    } catch {
-      handleApiRejection();
+    } catch (err: any) {
+      if (err.response.data.message) {
+        addToast({
+          type: "helper",
+          title: "Erro",
+          description: err.response.data.message,
+        });
+      } else {
+        handleApiRejection();
+      }
     } finally {
       hideLoader();
     }

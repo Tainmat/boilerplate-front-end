@@ -33,6 +33,7 @@ export function ListInspections() {
     handleDeleteInspection,
     addNew,
     handleOnChangeStatusInspection,
+    handleSyncInspection,
   } = useInspectionsRules();
 
   return (
@@ -98,6 +99,7 @@ export function ListInspections() {
                   }
                   handleDeleteInspection={(id: string) => handleDeleteInspection(id)}
                   offline={true}
+                  onRetrySync={(id: string) => handleSyncInspection(id)}
                   storageBarData={storageBarData}
                 />
               </Row>

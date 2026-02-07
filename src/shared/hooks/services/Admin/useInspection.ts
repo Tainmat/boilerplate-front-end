@@ -131,7 +131,7 @@ export function useInspection() {
       const { data } = await post("/operational/parts-inspection", inspectionData);
       return data.data || data;
     } finally {
-      setLoading(false); // Removido o catch inútil, o erro sobe sozinho
+      setLoading(false);
     }
   }, []);
 
