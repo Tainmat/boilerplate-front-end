@@ -37,6 +37,9 @@ export interface IOfflineInspection extends IOfflineRegisterForm {
   id: string;
   createdAt: string;
   updatedAt: string;
+  isSyncing: boolean;
+  erroSync?: string;
+  syncAttempts: number;
 }
 
 interface IOfflineInspectionState {

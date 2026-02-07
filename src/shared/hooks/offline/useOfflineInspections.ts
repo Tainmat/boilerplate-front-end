@@ -42,9 +42,9 @@ export function useOfflineInspections() {
         inspectorUser: i.inspectorUser,
         inspectionStatus: i.inspectionStatus,
         isActive: i.isActive,
-        isSyncing: false,
-        erroSync: undefined,
-        syncAttempts: 0,
+        isSyncing: i.isSyncing ?? false,
+        erroSync: i.erroSync,
+        syncAttempts: i.syncAttempts ?? 0,
         quantityPhotos: i.additionalImages?.images?.filter((img) => img !== null).length || 0,
       }));
 
@@ -77,7 +77,12 @@ export function useOfflineInspections() {
   );
 
   const addNewInspection = useCallback(
-    async (data: Omit<IOfflineInspection, "id" | "createdAt" | "updatedAt">) => {
+    async (
+      data: Omit<
+        IOfflineInspection,
+        "id" | "createdAt" | "updatedAt" | "isSyncing" | "erroSync" | "syncAttempts"
+      >,
+    ) => {
       try {
         const id = uuidv4();
         const now = new Date().toISOString();
@@ -100,6 +105,9 @@ export function useOfflineInspections() {
           id,
           createdAt: now,
           updatedAt: now,
+          isSyncing: false,
+          erroSync: undefined,
+          syncAttempts: 0,
         };
 
         await inspectionsDB.add(newInspection);
@@ -194,41 +202,36 @@ export function useOfflineInspections() {
   }, [dispatch]);
 
   const markAsSync = useCallback(
-    (id: string) => {
+    async (id: string) => {
       dispatch(updateCard({ id, data: { isSyncing: true } }));
+      await inspectionsDB.update(id, { isSyncing: true });
     },
     [dispatch],
   );
 
   const markErrorSync = useCallback(
-    (id: string, error: string) => {
+    async (id: string, error: string) => {
       const card = cardsList.find((c) => c.id === id);
-      dispatch(
-        updateCard({
-          id,
-          data: {
-            isSyncing: false,
-            erroSync: error,
-            syncAttempts: (card?.syncAttempts || 0) + 1,
-          },
-        }),
-      );
+      const syncData = {
+        isSyncing: false,
+        erroSync: error,
+        syncAttempts: (card?.syncAttempts || 0) + 1,
+      };
+      dispatch(updateCard({ id, data: syncData }));
+      await inspectionsDB.update(id, syncData);
     },
     [dispatch, cardsList],
   );
 
   const resetSync = useCallback(
-    (id: string) => {
-      dispatch(
-        updateCard({
-          id,
-          data: {
-            isSyncing: false,
-            erroSync: undefined,
-            syncAttempts: 0,
-          },
-        }),
-      );
+    async (id: string) => {
+      const syncData = {
+        isSyncing: false,
+        erroSync: undefined,
+        syncAttempts: 0,
+      };
+      dispatch(updateCard({ id, data: syncData }));
+      await inspectionsDB.update(id, syncData);
     },
     [dispatch],
   );

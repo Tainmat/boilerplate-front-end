@@ -11,6 +11,7 @@ import {
 
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
 import { useInspection } from "@/shared/hooks/services/Admin/useInspection";
+import { post } from "@/shared/services/api/api.service";
 import { getById } from "@/shared/services/indexedDB/inspectionsDB";
 
 import { useToastContext } from "../Toast";
@@ -37,7 +38,7 @@ function OnlineStatusContext({ children }: Props) {
   const onlineStableTimeRef = useRef<NodeJS.Timeout | null>(null);
 
   const { cardsList, removeInspection, markAsSync, markErrorSync } = useOfflineInspections();
-  const { createInspection, uploadInspectionAttachments } = useInspection();
+  const { uploadInspectionAttachments } = useInspection();
 
   const syncInspection = useCallback(
     async (id: string): Promise<boolean> => {
@@ -86,8 +87,13 @@ function OnlineStatusContext({ children }: Props) {
         };
 
         // POST na API
-        const createdInspection = await createInspection(apiData);
-        const inspectionId = createdInspection?.id || createdInspection;
+        const response = await post("/operational/parts-inspection", apiData);
+
+        if (response.error) {
+          throw new Error(response.message || "Erro ao criar inspeção");
+        }
+
+        const inspectionId = response.data?.data?.id || response.data?.data;
 
         // Upload imagens se tiver
         if (fullData.additionalImages?.images) {
@@ -114,8 +120,6 @@ function OnlineStatusContext({ children }: Props) {
 
         return true;
       } catch (error: any) {
-        console.error("Erro ao sincronizar:", error);
-
         markErrorSync(id, error?.response?.data?.message || error?.message || "Erro desconhecido");
 
         addToast({
@@ -127,14 +131,7 @@ function OnlineStatusContext({ children }: Props) {
         return false;
       }
     },
-    [
-      addToast,
-      createInspection,
-      removeInspection,
-      uploadInspectionAttachments,
-      markAsSync,
-      markErrorSync,
-    ],
+    [addToast, removeInspection, uploadInspectionAttachments, markAsSync, markErrorSync],
   );
 
   const syncAll = useCallback(async () => {

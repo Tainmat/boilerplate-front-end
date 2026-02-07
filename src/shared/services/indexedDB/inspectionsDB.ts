@@ -67,17 +67,17 @@ export async function getAll(): Promise<IOfflineInspection[]> {
   }
 }
 
-export async function update(id: string, data: IOfflineInspection): Promise<void> {
+export async function update(id: string, data: Partial<IOfflineInspection>): Promise<void> {
   try {
     const db = await getDB();
 
-    const inspectionExists = await db.get(STORE_NAME, id);
+    const existing = await db.get(STORE_NAME, id);
 
-    if (!inspectionExists) {
+    if (!existing) {
       throw new Error(`Inspeção ${id} não encontrada no IndexedDB`);
     }
 
-    await db.put(STORE_NAME, data);
+    await db.put(STORE_NAME, { ...existing, ...data });
   } catch (error) {
     console.error("❌ Erro ao atualizar inspeção no IndexedDB:", error);
     throw error;
