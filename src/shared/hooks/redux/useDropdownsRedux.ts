@@ -16,8 +16,13 @@ import { RootState } from "@/shared/store/store";
 export function useDropdownsRedux() {
   const dispatch = useDispatch();
 
-  const { customersDropdown, equipmentsDropdown, inspectionStatusDropdown, lastUpdated } =
-    useSelector((state: RootState) => state.dropdownsData);
+  const {
+    customersDropdown,
+    equipmentsDropdown,
+    inspectionStatusDropdown,
+    usersDropdown,
+    lastUpdated,
+  } = useSelector((state: RootState) => state.dropdownsData);
 
   const setCustomersDropdownAction = (dropdown: ICustomerOffline[]) =>
     dispatch(setCustomersDropdown(dropdown));
@@ -42,6 +47,7 @@ export function useDropdownsRedux() {
     customersDropdown,
     equipmentsDropdown,
     inspectionStatusDropdown,
+    usersDropdown,
     lastUpdated,
     setCustomersDropdownAction,
     setEquipmentsDropdownAction,

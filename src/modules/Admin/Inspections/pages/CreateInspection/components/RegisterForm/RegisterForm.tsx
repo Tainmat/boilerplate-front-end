@@ -8,7 +8,6 @@ import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.inter
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { useAlertContext } from "@shared/contexts/Alert";
-import { useUsersDropdown } from "@shared/hooks/services/Admin/Dropdown/useUsersDropdown";
 import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 import { Field, Form, Formik } from "formik";
 import React from "react";
@@ -44,10 +43,22 @@ export function InspectionRegisterForm({
   const navigate = useNavigate();
 
   // Buscar dados para os selects
-  const { customersDropdown, inspectionStatusDropdown } = useDropdownsRedux();
-  const { result: usersOptions, loading: loadingUsers } = useUsersDropdown();
+  const { customersDropdown, inspectionStatusDropdown, usersDropdown } = useDropdownsRedux();
 
-  // Preparar opções para os selects - já vem pronto dos hooks dropdown
+  const usersOptions = usersDropdown.map((user) => ({
+    value: user.id,
+    label: user.socialName,
+  }));
+
+  const customersOptions = customersDropdown.map((customer) => ({
+    value: customer.id,
+    label: customer.fantasyName,
+  }));
+
+  const inspectionStatusOptions = inspectionStatusDropdown.map((status) => ({
+    value: status.id,
+    label: status.description,
+  }));
 
   if (!initialValues) {
     return (
@@ -144,29 +155,25 @@ export function InspectionRegisterForm({
                   <Card.Body>
                     <Row className="g-3">
                       <Col md={6}>
-                        {loadingUsers ? (
-                          <Skeleton />
-                        ) : (
-                          <Field
-                            as={Select}
-                            readOnly={!isInspectionChanger()}
-                            label="Inspetor Responsável *"
-                            name="inspectorUserId"
-                            placeholder="Selecione o inspetor"
-                            options={usersOptions}
-                            error={touched.inspectorUserId && !!errors.inspectorUserId}
-                            helperText={
-                              touched.inspectorUserId && !!errors.inspectorUserId
-                                ? errors.inspectorUserId
-                                : ""
-                            }
-                            disabled={isEdit}
-                            onChange={({ value }: IOption) => {
-                              setFieldTouched("inspectorUserId");
-                              setFieldValue("inspectorUserId", value);
-                            }}
-                          />
-                        )}
+                        <Field
+                          as={Select}
+                          readOnly={!isInspectionChanger()}
+                          label="Inspetor Responsável *"
+                          name="inspectorUserId"
+                          placeholder="Selecione o inspetor"
+                          options={usersOptions}
+                          error={touched.inspectorUserId && !!errors.inspectorUserId}
+                          helperText={
+                            touched.inspectorUserId && !!errors.inspectorUserId
+                              ? errors.inspectorUserId
+                              : ""
+                          }
+                          disabled={isEdit}
+                          onChange={({ value }: IOption) => {
+                            setFieldTouched("inspectorUserId");
+                            setFieldValue("inspectorUserId", value);
+                          }}
+                        />
                       </Col>
                     </Row>
                   </Card.Body>
@@ -294,12 +301,7 @@ export function InspectionRegisterForm({
                           label="Cliente *"
                           name="customerId"
                           placeholder="Selecione o cliente"
-                          options={customersDropdown.map((i) => {
-                            return {
-                              label: i.fantasyName,
-                              value: i.id,
-                            };
-                          })}
+                          options={customersOptions}
                           error={touched.customerId && !!errors.customerId}
                           helperText={
                             touched.customerId && !!errors.customerId ? errors.customerId : ""
@@ -723,10 +725,7 @@ export function InspectionRegisterForm({
                           label="Status da Inspeção *"
                           name="inspectionStatusId"
                           placeholder="Selecione o status"
-                          options={inspectionStatusDropdown.map((item) => ({
-                            value: item.id,
-                            label: item.description,
-                          }))}
+                          options={inspectionStatusOptions}
                           error={touched.inspectionStatusId && !!errors.inspectionStatusId}
                           helperText={
                             touched.inspectionStatusId && !!errors.inspectionStatusId
