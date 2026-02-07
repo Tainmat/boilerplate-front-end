@@ -42,6 +42,7 @@ export function ListInspections() {
     handleOnSearch,
     handleOnChangeItemsPerPage,
     handleOnChangePage,
+    handleDeleteInspection,
 
     // Callbacks de ações
     addNew,
@@ -109,6 +110,7 @@ export function ListInspections() {
                   handleOnChangeStatusInspection={(id: string, inStatus: boolean) =>
                     handleOnChangeStatusInspection(id, inStatus)
                   }
+                  handleDeleteInspection={(id: string) => handleDeleteInspection(id)}
                   offline={true}
                 />
               </Row>
