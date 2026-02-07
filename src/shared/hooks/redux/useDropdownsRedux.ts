@@ -4,18 +4,25 @@ import {
   ICustomerOffline,
   IEquipmentDropdown,
   IInpectionStatusOffline,
+  IInspectorOffline,
   setAllDropdowns,
   setCustomersDropdown,
   setEquipmentsDropdown,
   setInspectionStatusDropdown,
+  setUsersDropdown,
 } from "@/shared/store/modules/Dropdowns";
 import { RootState } from "@/shared/store/store";
 
 export function useDropdownsRedux() {
   const dispatch = useDispatch();
 
-  const { customersDropdown, equipmentsDropdown, inspectionStatusDropdown, lastUpdated } =
-    useSelector((state: RootState) => state.dropdownsData);
+  const {
+    customersDropdown,
+    equipmentsDropdown,
+    inspectionStatusDropdown,
+    usersDropdown,
+    lastUpdated,
+  } = useSelector((state: RootState) => state.dropdownsData);
 
   const setCustomersDropdownAction = (dropdown: ICustomerOffline[]) =>
     dispatch(setCustomersDropdown(dropdown));
@@ -26,20 +33,26 @@ export function useDropdownsRedux() {
   const setInspectionStatusDropdownAction = (dropdown: IInpectionStatusOffline[]) =>
     dispatch(setInspectionStatusDropdown(dropdown));
 
+  const setUsersDropdownAction = (dropdown: IInspectorOffline[]) =>
+    dispatch(setUsersDropdown(dropdown));
+
   const setAllDropdownsAction = (dropdowns: {
     customers: ICustomerOffline[];
     equipments: IEquipmentDropdown[];
     inspectionStatus: IInpectionStatusOffline[];
+    users: IInspectorOffline[];
   }) => dispatch(setAllDropdowns(dropdowns));
 
   return {
     customersDropdown,
     equipmentsDropdown,
     inspectionStatusDropdown,
+    usersDropdown,
     lastUpdated,
     setCustomersDropdownAction,
     setEquipmentsDropdownAction,
     setInspectionStatusDropdownAction,
+    setUsersDropdownAction,
     setAllDropdownsAction,
   };
 }

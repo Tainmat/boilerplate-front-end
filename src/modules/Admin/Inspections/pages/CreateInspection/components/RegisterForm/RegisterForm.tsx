@@ -8,28 +8,27 @@ import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.inter
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { useAlertContext } from "@shared/contexts/Alert";
-import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
-import { useUsersDropdown } from "@shared/hooks/services/Admin/Dropdown/useUsersDropdown";
-import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
 import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 import { Field, Form, Formik } from "formik";
 import React from "react";
 import { Card, Col, Row } from "react-bootstrap";
-import ReactQuill from "react-quill-new";
 import { useNavigate } from "react-router-dom";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
 
+import { GeneralConditionsForm } from "./components/GeneralConditionsForm";
 import { IInspectionRegisterForm, inspectionValidationSchema } from "./RegisterForm.form";
 
 interface Props {
   initialValues: IInspectionRegisterForm | null;
   onSubmit: (data: IInspectionRegisterForm) => void;
-  selectedEquipment?: IEquipment | null;
+  selectedEquipment?: IEquipmentDropdown | null;
   onBack?: () => void;
+  isEdit?: boolean;
 }
 
 export function InspectionRegisterForm({
@@ -37,67 +36,29 @@ export function InspectionRegisterForm({
   onSubmit,
   selectedEquipment,
   onBack,
+  isEdit,
 }: Props) {
   const { isInspectionChanger } = useAuthRoles();
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
 
-  const colors: string[] = [
-    "#000000",
-    "#333333",
-    "#666666",
-    "#999999",
-    "#cccccc",
-    "#2c3e50",
-    "#000099",
-    "#3498db",
-    "#e74c3c",
-    "#f1c0c0",
-    "#f39c12",
-    "#fff2cc",
-    "#27ae60",
-    "#c8e6c9",
-  ];
-
-  const executiveConfig = {
-    toolbar: [
-      // Formatação de texto
-      ["bold", "italic", "underline"],
-
-      // Paleta de cores corporativas (texto)
-      [
-        {
-          color: colors,
-        },
-      ],
-
-      // Paleta de cores de fundo
-      [
-        {
-          background: colors,
-        },
-      ],
-
-      // Listas organizadas
-      [{ list: "ordered" }, { list: "bullet" }],
-
-      // Alinhamento profissional
-      [{ align: ["", "center", "right", "justify"] }],
-
-      // Links e citações
-      ["link", "blockquote"],
-
-      // Utilitários
-      ["clean"],
-    ],
-  };
-
   // Buscar dados para os selects
-  const { customersDropdown } = useDropdownsRedux();
-  const { result: usersOptions, loading: loadingUsers } = useUsersDropdown();
-  const { result: inspectionStatusOptions } = usePartInspectionStatusDropdown();
+  const { customersDropdown, inspectionStatusDropdown, usersDropdown } = useDropdownsRedux();
 
-  // Preparar opções para os selects - já vem pronto dos hooks dropdown
+  const usersOptions = usersDropdown.map((user) => ({
+    value: user.id,
+    label: user.socialName,
+  }));
+
+  const customersOptions = customersDropdown.map((customer) => ({
+    value: customer.id,
+    label: customer.fantasyName,
+  }));
+
+  const inspectionStatusOptions = inspectionStatusDropdown.map((status) => ({
+    value: status.id,
+    label: status.description,
+  }));
 
   if (!initialValues) {
     return (
@@ -192,38 +153,27 @@ export function InspectionRegisterForm({
               <Col xs={12}>
                 <Card className="shadow-sm" style={{ borderLeft: "4px solid #047a32" }}>
                   <Card.Body>
-                    {/* <div className="border-bottom pb-3 mb-4" style={{ borderColor: "#047a32" }}>
-                    <Heading size="sm" className="mb-1 fw-bold text-success">
-                      Inspetor Responsável
-                    </Heading>
-                    <small className="text-muted">
-                      Identificação do inspetor responsável pela inspeção
-                    </small>
-                  </div> */}
                     <Row className="g-3">
                       <Col md={6}>
-                        {loadingUsers ? (
-                          <Skeleton />
-                        ) : (
-                          <Field
-                            as={Select}
-                            readOnly={!isInspectionChanger()}
-                            label="Inspetor Responsável *"
-                            name="inspectorUserId"
-                            placeholder="Selecione o inspetor"
-                            options={usersOptions}
-                            error={touched.inspectorUserId && !!errors.inspectorUserId}
-                            helperText={
-                              touched.inspectorUserId && !!errors.inspectorUserId
-                                ? errors.inspectorUserId
-                                : ""
-                            }
-                            onChange={({ value }: IOption) => {
-                              setFieldTouched("inspectorUserId");
-                              setFieldValue("inspectorUserId", value);
-                            }}
-                          />
-                        )}
+                        <Field
+                          as={Select}
+                          readOnly={!isInspectionChanger()}
+                          label="Inspetor Responsável *"
+                          name="inspectorUserId"
+                          placeholder="Selecione o inspetor"
+                          options={usersOptions}
+                          error={touched.inspectorUserId && !!errors.inspectorUserId}
+                          helperText={
+                            touched.inspectorUserId && !!errors.inspectorUserId
+                              ? errors.inspectorUserId
+                              : ""
+                          }
+                          disabled={isEdit}
+                          onChange={({ value }: IOption) => {
+                            setFieldTouched("inspectorUserId");
+                            setFieldValue("inspectorUserId", value);
+                          }}
+                        />
                       </Col>
                     </Row>
                   </Card.Body>
@@ -351,12 +301,7 @@ export function InspectionRegisterForm({
                           label="Cliente *"
                           name="customerId"
                           placeholder="Selecione o cliente"
-                          options={customersDropdown.map((i) => {
-                            return {
-                              label: i.fantasyName,
-                              value: i.id,
-                            };
-                          })}
+                          options={customersOptions}
                           error={touched.customerId && !!errors.customerId}
                           helperText={
                             touched.customerId && !!errors.customerId ? errors.customerId : ""
@@ -756,51 +701,7 @@ export function InspectionRegisterForm({
             {/* Seção 6: Considerações Gerais */}
             <Row className="mb-4">
               <Col xs={12}>
-                <Card className="shadow-sm" style={{ borderLeft: "4px solid #047a32" }}>
-                  <Card.Body>
-                    <div className="border-bottom pb-3 mb-4" style={{ borderColor: "#047a32" }}>
-                      <Heading size="sm" className="mb-1 fw-bold text-success">
-                        6. Considerações Gerais
-                      </Heading>
-                      <small className="text-muted">
-                        Observações importantes sobre as condições de inspeção
-                      </small>
-                    </div>
-                    <Row className="g-3">
-                      <Col xs={12}>
-                        <ReactQuill
-                          readOnly={!isInspectionChanger()}
-                          className="text-editor"
-                          theme="snow"
-                          value={values.finalConclusion}
-                          onChange={(e) => setFieldValue("finalConclusion", e)}
-                          modules={executiveConfig}
-                        />
-                        <div className="d-flex justify-content-end mt-2">
-                          <small
-                            className={`${
-                              (values.finalConclusion?.length || 0) > 2048
-                                ? "text-danger"
-                                : (values.finalConclusion?.length || 0) > 1800
-                                  ? "text-warning"
-                                  : "text-muted"
-                            }`}
-                          >
-                            {values.finalConclusion?.length || 0} / 2048
-                          </small>
-                        </div>
-                      </Col>
-                      {/* <Col xs={12}>
-                      <InputRichText
-                        name="finalConclusion"
-                        label="Observações e Considerações"
-                        placeholder="Registre informações relevantes:"
-                        helperText="Documente aspectos importantes da inspeção"
-                      />
-                    </Col> */}
-                    </Row>
-                  </Card.Body>
-                </Card>
+                <GeneralConditionsForm />
               </Col>
             </Row>
 
