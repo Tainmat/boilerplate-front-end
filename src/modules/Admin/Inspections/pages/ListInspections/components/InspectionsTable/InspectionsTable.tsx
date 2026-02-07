@@ -22,6 +22,14 @@ interface IInspectionTable
   quantityPhotos?: number;
 }
 
+interface StorageBarData {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  usedMB: number;
+  storageQuotaMB: number;
+  percentage: number;
+  formatSize: (mb: number) => string;
+}
+
 interface Props {
   data: IInspectionTable[] | null;
   onEdit: (id: string) => void;
@@ -30,6 +38,7 @@ interface Props {
   handleDeleteInspection?: (id: string) => void;
   onRetrySync?: (id: string) => void;
   offline: boolean;
+  storageBarData?: StorageBarData;
 }
 
 function getStatusColor(
@@ -61,16 +70,17 @@ export function InspectionsTable({
   onGeneratePdf,
   onRetrySync,
   offline,
+  storageBarData,
 }: Props) {
   const { isSystemAdmin } = useAuthRoles();
   const { isInspectionChanger } = useAuthRoles();
 
   return (
     <>
-      {offline && (
+      {offline && storageBarData && (
         <Row>
           <Col className="mb-4">
-            <StorageBar />
+            <StorageBar {...storageBarData} />
           </Col>
         </Row>
       )}

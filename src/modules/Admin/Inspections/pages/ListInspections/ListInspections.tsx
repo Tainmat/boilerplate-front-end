@@ -14,37 +14,23 @@ import { useInspectionsRules } from "./useInspectionsRules";
 
 export function ListInspections() {
   const {
-    // Estados
     tableMode,
     setTableMode,
     isOnline,
-
-    // Permissões
     isInspectionChanger,
-
-    // Constantes
     SEARCH_OPTIONS,
-
-    // Hook inspections
     result,
     params,
-
-    // Hook offline inspections
     offlineInspections,
     errorsCount,
-
-    // PDF
+    storageBarData,
     pdfRef,
     inspectionToPrint,
     handleGeneratePdf,
-
-    // Callbacks de busca/paginação
     handleOnSearch,
     handleOnChangeItemsPerPage,
     handleOnChangePage,
     handleDeleteInspection,
-
-    // Callbacks de ações
     addNew,
     handleOnChangeStatusInspection,
   } = useInspectionsRules();
@@ -112,6 +98,7 @@ export function ListInspections() {
                   }
                   handleDeleteInspection={(id: string) => handleDeleteInspection(id)}
                   offline={true}
+                  storageBarData={storageBarData}
                 />
               </Row>
             </Tab>

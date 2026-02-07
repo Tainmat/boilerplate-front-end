@@ -22,6 +22,7 @@ import {
   IInspectionSearchForm,
   initialInspectionSearchValues,
 } from "./components/InspectionSearchForm";
+import { useStorageBar } from "./components/StorageBar/useStorageBar";
 
 export function useInspectionsRules() {
   // Navegação
@@ -39,6 +40,8 @@ export function useInspectionsRules() {
   const { fetchInspection } = useInspection();
   const { result, params, setParams, refetch } = useInspections();
   const { cardsList: offlineInspections, removeInspection } = useOfflineInspections();
+  const { recalculate, containerRef, usedMB, storageQuotaMB, percentage, formatSize } =
+    useStorageBar();
 
   // Permissões
   const { isInspectionChanger } = useAuthRoles();
@@ -237,8 +240,9 @@ export function useInspectionsRules() {
         "Ao remover a inspeção, todos os dados serão perdidos, não será possível reverter essa ação.",
       cancelTxt: "Voltar",
       confirmTxt: "Remover inspeção",
-      onConfirm: () => {
-        removeInspection(inspectionId);
+      onConfirm: async () => {
+        await removeInspection(inspectionId);
+        await recalculate();
       },
     });
   };
@@ -280,6 +284,9 @@ export function useInspectionsRules() {
     // Hook offline inspections
     offlineInspections,
     errorsCount,
+
+    // Storage bar
+    storageBarData: { containerRef, usedMB, storageQuotaMB, percentage, formatSize },
 
     // PDF
     pdfRef,
