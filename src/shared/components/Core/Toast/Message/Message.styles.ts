@@ -80,11 +80,19 @@ export const Container = styled(animated.div)<Props>`
 
     .text {
       flex: 1;
+      min-width: 0;
 
       .heading {
         display: flex;
         align-items: center;
         height: 2.5rem;
+      }
+
+      .toast-description {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        word-break: break-word;
       }
     }
 

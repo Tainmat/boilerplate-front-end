@@ -75,7 +75,6 @@ export interface SingleItemResponse<T> {
 export interface ApiResponse {
   status: number;
   data?: any;
-  error?: boolean;
   message?: any;
 }
 
@@ -83,7 +82,7 @@ export async function login(
   path: string,
   body?: any,
   header?: Record<string, string>,
-): Promise<ApiResponse> {
+): Promise<ApiResponse & { error?: boolean }> {
   try {
     const response = await api.post(path, body, {
       headers: {
@@ -109,23 +108,15 @@ export async function post(
 ): Promise<ApiResponse> {
   const token = getAuthorizationToken();
 
-  try {
-    const response = await api.post(path, body, {
-      headers: {
-        Authorization: token,
-        Accept: "application/json",
-        ...header,
-      },
-    });
+  const response = await api.post(path, body, {
+    headers: {
+      Authorization: token,
+      Accept: "application/json",
+      ...header,
+    },
+  });
 
-    return response.data;
-  } catch (error: any) {
-    return {
-      status: error?.response?.data?.status_code || 0,
-      error: true,
-      message: error?.response?.data?.message || "Erro de conexão",
-    };
-  }
+  return response.data;
 }
 
 export async function put(
@@ -135,23 +126,15 @@ export async function put(
 ): Promise<ApiResponse> {
   const token = getAuthorizationToken();
 
-  try {
-    const response = await api.put(path, body, {
-      headers: {
-        Authorization: token,
-        Accept: "application/json",
-        ...header,
-      },
-    });
+  const response = await api.put(path, body, {
+    headers: {
+      Authorization: token,
+      Accept: "application/json",
+      ...header,
+    },
+  });
 
-    return response.data;
-  } catch (error: any) {
-    return {
-      status: error?.response?.data?.status_code || 0,
-      error: true,
-      message: error?.response?.data?.message || "Erro de conexão",
-    };
-  }
+  return response.data;
 }
 
 export async function get(
@@ -161,24 +144,16 @@ export async function get(
 ): Promise<ApiResponse> {
   const token = getAuthorizationToken();
 
-  try {
-    const response = await api.get(path, {
-      params,
-      headers: {
-        Accept: "application/json",
-        Authorization: token,
-      },
-      signal: controller?.signal,
-    });
+  const response = await api.get(path, {
+    params,
+    headers: {
+      Accept: "application/json",
+      Authorization: token,
+    },
+    signal: controller?.signal,
+  });
 
-    return response;
-  } catch (error: any) {
-    return {
-      status: error?.response?.status || 0,
-      error: true,
-      message: error?.response?.data?.message || "Erro de conexão",
-    };
-  }
+  return response;
 }
 
 export async function fakeRequest(

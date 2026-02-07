@@ -60,7 +60,7 @@ export function Message({ message, style }: Props) {
         </div>
 
         {message.description && (
-          <Paragraph size="sm" className="text-neutral-high-medium">
+          <Paragraph size="sm" className="text-neutral-high-medium toast-description">
             {message.description}
           </Paragraph>
         )}

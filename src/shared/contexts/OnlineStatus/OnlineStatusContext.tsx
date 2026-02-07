@@ -87,13 +87,8 @@ function OnlineStatusContext({ children }: Props) {
         };
 
         // POST na API
-        const response = await post("/operational/parts-inspection", apiData);
-
-        if (response.error) {
-          throw new Error(response.message || "Erro ao criar inspeção");
-        }
-
-        const inspectionId = response.data?.data?.id || response.data?.data;
+        const { data } = await post("/operational/parts-inspection", apiData);
+        const inspectionId = data?.data?.id || data?.data;
 
         // Upload imagens se tiver
         if (fullData.additionalImages?.images) {
