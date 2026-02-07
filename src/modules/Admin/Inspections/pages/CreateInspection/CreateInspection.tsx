@@ -7,7 +7,6 @@ import { TITLE_ADMIN_INSPECTIONS } from "@shared/constants/title.browser";
 import { useBreadcrumbContext } from "@shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@shared/contexts/Loader";
 import { useToastContext } from "@shared/contexts/Toast";
-import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
 import { IInspectionCreateData, useInspection } from "@shared/hooks/services/Admin/useInspection";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
@@ -18,7 +17,6 @@ import { useAuthContext } from "@/shared/contexts/Auth";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
-import { get } from "@/shared/services/api/api.service";
 import { getStorageSize } from "@/shared/services/indexedDB/inspectionsDB";
 import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 
@@ -40,7 +38,7 @@ export function CreateInspection() {
 
   const [inspection, setInspection] = useState<IInspectionRegisterForm | null>(null);
   const [currentStep, setCurrentStep] = useState<"equipment" | "form">("equipment");
-  const [selectedEquipment, setSelectedEquipment] = useState<IEquipment | null>(null);
+  const [selectedEquipment, setSelectedEquipment] = useState<IEquipmentDropdown | null>(null);
 
   const { customersDropdown, inspectionStatusDropdown } = useDropdownsRedux();
 
@@ -151,9 +149,6 @@ export function CreateInspection() {
             description: data.partType.description || "",
             croqui: data.partType.croqui,
             totalInspectionPoints: data.partType.totalInspectionPoints || 0,
-            isActive: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
           });
         }
       } catch {
@@ -174,49 +169,40 @@ export function CreateInspection() {
   ]);
 
   async function handleEquipmentSelection(equipment: IEquipmentDropdown) {
-    try {
-      const partType = await get(`parametrizations/part-types/${equipment.id}`);
+    setSelectedEquipment(equipment);
 
-      setSelectedEquipment(partType.data.data);
-
-      setInspection({
-        customerId: "",
-        inspectorUserId: "",
-        partTypeId: equipment.id || "",
-        reportNumber: "",
-        reportStartDate: "",
-        reportEndDate: "",
-        revisionNumber: "00",
-        sheetNumber: "1/1",
-        componentId: "",
-        positionNumber: "",
-        inspectionLocation: "",
-        mdaInformation: "",
-        isVI: false,
-        isDM: false,
-        isPM: false,
-        isUS: false,
-        isLP: false,
-        isDU: false,
-        finalConclusion: "",
-        inspectionStatusId: "",
-        isSandingBrushSandblasting: false,
-        isCleaningChemistry: false,
-        instruments: "",
-        /* generalConsiderations: "", */
-        // Posições de inspeção selecionadas
-        selectedPositions: [], // Nenhuma posição selecionada por padrão
-        // Nova estrutura de imagens adicionais
-        additionalImages: {
-          images: [null, null, null], // 3 slots vazios
-          imagesToDel: [],
-        },
-        isActive: true,
-      });
-      setCurrentStep("form");
-    } catch (error) {
-      console.error("Erro ao buscar imagem do equipamento:", error);
-    }
+    setInspection({
+      customerId: "",
+      inspectorUserId: "",
+      partTypeId: equipment.id || "",
+      reportNumber: "",
+      reportStartDate: "",
+      reportEndDate: "",
+      revisionNumber: "00",
+      sheetNumber: "1/1",
+      componentId: "",
+      positionNumber: "",
+      inspectionLocation: "",
+      mdaInformation: "",
+      isVI: false,
+      isDM: false,
+      isPM: false,
+      isUS: false,
+      isLP: false,
+      isDU: false,
+      finalConclusion: "",
+      inspectionStatusId: "",
+      isSandingBrushSandblasting: false,
+      isCleaningChemistry: false,
+      instruments: "",
+      selectedPositions: [],
+      additionalImages: {
+        images: [null, null, null],
+        imagesToDel: [],
+      },
+      isActive: true,
+    });
+    setCurrentStep("form");
   }
 
   function handleBackToEquipmentSelection() {

@@ -10,7 +10,6 @@ import { Heading } from "@shared/components/Core/Typography/Heading";
 import { useAlertContext } from "@shared/contexts/Alert";
 import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useUsersDropdown } from "@shared/hooks/services/Admin/Dropdown/useUsersDropdown";
-import { IEquipment } from "@shared/hooks/services/Admin/useEquipments";
 import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 import { Field, Form, Formik } from "formik";
 import React from "react";
@@ -20,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
 
 import { GeneralConditionsForm } from "./components/GeneralConditionsForm";
@@ -28,7 +28,7 @@ import { IInspectionRegisterForm, inspectionValidationSchema } from "./RegisterF
 interface Props {
   initialValues: IInspectionRegisterForm | null;
   onSubmit: (data: IInspectionRegisterForm) => void;
-  selectedEquipment?: IEquipment | null;
+  selectedEquipment?: IEquipmentDropdown | null;
   onBack?: () => void;
 }
 

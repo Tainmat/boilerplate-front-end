@@ -4,7 +4,7 @@ import { IEquipment } from "@/shared/hooks/services/Admin/useEquipments";
 
 export type IEquipmentDropdown = Pick<
   IEquipment,
-  "id" | "name" | "totalInspectionPoints" | "croqui"
+  "id" | "name" | "totalInspectionPoints" | "croqui" | "description"
 >;
 
 export interface ICustomerOffline {
