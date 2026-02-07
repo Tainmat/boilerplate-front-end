@@ -8,7 +8,6 @@ import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.inter
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { Heading } from "@shared/components/Core/Typography/Heading";
 import { useAlertContext } from "@shared/contexts/Alert";
-import { usePartInspectionStatusDropdown } from "@shared/hooks/services/Admin/Dropdown/usePartInspectionStatusDropdown";
 import { useUsersDropdown } from "@shared/hooks/services/Admin/Dropdown/useUsersDropdown";
 import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 import { Field, Form, Formik } from "formik";
@@ -30,6 +29,7 @@ interface Props {
   onSubmit: (data: IInspectionRegisterForm) => void;
   selectedEquipment?: IEquipmentDropdown | null;
   onBack?: () => void;
+  isEdit?: boolean;
 }
 
 export function InspectionRegisterForm({
@@ -37,15 +37,15 @@ export function InspectionRegisterForm({
   onSubmit,
   selectedEquipment,
   onBack,
+  isEdit,
 }: Props) {
   const { isInspectionChanger } = useAuthRoles();
   const { addAlertOnCancel } = useAlertContext();
   const navigate = useNavigate();
 
   // Buscar dados para os selects
-  const { customersDropdown } = useDropdownsRedux();
+  const { customersDropdown, inspectionStatusDropdown } = useDropdownsRedux();
   const { result: usersOptions, loading: loadingUsers } = useUsersDropdown();
-  const { result: inspectionStatusOptions } = usePartInspectionStatusDropdown();
 
   // Preparar opções para os selects - já vem pronto dos hooks dropdown
 
@@ -142,14 +142,6 @@ export function InspectionRegisterForm({
               <Col xs={12}>
                 <Card className="shadow-sm" style={{ borderLeft: "4px solid #047a32" }}>
                   <Card.Body>
-                    {/* <div className="border-bottom pb-3 mb-4" style={{ borderColor: "#047a32" }}>
-                    <Heading size="sm" className="mb-1 fw-bold text-success">
-                      Inspetor Responsável
-                    </Heading>
-                    <small className="text-muted">
-                      Identificação do inspetor responsável pela inspeção
-                    </small>
-                  </div> */}
                     <Row className="g-3">
                       <Col md={6}>
                         {loadingUsers ? (
@@ -168,6 +160,7 @@ export function InspectionRegisterForm({
                                 ? errors.inspectorUserId
                                 : ""
                             }
+                            disabled={isEdit}
                             onChange={({ value }: IOption) => {
                               setFieldTouched("inspectorUserId");
                               setFieldValue("inspectorUserId", value);
@@ -730,7 +723,10 @@ export function InspectionRegisterForm({
                           label="Status da Inspeção *"
                           name="inspectionStatusId"
                           placeholder="Selecione o status"
-                          options={inspectionStatusOptions}
+                          options={inspectionStatusDropdown.map((item) => ({
+                            value: item.id,
+                            label: item.description,
+                          }))}
                           error={touched.inspectionStatusId && !!errors.inspectionStatusId}
                           helperText={
                             touched.inspectionStatusId && !!errors.inspectionStatusId

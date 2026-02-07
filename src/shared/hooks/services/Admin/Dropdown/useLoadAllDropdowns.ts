@@ -7,6 +7,7 @@ import {
   ICustomerOffline,
   IEquipmentDropdown,
   IInpectionStatusOffline,
+  IInspectorOffline,
 } from "@/shared/store/modules/Dropdowns";
 import { removeEmptyEntries } from "@/shared/utils/generic";
 
@@ -24,11 +25,14 @@ export function useLoadAllDropdowns() {
     });
 
     try {
-      const [statusRes, customersRes, equipmentsRes] = await Promise.all([
+      const [statusRes, customersRes, equipmentsRes, usersRes] = await Promise.all([
         get("parametrizations/part-inspection-status/dropdown", queryParams),
         get("parametrizations/customers/dropdown", queryParams),
         get("parametrizations/part-types", {
           status: "active",
+        }),
+        get("parametrizations/profile-management/users/dropdown", {
+          onlyInspectionPermitions: true,
         }),
       ]);
 
@@ -62,16 +66,27 @@ export function useLoadAllDropdowns() {
         },
       );
 
+      const usersDropdown: IInspectorOffline[] = usersRes.data.data.map(
+        (item: IInspectorOffline) => {
+          return {
+            id: item.id,
+            socialName: item.socialName,
+          };
+        },
+      );
+
       setAllDropdownsAction({
         inspectionStatus: statusDropdown,
         customers: customersDropdown,
         equipments: equipmentsDropdown,
+        users: usersDropdown,
       });
     } catch {
       setAllDropdownsAction({
         inspectionStatus: [],
         customers: [],
         equipments: [],
+        users: [],
       });
 
       addToast({

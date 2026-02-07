@@ -377,6 +377,7 @@ export function CreateInspection() {
                   selectedEquipment={selectedEquipment}
                   onSubmit={(values) => handleOnSubmit(values)}
                   onBack={!uuid ? handleBackToEquipmentSelection : undefined}
+                  isEdit={!!uuid}
                 />
               )}
             </Col>
