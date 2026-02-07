@@ -14,36 +14,23 @@ import { useInspectionsRules } from "./useInspectionsRules";
 
 export function ListInspections() {
   const {
-    // Estados
     tableMode,
     setTableMode,
     isOnline,
-
-    // Permissões
     isInspectionChanger,
-
-    // Constantes
     SEARCH_OPTIONS,
-
-    // Hook inspections
     result,
     params,
-
-    // Hook offline inspections
     offlineInspections,
     errorsCount,
-
-    // PDF
+    storageBarData,
     pdfRef,
     inspectionToPrint,
     handleGeneratePdf,
-
-    // Callbacks de busca/paginação
     handleOnSearch,
     handleOnChangeItemsPerPage,
     handleOnChangePage,
-
-    // Callbacks de ações
+    handleDeleteInspection,
     addNew,
     handleOnChangeStatusInspection,
   } = useInspectionsRules();
@@ -67,6 +54,7 @@ export function ListInspections() {
                 }
                 onSubmit={(search) => handleOnSearch(search)}
                 onAdd={isInspectionChanger() ? addNew : undefined}
+                offline={tableMode === "offline"}
               />
             </Col>
           </Row>
@@ -108,31 +96,37 @@ export function ListInspections() {
                   handleOnChangeStatusInspection={(id: string, inStatus: boolean) =>
                     handleOnChangeStatusInspection(id, inStatus)
                   }
+                  handleDeleteInspection={(id: string) => handleDeleteInspection(id)}
                   offline={true}
+                  storageBarData={storageBarData}
                 />
               </Row>
             </Tab>
           </Tabs>
 
-          <Row>
-            <Col xs={9}>
-              <ItemsPerPage onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))} />
-            </Col>
-
-            <Col xs={3} className="d-flex justify-content-end ">
-              {params && result ? (
-                <Pagination
-                  key={params.page}
-                  defaultCurrent={params.page}
-                  pageSize={Number(params.records)}
-                  total={result.total}
-                  onChange={(page) => handleOnChangePage(page)}
+          {tableMode === "online" && (
+            <Row>
+              <Col xs={9}>
+                <ItemsPerPage
+                  onChange={(items) => handleOnChangeItemsPerPage(Number(items.value))}
                 />
-              ) : (
-                <Skeleton />
-              )}
-            </Col>
-          </Row>
+              </Col>
+
+              <Col xs={3} className="d-flex justify-content-end ">
+                {params && result ? (
+                  <Pagination
+                    key={params.page}
+                    defaultCurrent={params.page}
+                    pageSize={Number(params.records)}
+                    total={result.total}
+                    onChange={(page) => handleOnChangePage(page)}
+                  />
+                ) : (
+                  <Skeleton />
+                )}
+              </Col>
+            </Row>
+          )}
         </Container>
         {inspectionToPrint && (
           <div

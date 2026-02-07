@@ -6,6 +6,7 @@ import { ROUTE_HOME } from "@/modules/Home/routes/Home.paths";
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
 import { DEFAULT_ITEMS_PER_PAGE } from "@/shared/constants/options";
 import { TITLE_ADMIN_INSPECTIONS } from "@/shared/constants/title.browser";
+import { useAlertContext } from "@/shared/contexts/Alert";
 import { useBreadcrumbContext } from "@/shared/contexts/Layout/Breadcrumb";
 import { useLoaderContext } from "@/shared/contexts/Loader";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
@@ -21,6 +22,7 @@ import {
   IInspectionSearchForm,
   initialInspectionSearchValues,
 } from "./components/InspectionSearchForm";
+import { useStorageBar } from "./components/StorageBar/useStorageBar";
 
 export function useInspectionsRules() {
   // Navegação
@@ -32,11 +34,14 @@ export function useInspectionsRules() {
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { addToast, handleApiRejection } = useToastContext();
   const { showLoader, hideLoader } = useLoaderContext();
+  const { addAlert } = useAlertContext();
 
   // Hooks de dados
   const { fetchInspection } = useInspection();
   const { result, params, setParams, refetch } = useInspections();
-  const { cardsList: offlineInspections } = useOfflineInspections();
+  const { cardsList: offlineInspections, removeInspection } = useOfflineInspections();
+  const { recalculate, containerRef, usedMB, storageQuotaMB, percentage, formatSize } =
+    useStorageBar();
 
   // Permissões
   const { isInspectionChanger } = useAuthRoles();
@@ -225,6 +230,23 @@ export function useInspectionsRules() {
     }
   }
 
+  const handleDeleteInspection = async (inspectionId: string) => {
+    addAlert({
+      iconModal: "error",
+      iconType: "warning",
+      buttonType: "warning",
+      title: "Remover inspeção",
+      description:
+        "Ao remover a inspeção, todos os dados serão perdidos, não será possível reverter essa ação.",
+      cancelTxt: "Voltar",
+      confirmTxt: "Remover inspeção",
+      onConfirm: async () => {
+        await removeInspection(inspectionId);
+        await recalculate();
+      },
+    });
+  };
+
   const SEARCH_OPTIONS: IOption[] = [
     {
       value: "reportNumber",
@@ -263,6 +285,9 @@ export function useInspectionsRules() {
     offlineInspections,
     errorsCount,
 
+    // Storage bar
+    storageBarData: { containerRef, usedMB, storageQuotaMB, percentage, formatSize },
+
     // PDF
     pdfRef,
     inspectionToPrint,
@@ -276,5 +301,6 @@ export function useInspectionsRules() {
     // Callbacks de ações
     addNew,
     handleOnChangeStatusInspection,
+    handleDeleteInspection,
   };
 }

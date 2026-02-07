@@ -22,13 +22,23 @@ interface IInspectionTable
   quantityPhotos?: number;
 }
 
+interface StorageBarData {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  usedMB: number;
+  storageQuotaMB: number;
+  percentage: number;
+  formatSize: (mb: number) => string;
+}
+
 interface Props {
   data: IInspectionTable[] | null;
   onEdit: (id: string) => void;
   onGeneratePdf: (id: string) => void;
   handleOnChangeStatusInspection: (id: string, inStatus: boolean) => void;
+  handleDeleteInspection?: (id: string) => void;
   onRetrySync?: (id: string) => void;
   offline: boolean;
+  storageBarData?: StorageBarData;
 }
 
 function getStatusColor(
@@ -56,19 +66,21 @@ export function InspectionsTable({
   data,
   onEdit,
   handleOnChangeStatusInspection,
+  handleDeleteInspection,
   onGeneratePdf,
   onRetrySync,
   offline,
+  storageBarData,
 }: Props) {
   const { isSystemAdmin } = useAuthRoles();
   const { isInspectionChanger } = useAuthRoles();
 
   return (
     <>
-      {offline && (
+      {offline && storageBarData && (
         <Row>
           <Col className="mb-4">
-            <StorageBar />
+            <StorageBar {...storageBarData} />
           </Col>
         </Row>
       )}
@@ -155,36 +167,6 @@ export function InspectionsTable({
 
                   <Td>
                     <div className="d-flex justify-content-center gap-2 align-items-center">
-                      {offline && (
-                        <>
-                          {item.isSyncing ? (
-                            <Tooltip title="Sincronizando..." place="top">
-                              <div
-                                className="spinner-border spinner-border-sm text-primary"
-                                role="status"
-                                style={{ width: "1rem", height: "1rem" }}
-                              >
-                                <span className="visually-hidden">Sincronizando...</span>
-                              </div>
-                            </Tooltip>
-                          ) : item.erroSync ? (
-                            <Tooltip
-                              title={`Erro: ${item.erroSync} (${item.syncAttempts || 0} tentativas)`}
-                              place="top"
-                            >
-                              <Icon icon="error" size="sm" mode="warning" />
-                            </Tooltip>
-                          ) : (
-                            <Tooltip
-                              title={`Aguardando sincronização (${item.syncAttempts || 0} tentativas)`}
-                              place="top"
-                            >
-                              <Icon icon="schedule" size="sm" mode="helper" />
-                            </Tooltip>
-                          )}
-                        </>
-                      )}
-
                       {offline && item.erroSync && (
                         <Tooltip title="Tentar Sincronizar Novamente" place="top">
                           <ButtonIcon
@@ -231,6 +213,57 @@ export function InspectionsTable({
                               onClick={() => handleOnChangeStatusInspection(item.id, item.isActive)}
                             />
                           </Tooltip>
+                        </>
+                      )}
+
+                      {offline && (
+                        <>
+                          {handleDeleteInspection && (
+                            <Tooltip title="Remover Inspeção" place="top-start">
+                              <ButtonIcon
+                                disabled={!item.isActive}
+                                size="sm"
+                                icon="delete"
+                                onClick={() => handleDeleteInspection(item.id)}
+                                mode="warning"
+                              />
+                            </Tooltip>
+                          )}
+                          <div
+                            style={{
+                              display: "flex",
+                              width: "40px",
+                              height: "40px",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {item.isSyncing ? (
+                              <Tooltip title="Sincronizando..." place="top">
+                                <div
+                                  className="spinner-border spinner-border-sm text-primary"
+                                  role="status"
+                                  style={{ width: "40px", height: "40px" }}
+                                >
+                                  <span className="visually-hidden">Sincronizando...</span>
+                                </div>
+                              </Tooltip>
+                            ) : item.erroSync ? (
+                              <Tooltip
+                                title={`Erro: ${item.erroSync} (${item.syncAttempts || 0} tentativas)`}
+                                place="top"
+                              >
+                                <Icon icon="error" size="sm" mode="warning" />
+                              </Tooltip>
+                            ) : (
+                              <Tooltip
+                                title={`Aguardando sincronização (${item.syncAttempts || 0} tentativas)`}
+                                place="top"
+                              >
+                                <Icon icon="schedule" size="sm" mode="helper" />
+                              </Tooltip>
+                            )}
+                          </div>
                         </>
                       )}
                     </div>

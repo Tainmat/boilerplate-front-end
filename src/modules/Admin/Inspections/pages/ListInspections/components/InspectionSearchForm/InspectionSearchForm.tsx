@@ -19,9 +19,16 @@ interface Props {
   defaultValues?: IInspectionSearchForm | null;
   onSubmit?: (data: IInspectionSearchForm) => void;
   onAdd?: () => void;
+  offline?: boolean;
 }
 
-export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, onAdd }: Props) {
+export function InspectionSearchForm({
+  searchOptions,
+  defaultValues,
+  onSubmit,
+  onAdd,
+  offline,
+}: Props) {
   useDeviceDetection();
   const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
   const { inspectionStatusDropdown } = useDropdownsRedux();
@@ -55,8 +62,8 @@ export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, o
           <Formik initialValues={initialValues} onSubmit={(values) => onSubmit && onSubmit(values)}>
             {({ values, setFieldValue, submitForm }) => (
               <Form>
-                <Row className="align-items-end mb-3">
-                  <Col xs={12} md={3}>
+                <Row className="align-items-end">
+                  <Col xs={12} md={3} className="mb-3">
                     <Field
                       as={SelectSearch}
                       placeholder="Pesquisar por"
@@ -64,6 +71,7 @@ export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, o
                       value={values.searchingBy}
                       options={searchOptions}
                       readOnly={searchOptions.length === 1}
+                      disabled={offline}
                       onChange={(option: IOption) => {
                         setFieldValue("searchingBy", option.value);
                         setFieldValue("search", "");
@@ -75,14 +83,14 @@ export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, o
                     />
                   </Col>
 
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={4} className="mb-3">
                     <Field
                       as={InputSearch}
                       placeholder="Pesquisar"
                       name="search"
                       type="text"
                       submitForm
-                      disabled={!values.searchingBy}
+                      disabled={!values.searchingBy || offline}
                       onReset={() => {
                         setFieldValue("search", "");
                         submitForm();
@@ -90,13 +98,14 @@ export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, o
                     />
                   </Col>
 
-                  <Col xs={12} md={3}>
+                  <Col xs={12} md={3} className="mb-3">
                     <Field
                       as={SelectSearch}
                       name="inspectionStatusId"
                       placeholder="Status da Inspeção"
                       value={values.inspectionStatusId}
                       options={[{ label: "Todos", value: "" }, ...inspectionStatusOptions]}
+                      disabled={offline}
                       onChange={({ value }: IOption) => {
                         setFieldValue("inspectionStatusId", value);
                         submitForm();
@@ -107,10 +116,20 @@ export function InspectionSearchForm({ searchOptions, defaultValues, onSubmit, o
                     />
                   </Col>
 
-                  <Col xs={12} md={2} className="d-flex align-items-center justify-content-end ">
+                  <Col
+                    xs={12}
+                    md={2}
+                    className="d-flex align-items-center justify-content-end mb-3"
+                  >
                     <div className="d-flex gap-2">
                       <Tooltip title="Buscar" place="top-start">
-                        <ButtonIcon type="submit" size="lg" icon="search" mode="helper" />
+                        <ButtonIcon
+                          type="submit"
+                          size="lg"
+                          icon="search"
+                          mode="helper"
+                          disabled={offline}
+                        />
                       </Tooltip>
                       {onAdd && (
                         <Tooltip title="Adicionar" place="top-start">
