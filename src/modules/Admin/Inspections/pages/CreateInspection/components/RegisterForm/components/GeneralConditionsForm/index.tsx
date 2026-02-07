@@ -1,0 +1,1 @@
+export { GeneralConditionsForm } from "./GeneralConditionsForm";
