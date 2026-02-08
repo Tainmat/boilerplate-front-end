@@ -17,7 +17,7 @@ import { useAuthContext } from "@/shared/contexts/Auth";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
-import { getStorageSize } from "@/shared/services/indexedDB/inspectionsDB";
+import { getStoragePercentage } from "@/shared/services/indexedDB/inspectionsDB";
 import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
@@ -33,8 +33,7 @@ export function CreateInspection() {
   const { addToast, handleApiRejection } = useToastContext();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const { uuid } = useParams();
-  const { fetchInspection, createInspection, updateInspection, uploadInspectionAttachments } =
-    useInspection();
+  const { fetchInspection, createInspection, updateInspection } = useInspection();
 
   const [inspection, setInspection] = useState<IInspectionRegisterForm | null>(null);
   const [currentStep, setCurrentStep] = useState<"equipment" | "form">("equipment");
@@ -215,30 +214,17 @@ export function CreateInspection() {
     try {
       showLoader();
 
-      // Preparar estrutura completa de imagens para envio em base64
-      const imageDataToUpload = {
-        images: [] as string[],
-        imagesToDel: [] as string[],
-      };
-
-      // Adicionar APENAS imagens novas (sem ID, ou seja, que não vieram do servidor)
+      const newImages: string[] = [];
       if (formValues.additionalImages?.images) {
         formValues.additionalImages.images.forEach((imageData) => {
-          // Só envia se a imagem tem base64 E não tem ID (imagem nova)
           if (imageData && imageData.base64 && !imageData.id) {
-            imageDataToUpload.images.push(imageData.base64);
+            newImages.push(imageData.base64);
           }
         });
       }
 
-      // Adicionar imagens para exclusão (se houver IDs)
-      if (formValues.additionalImages?.imagesToDel) {
-        formValues.additionalImages.imagesToDel.forEach((imageId) => {
-          imageDataToUpload.imagesToDel.push(imageId);
-        });
-      }
+      const imagesToDelete: string[] = formValues.additionalImages?.imagesToDel || [];
 
-      // Converter dados do formulário para o formato da API
       const apiData: IInspectionCreateData = {
         customerId: formValues.customerId,
         inspectorUserId: formValues.inspectorUserId,
@@ -263,31 +249,22 @@ export function CreateInspection() {
         isSandingBrushSandblasting: formValues.isSandingBrushSandblasting,
         isCleaningChemistry: formValues.isCleaningChemistry,
         instruments: formValues.instruments,
-        /* generalConsiderations: formValues.generalConsiderations, */
-        // Converter selectedPositions para as posições individuais e positionNumber
         position1: formValues.selectedPositions?.includes(1) ? "Posição 1 selecionada" : "",
         position2: formValues.selectedPositions?.includes(2) ? "Posição 2 selecionada" : "",
         position3: formValues.selectedPositions?.includes(3) ? "Posição 3 selecionada" : "",
         position4: formValues.selectedPositions?.includes(4) ? "Posição 4 selecionada" : "",
         position5: formValues.selectedPositions?.includes(5) ? "Posição 5 selecionada" : "",
         position6: formValues.selectedPositions?.includes(6) ? "Posição 6 selecionada" : "",
-        // Campos de conclusão podem ser vazios já que foram removidos do formulário
         flankAndBottomConclusion: "",
         keywayChannelsConclusion: "",
         additionalObservations: "",
+        images: newImages.length > 0 ? newImages : undefined,
+        imagesToDelete: imagesToDelete.length > 0 ? imagesToDelete : undefined,
         isActive: formValues.isActive,
       };
 
-      let inspectionId = uuid;
-
       if (uuid) {
-        // Modo edição - PUT
         await updateInspection(uuid, apiData);
-
-        // Se há imagens para anexar ou excluir, enviar separadamente
-        if (imageDataToUpload.images.length > 0 || imageDataToUpload.imagesToDel.length > 0) {
-          await uploadInspectionAttachments(uuid, imageDataToUpload);
-        }
 
         addToast({
           type: "success",
@@ -296,13 +273,7 @@ export function CreateInspection() {
         });
       } else {
         if (isOnline) {
-          const createdInspection = await createInspection(apiData);
-          inspectionId = createdInspection?.id || createdInspection;
-
-          // Se há imagens para anexar e temos o ID da inspeção, enviar attachments
-          if (imageDataToUpload.images.length > 0 && inspectionId) {
-            await uploadInspectionAttachments(inspectionId, imageDataToUpload);
-          }
+          await createInspection(apiData);
 
           addToast({
             type: "success",
@@ -310,12 +281,12 @@ export function CreateInspection() {
             description: "Inspeção criada com sucesso!",
           });
         } else {
-          const storageSize = await getStorageSize();
-          if (storageSize > 45) {
+          const storagePercentage = await getStoragePercentage();
+          if (storagePercentage >= 98) {
             addToast({
               type: "warning",
               title: "Armazenamento cheio",
-              description: "Espaço insuficiente. Conecte-se para sincronizar.",
+              description: `Uso em ${storagePercentage.toFixed(0)}%. Conecte-se para sincronizar.`,
             });
             hideLoader();
             return;
@@ -336,7 +307,7 @@ export function CreateInspection() {
           addToast({
             type: "info",
             title: "Salvo offline",
-            description: `Espaço usado: ${storageSize.toFixed(1)}MB`,
+            description: `Armazenamento em ${storagePercentage.toFixed(0)}%.`,
           });
         }
       }

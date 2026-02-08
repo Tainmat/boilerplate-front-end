@@ -1,6 +1,10 @@
 import ProgressBar from "progressbar.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { getStorageSize } from "@/shared/services/indexedDB/inspectionsDB";
+
+const STORAGE_LIMIT_MB = 10;
+
 export function useStorageBar() {
   function formatSize(mb: number) {
     if (mb < 1) {
@@ -12,31 +16,14 @@ export function useStorageBar() {
   const containerRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<InstanceType<typeof ProgressBar.Line> | null>(null);
   const [usedMB, setUsedMB] = useState(0);
-  const [storageQuotaMB, setStorageQuotaMB] = useState(0);
+  const [storageQuotaMB] = useState(STORAGE_LIMIT_MB);
   const [percentage, setPercentage] = useState(0);
 
-  async function getStorageQuota() {
-    if (navigator.storage && navigator.storage.estimate) {
-      const estimate = await navigator.storage.estimate();
-
-      return {
-        usage: estimate.usage || 0, // Bytes usados
-        quota: estimate.quota || 0, // Bytes totais
-        usageInMB: (estimate.usage || 0) / (1024 * 1024),
-        quotaInMB: (estimate.quota || 0) / (1024 * 1024),
-        percentage: ((estimate.usage || 0) / (estimate.quota || 1)) * 100,
-      };
-    }
-
-    return null;
-  }
-
   const recalculate = useCallback(async () => {
-    const storageQuota = await getStorageQuota();
-    const newPercentage = storageQuota ? storageQuota.percentage : 0;
+    const used = await getStorageSize();
+    const newPercentage = Math.min((used / STORAGE_LIMIT_MB) * 100, 100);
 
-    setUsedMB(storageQuota ? storageQuota.usageInMB : 0);
-    setStorageQuotaMB(storageQuota ? storageQuota.quotaInMB : 0);
+    setUsedMB(used);
     setPercentage(newPercentage);
 
     if (barRef.current) {
@@ -46,10 +33,11 @@ export function useStorageBar() {
 
   useEffect(() => {
     async function loadStorageSize() {
-      const storageQuota = await getStorageQuota();
-      setUsedMB(storageQuota ? storageQuota.usageInMB : 0);
-      setStorageQuotaMB(storageQuota ? storageQuota.quotaInMB : 0);
-      setPercentage(storageQuota ? storageQuota.percentage : 0);
+      const used = await getStorageSize();
+      const newPercentage = Math.min((used / STORAGE_LIMIT_MB) * 100, 100);
+
+      setUsedMB(used);
+      setPercentage(newPercentage);
 
       if (!containerRef.current) return;
 

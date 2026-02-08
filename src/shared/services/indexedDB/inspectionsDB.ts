@@ -142,3 +142,15 @@ export async function getStorageSize(): Promise<number> {
     return 0;
   }
 }
+
+const STORAGE_LIMIT_MB = 10;
+
+export async function getStoragePercentage(): Promise<number> {
+  try {
+    const usedMB = await getStorageSize();
+    return Math.min((usedMB / STORAGE_LIMIT_MB) * 100, 100);
+  } catch (error) {
+    console.error("❌ Erro ao calcular porcentagem do storage:", error);
+    return 0;
+  }
+}

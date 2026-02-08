@@ -22,7 +22,7 @@ export function StorageBar({
       <Heading size="sm">Armazenamento Interno</Heading>
       <S.BarContainer ref={containerRef} />
       <S.UsageText usagePercentage={percentage}>
-        {formatSize(usedMB)} / {formatSize(storageQuotaMB)}
+        {formatSize(usedMB)} / {formatSize(storageQuotaMB)} - {percentage.toFixed(2)}%
       </S.UsageText>
     </S.Container>
   );

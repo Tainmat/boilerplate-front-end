@@ -103,7 +103,8 @@ export interface IInspectionCreateData {
   additionalObservations: string;
   /* supervisorName: string;
   clientRepresentativeName: string; */
-  additionalImagesBase64?: string[];
+  images?: string[];
+  imagesToDelete?: string[];
   isActive: boolean;
 }
 
