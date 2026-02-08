@@ -24,6 +24,11 @@ export const Container = styled(animated.div)<Props>`
 
     width: 420px;
 
+    @media (max-width: 480px) and (orientation: portrait) {
+      width: calc(100vw - 2rem);
+      margin: 0 auto;
+    }
+
     & + div {
       margin-top: ${props.theme.spacing.nano};
     }

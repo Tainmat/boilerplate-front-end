@@ -16,6 +16,15 @@ export const Container = styled.div<Props>`
     z-index: ${props.theme.zindex.ten};
     max-height: 100vh;
 
+    @media (max-width: 480px) and (orientation: portrait) {
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     ${!props.$hasMessages &&
     css`
       display: none;
