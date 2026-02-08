@@ -10,14 +10,14 @@ import { useToastContext } from "@shared/contexts/Toast";
 import { IInspectionCreateData, useInspection } from "@shared/hooks/services/Admin/useInspection";
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { ROUTE_LIST_INSPECTIONS } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 import { useAuthContext } from "@/shared/contexts/Auth";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
-import { getStoragePercentage } from "@/shared/services/indexedDB/inspectionsDB";
+import { getById, getStoragePercentage } from "@/shared/services/indexedDB/inspectionsDB";
 import { IEquipmentDropdown } from "@/shared/store/modules/Dropdowns";
 
 import { EquipmentSelectionStep } from "./components/EquipmentSelectionStep";
@@ -27,8 +27,9 @@ import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/R
 export function CreateInspection() {
   const { user } = useAuthContext();
   const { isOnline } = useOnlineStatus();
-  const { addNewInspection } = useOfflineInspections();
+  const { addNewInspection, updateInspection: updateOfflineInspection } = useOfflineInspections();
   const navigate = useNavigate();
+  const location = useLocation();
   const { showLoader, hideLoader } = useLoaderContext();
   const { addToast, handleApiRejection } = useToastContext();
   const { setPageBreadcrumb } = useBreadcrumbContext();
@@ -39,7 +40,8 @@ export function CreateInspection() {
   const [currentStep, setCurrentStep] = useState<"equipment" | "form">("equipment");
   const [selectedEquipment, setSelectedEquipment] = useState<IEquipmentDropdown | null>(null);
 
-  const { customersDropdown, inspectionStatusDropdown } = useDropdownsRedux();
+  const { customersDropdown, inspectionStatusDropdown, equipmentsDropdown } = useDropdownsRedux();
+  const [editOffline, setEditOffline] = useState(false);
 
   useEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -51,110 +53,138 @@ export function CreateInspection() {
       { text: "Inspeções" },
     ]);
 
-    if (uuid) {
-      // Modo edição - pula step de equipamento e carrega dados
-      setCurrentStep("form");
-      loadInspectionData(uuid);
+    const isOffline = location.pathname.includes("offline");
+
+    if (isOffline) {
+      setEditOffline(true);
     }
 
-    async function loadInspectionData(id: string) {
+    if (uuid) {
+      setCurrentStep("form");
+      loadInspectionData(uuid, isOffline);
+    }
+
+    async function loadInspectionData(id: string, isOffline: boolean) {
       try {
         showLoader();
-        const data = await fetchInspection(id);
 
-        // Processar imagens dos attachments existentes que já vêm em base64 do backend
-        const existingImages: (IImageData | null)[] = [null, null, null];
-
-        if (data.attachments && data.attachments.length > 0) {
-          // Processar imagens que já vêm em base64 do backend
-          data.attachments.slice(0, 3).forEach((attachment: any, index: number) => {
-            if (attachment.url && attachment.url.startsWith("data:image/")) {
-              // attachment.url já é base64
-              const imageData = {
-                id: attachment.id,
-                base64: attachment.url,
-                name: `attachment-${attachment.id}.jpg`,
-                size: 0, // Tamanho não disponível do servidor
-                type: attachment.url.includes("data:image/")
-                  ? attachment.url.split(";")[0].split(":")[1]
-                  : "image/jpeg",
-              };
-
-              existingImages[index] = imageData;
-            }
-          });
-        }
-
-        // Converter dados da API para o formato do formulário
-        const formData: IInspectionRegisterForm = {
-          customerId: data.customerId || "",
-          inspectorUserId: data.inspectorUserId || "",
-          partTypeId: data.partTypeId || "",
-          reportNumber: data.reportNumber || "",
-          reportStartDate: data.reportStartDate || "",
-          reportEndDate: data.reportEndDate || "",
-          revisionNumber: data.revisionNumber || "00",
-          sheetNumber: data.sheetNumber || "1/1",
-          componentId: data.componentId || "",
-          positionNumber: data.positionNumber || "",
-          inspectionLocation: data.inspectionLocation || "",
-          mdaInformation: data.mdaInformation || "",
-          isVI: data.isVI || false,
-          isDM: data.isDM || false,
-          isPM: data.isPM || false,
-          isUS: data.isUS || false,
-          isLP: data.isLP || false,
-          isDU: data.isDU || false,
-          finalConclusion: data.finalConclusion || "",
-          inspectionStatusId: data.inspectionStatusId || "",
-          isSandingBrushSandblasting: data.isSandingBrushSandblasting || false,
-          isCleaningChemistry: data.isCleaningChemistry || false,
-          instruments: data.instruments || "",
-          // Determinar quais posições foram preenchidas
-          selectedPositions: (() => {
-            if (data.positionNumber && typeof data.positionNumber === "string") {
-              // Se positionNumber é uma string no formato "1,2,4,6", fazer parse
-              return data.positionNumber
-                .split(",")
-                .map((num: string) => parseInt(num.trim()))
-                .filter((num: number) => !isNaN(num));
-            } else {
-              // Legacy: verificar posições individuais
-              const positions = [];
-              if (data.position1) positions.push(1);
-              if (data.position2) positions.push(2);
-              if (data.position3) positions.push(3);
-              if (data.position4) positions.push(4);
-              if (data.position5) positions.push(5);
-              if (data.position6) positions.push(6);
-              return positions.length > 0 ? positions : [1];
-            }
-          })(),
-          // Estrutura de imagens adicionais com dados existentes
-          additionalImages: {
-            images: existingImages,
-            imagesToDel: [],
-          },
-          isActive: data.isActive,
-        };
-
-        setInspection(formData);
-
-        // Se há dados do part type, usar como equipamento selecionado
-        if (data.partType) {
-          setSelectedEquipment({
-            id: data.partType.id,
-            name: data.partType.name,
-            description: data.partType.description || "",
-            croqui: data.partType.croqui,
-            totalInspectionPoints: data.partType.totalInspectionPoints || 0,
-          });
+        if (isOffline) {
+          await loadOfflineInspection(id);
+        } else {
+          await loadOnlineInspection(id);
         }
       } catch {
         handleApiRejection();
         navigate(-1);
       } finally {
         hideLoader();
+      }
+    }
+
+    async function loadOfflineInspection(id: string) {
+      const offlineData = await getById(id);
+
+      if (!offlineData) {
+        addToast({
+          title: "Erro",
+          description: "Inspeção não encontrada",
+          type: "warning",
+        });
+        navigate(ROUTE_LIST_INSPECTIONS);
+        return;
+      }
+
+      // Buscar equipamento pelo partTypeId
+      const equipment = equipmentsDropdown.find((e) => e.id === offlineData.partTypeId);
+      if (equipment) {
+        setSelectedEquipment(equipment);
+      }
+
+      // IOfflineInspection já estende IInspectionRegisterForm
+      setInspection(offlineData);
+    }
+
+    async function loadOnlineInspection(id: string) {
+      const data = await fetchInspection(id);
+
+      // Processar imagens dos attachments existentes que já vêm em base64 do backend
+      const existingImages: (IImageData | null)[] = [null, null, null];
+
+      if (data.attachments && data.attachments.length > 0) {
+        data.attachments.slice(0, 3).forEach((attachment: any, index: number) => {
+          if (attachment.url && attachment.url.startsWith("data:image/")) {
+            existingImages[index] = {
+              id: attachment.id,
+              base64: attachment.url,
+              name: `attachment-${attachment.id}.jpg`,
+              size: 0,
+              type: attachment.url.includes("data:image/")
+                ? attachment.url.split(";")[0].split(":")[1]
+                : "image/jpeg",
+            };
+          }
+        });
+      }
+
+      // Converter dados da API para o formato do formulário
+      const formData: IInspectionRegisterForm = {
+        customerId: data.customerId || "",
+        inspectorUserId: data.inspectorUserId || "",
+        partTypeId: data.partTypeId || "",
+        reportNumber: data.reportNumber || "",
+        reportStartDate: data.reportStartDate || "",
+        reportEndDate: data.reportEndDate || "",
+        revisionNumber: data.revisionNumber || "00",
+        sheetNumber: data.sheetNumber || "1/1",
+        componentId: data.componentId || "",
+        positionNumber: data.positionNumber || "",
+        inspectionLocation: data.inspectionLocation || "",
+        mdaInformation: data.mdaInformation || "",
+        isVI: data.isVI || false,
+        isDM: data.isDM || false,
+        isPM: data.isPM || false,
+        isUS: data.isUS || false,
+        isLP: data.isLP || false,
+        isDU: data.isDU || false,
+        finalConclusion: data.finalConclusion || "",
+        inspectionStatusId: data.inspectionStatusId || "",
+        isSandingBrushSandblasting: data.isSandingBrushSandblasting || false,
+        isCleaningChemistry: data.isCleaningChemistry || false,
+        instruments: data.instruments || "",
+        selectedPositions: (() => {
+          if (data.positionNumber && typeof data.positionNumber === "string") {
+            return data.positionNumber
+              .split(",")
+              .map((num: string) => parseInt(num.trim()))
+              .filter((num: number) => !isNaN(num));
+          } else {
+            const positions = [];
+            if (data.position1) positions.push(1);
+            if (data.position2) positions.push(2);
+            if (data.position3) positions.push(3);
+            if (data.position4) positions.push(4);
+            if (data.position5) positions.push(5);
+            if (data.position6) positions.push(6);
+            return positions.length > 0 ? positions : [1];
+          }
+        })(),
+        additionalImages: {
+          images: existingImages,
+          imagesToDel: [],
+        },
+        isActive: data.isActive,
+      };
+
+      setInspection(formData);
+
+      if (data.partType) {
+        setSelectedEquipment({
+          id: data.partType.id,
+          name: data.partType.name,
+          description: data.partType.description || "",
+          croqui: data.partType.croqui,
+          totalInspectionPoints: data.partType.totalInspectionPoints || 0,
+        });
       }
     }
   }, [
@@ -165,6 +195,9 @@ export function CreateInspection() {
     hideLoader,
     fetchInspection,
     handleApiRejection,
+    location,
+    addToast,
+    equipmentsDropdown,
   ]);
 
   async function handleEquipmentSelection(equipment: IEquipmentDropdown) {
@@ -263,7 +296,28 @@ export function CreateInspection() {
         isActive: formValues.isActive,
       };
 
-      if (uuid) {
+      if (editOffline && uuid) {
+        await updateOfflineInspection(uuid, {
+          ...formValues,
+          customer: customersDropdown.find((c) => c.id === formValues.customerId)!,
+          inspectionStatus: inspectionStatusDropdown.find(
+            (i) => i.id === formValues.inspectionStatusId,
+          )!,
+          inspectorUser: {
+            id: user?.id || "",
+            name: user?.socialName || "",
+          },
+          isSyncing: false,
+          erroSync: undefined,
+          syncAttempts: 0,
+        });
+
+        addToast({
+          type: "success",
+          title: "Sucesso!",
+          description: "Inspeção offline atualizada com sucesso!",
+        });
+      } else if (uuid) {
         await updateInspection(uuid, apiData);
 
         addToast({

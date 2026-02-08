@@ -5,6 +5,7 @@ import {
   ROUTE_LIST_INSPECTIONS,
   ROUTE_SAVE_INSPECTION,
   ROUTE_UPDATE_INSPECTION,
+  ROUTE_UPDATE_INSPECTION_OFFLINE,
 } from "@/modules/Admin/Inspections/routes/Inspection.paths";
 import {
   ROLE_ADMINISTRATOR,
@@ -39,6 +40,12 @@ export const inspectionRoutes: IRouteProps[] = [
   },
   {
     path: `${ROUTE_UPDATE_INSPECTION}/:uuid`,
+    component: CreateInspection,
+    isPrivate: true,
+    allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_INSPECTOR],
+  },
+  {
+    path: `${ROUTE_UPDATE_INSPECTION_OFFLINE}`,
     component: CreateInspection,
     isPrivate: true,
     allowedRoles: [ROLE_SYSTEM_ADMIN, ROLE_ADMINISTRATOR, ROLE_INSPECTOR],

@@ -52,6 +52,7 @@ export function useInspectionsRules() {
 
   // PDF
   const pdfRef = useRef<HTMLDivElement>(null);
+  const printTitleRef = useRef("");
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
 
   useLayoutEffect(() => {
@@ -147,11 +148,14 @@ export function useInspectionsRules() {
     navigate(!uuid ? ROUTE_SAVE_INSPECTION : `${ROUTE_UPDATE_INSPECTION}/${uuid}`);
   }
 
+  function updateOfflineInspection(uuid: string) {
+    navigate(`${ROUTE_UPDATE_INSPECTION}/${uuid}/offline`);
+  }
+
   const onAfterPrint = useCallback(() => {
-    // Limpar dados após impressão
     setInspectionToPrint(null);
-    hideLoader();
-  }, [hideLoader]);
+    document.title = TITLE_ADMIN_INSPECTIONS;
+  }, []);
 
   const onPrintError = useCallback(() => {
     addToast({
@@ -159,12 +163,12 @@ export function useInspectionsRules() {
       title: "Erro ao gerar PDF",
       description: "Não foi possível gerar o PDF. Tente novamente.",
     });
-    hideLoader();
-  }, [addToast, hideLoader]);
+    setInspectionToPrint(null);
+    document.title = TITLE_ADMIN_INSPECTIONS;
+  }, [addToast]);
 
   const handlePrint = useReactToPrint({
     contentRef: pdfRef,
-    documentTitle: `Relatorio_${inspectionToPrint?.reportNumber || ""}`,
     pageStyle: `
       @page {
         size: A4 portrait;
@@ -181,19 +185,32 @@ export function useInspectionsRules() {
     onPrintError,
   });
 
-  async function handleGeneratePdf(inspectionId: string) {
+  async function handleGeneratePdf(inspectionId: string, documentTitle: string) {
     try {
+      printTitleRef.current = documentTitle;
       showLoader();
       const data = await fetchInspection(inspectionId);
 
       if (data) {
-        // Setar os dados da inspeção
         setInspectionToPrint(data);
+        hideLoader();
 
-        // Aguardar renderização e chamar impressão
-        setTimeout(() => {
-          handlePrint();
-        }, 3000);
+        addAlert({
+          iconModal: "success",
+          iconType: "success",
+          buttonType: "success",
+          title: "PDF pronto para impressão",
+          description: `Deseja imprimir o relatório ${data.reportNumber}?`,
+          cancelTxt: "Cancelar",
+          confirmTxt: "Imprimir",
+          onConfirm: () => {
+            document.title = printTitleRef.current;
+            handlePrint();
+          },
+          onCancel: () => {
+            setInspectionToPrint(null);
+          },
+        });
       }
     } catch {
       hideLoader();
@@ -258,12 +275,15 @@ export function useInspectionsRules() {
         cancelTxt: "Cancelar",
         confirmTxt: "Reenviar inspeção",
         onConfirm: async () => {
-          await syncInspection(id);
+          const success = await syncInspection(id);
           await recalculate();
+          if (success) {
+            refetch();
+          }
         },
       });
     },
-    [syncInspection, recalculate, addAlert],
+    [syncInspection, recalculate, addAlert, refetch],
   );
 
   const SEARCH_OPTIONS: IOption[] = [
@@ -319,6 +339,7 @@ export function useInspectionsRules() {
 
     // Callbacks de ações
     addNew,
+    updateOfflineInspection,
     handleOnChangeStatusInspection,
     handleDeleteInspection,
     handleSyncInspection,

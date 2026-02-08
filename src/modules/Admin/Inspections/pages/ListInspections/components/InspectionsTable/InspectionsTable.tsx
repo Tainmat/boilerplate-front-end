@@ -21,6 +21,7 @@ interface IInspectionTable
   erroSync?: string | undefined;
   syncAttempts?: number;
   quantityPhotos?: number;
+  partType?: { id: string; name: string };
 }
 
 interface StorageBarData {
@@ -34,7 +35,7 @@ interface StorageBarData {
 interface Props {
   data: IInspectionTable[] | null;
   onEdit: (id: string) => void;
-  onGeneratePdf: (id: string) => void;
+  onGeneratePdf?: (id: string, documentTitle: string) => void;
   handleOnChangeStatusInspection: (id: string, inStatus: boolean) => void;
   handleDeleteInspection?: (id: string) => void;
   onRetrySync?: (id: string) => void;
@@ -202,7 +203,13 @@ export function InspectionsTable({
                               disabled={!item.isActive}
                               size="sm"
                               icon="picture_as_pdf"
-                              onClick={() => onGeneratePdf(item.id)}
+                              onClick={() => {
+                                if (onGeneratePdf)
+                                  onGeneratePdf(
+                                    item.id,
+                                    `${item.reportNumber} - ${item.partType?.name || ""}`,
+                                  );
+                              }}
                             />
                           </Tooltip>
 
