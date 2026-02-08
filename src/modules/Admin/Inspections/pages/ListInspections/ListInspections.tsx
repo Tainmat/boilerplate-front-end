@@ -32,6 +32,7 @@ export function ListInspections() {
     handleOnChangePage,
     handleDeleteInspection,
     addNew,
+    updateOfflineInspection,
     handleOnChangeStatusInspection,
     handleSyncInspection,
   } = useInspectionsRules();
@@ -69,7 +70,7 @@ export function ListInspections() {
                 <InspectionsTable
                   data={result?.data || null}
                   onEdit={(id: string) => addNew(id)}
-                  onGeneratePdf={(id: string) => handleGeneratePdf(id)}
+                  onGeneratePdf={(id, title) => handleGeneratePdf(id, title)}
                   handleOnChangeStatusInspection={(id: string, inStatus: boolean) =>
                     handleOnChangeStatusInspection(id, inStatus)
                   }
@@ -92,8 +93,7 @@ export function ListInspections() {
               <Row className="mb-3">
                 <InspectionsTable
                   data={offlineInspections || null}
-                  onEdit={(id: string) => addNew(id)}
-                  onGeneratePdf={(id: string) => handleGeneratePdf(id)}
+                  onEdit={(id: string) => updateOfflineInspection(id)}
                   handleOnChangeStatusInspection={(id: string, inStatus: boolean) =>
                     handleOnChangeStatusInspection(id, inStatus)
                   }

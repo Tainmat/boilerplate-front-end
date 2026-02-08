@@ -4,7 +4,6 @@ import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 
-import { IInspectionRegisterForm } from "@/modules/Admin/Inspections/pages/CreateInspection/components/RegisterForm/RegisterForm.form";
 import {
   addCard,
   clearCurrent,
@@ -138,7 +137,7 @@ export function useOfflineInspections() {
   );
 
   const updateInspection = useCallback(
-    async (id: string, data: Partial<IInspectionRegisterForm>) => {
+    async (id: string, data: Partial<IOfflineInspection>) => {
       try {
         const now = new Date().toISOString();
 

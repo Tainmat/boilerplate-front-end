@@ -10,7 +10,6 @@ import {
 } from "react";
 
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
-import { useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { post } from "@/shared/services/api/api.service";
 import { getById } from "@/shared/services/indexedDB/inspectionsDB";
 
@@ -38,7 +37,6 @@ function OnlineStatusContext({ children }: Props) {
   const onlineStableTimeRef = useRef<NodeJS.Timeout | null>(null);
 
   const { cardsList, removeInspection, markAsSync, markErrorSync } = useOfflineInspections();
-  const { uploadInspectionAttachments } = useInspection();
 
   const syncInspection = useCallback(
     async (id: string): Promise<boolean> => {
@@ -49,7 +47,17 @@ function OnlineStatusContext({ children }: Props) {
         const fullData = await getById(id);
         if (!fullData) throw new Error("Inspeção não encontrada");
 
-        // Preparar dados para API
+        // Coletar imagens base64
+        const images: string[] = [];
+        if (fullData.additionalImages?.images) {
+          fullData.additionalImages.images.forEach((img) => {
+            if (img && img.base64) {
+              images.push(img.base64);
+            }
+          });
+        }
+
+        // Preparar dados para API (com imagens no mesmo payload)
         const apiData = {
           customerId: fullData.customerId,
           inspectorUserId: fullData.inspectorUserId,
@@ -83,26 +91,12 @@ function OnlineStatusContext({ children }: Props) {
           flankAndBottomConclusion: "",
           keywayChannelsConclusion: "",
           additionalObservations: "",
+          images: images.length > 0 ? images : undefined,
           isActive: fullData.isActive,
         };
 
-        // POST na API
-        const { data } = await post("/operational/parts-inspection", apiData);
-        const inspectionId = data?.data?.id || data?.data;
-
-        // Upload imagens se tiver
-        if (fullData.additionalImages?.images) {
-          const imageDataToUpload = {
-            images: fullData.additionalImages.images
-              .filter((img) => img && img.base64)
-              .map((img) => img!.base64),
-            imagesToDel: [],
-          };
-
-          if (imageDataToUpload.images.length > 0) {
-            await uploadInspectionAttachments(inspectionId, imageDataToUpload);
-          }
-        }
+        // POST na API (inspeção + imagens atômico)
+        await post("/operational/parts-inspection", apiData);
 
         // Remover do offline
         await removeInspection(id);
@@ -126,7 +120,7 @@ function OnlineStatusContext({ children }: Props) {
         return false;
       }
     },
-    [addToast, removeInspection, uploadInspectionAttachments, markAsSync, markErrorSync],
+    [addToast, removeInspection, markAsSync, markErrorSync],
   );
 
   const syncAll = useCallback(async () => {
