@@ -52,7 +52,7 @@ export function useInspectionsRules() {
 
   // PDF
   const pdfRef = useRef<HTMLDivElement>(null);
-  const printTitleRef = useRef("");
+  const [printTitle, setPrintTitle] = useState("");
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
 
   useLayoutEffect(() => {
@@ -154,6 +154,7 @@ export function useInspectionsRules() {
 
   const onAfterPrint = useCallback(() => {
     setInspectionToPrint(null);
+    setPrintTitle("");
     document.title = TITLE_ADMIN_INSPECTIONS;
   }, []);
 
@@ -164,11 +165,13 @@ export function useInspectionsRules() {
       description: "Não foi possível gerar o PDF. Tente novamente.",
     });
     setInspectionToPrint(null);
+    setPrintTitle("");
     document.title = TITLE_ADMIN_INSPECTIONS;
   }, [addToast]);
 
   const handlePrint = useReactToPrint({
     contentRef: pdfRef,
+    documentTitle: printTitle || undefined,
     pageStyle: `
       @page {
         size: A4 portrait;
@@ -194,7 +197,7 @@ export function useInspectionsRules() {
 
   async function handleGeneratePdf(inspectionId: string, documentTitle: string) {
     try {
-      printTitleRef.current = documentTitle;
+      setPrintTitle(documentTitle);
       showLoader();
       const data = await fetchInspection(inspectionId);
 
@@ -211,9 +214,9 @@ export function useInspectionsRules() {
           cancelTxt: "Cancelar",
           confirmTxt: "Imprimir",
           onConfirm: async () => {
-            document.title = printTitleRef.current;
+            document.title = documentTitle;
             await document.fonts.ready;
-            setTimeout(handlePrint, 200);
+            setTimeout(handlePrint, 500);
           },
           onCancel: () => {
             setInspectionToPrint(null);

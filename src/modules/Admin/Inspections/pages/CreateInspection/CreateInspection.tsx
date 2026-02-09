@@ -26,7 +26,7 @@ import { IImageData, IInspectionRegisterForm } from "./components/RegisterForm/R
 
 export function CreateInspection() {
   const { user } = useAuthContext();
-  const { isOnline } = useOnlineStatus();
+  const { isOnline, syncInspection } = useOnlineStatus();
   const { addNewInspection, updateInspection: updateOfflineInspection } = useOfflineInspections();
   const navigate = useNavigate();
   const location = useLocation();
@@ -314,6 +314,10 @@ export function CreateInspection() {
           title: "Sucesso!",
           description: "Inspeção offline atualizada com sucesso!",
         });
+
+        if (isOnline) {
+          syncInspection(uuid);
+        }
       } else if (uuid) {
         await updateInspection(uuid, apiData);
 

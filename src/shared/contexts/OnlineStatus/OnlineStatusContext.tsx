@@ -33,6 +33,7 @@ function OnlineStatusContext({ children }: Props) {
   const [isSyncing, setIsSyncing] = useState(false);
   const { addToast } = useToastContext();
   const isFirstRender = useRef(true);
+  const hasTriedInitialSync = useRef(false);
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const onlineStableTimeRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -225,6 +226,15 @@ function OnlineStatusContext({ children }: Props) {
       window.removeEventListener("offline", handleOffline);
     };
   }, [addToast, cardsList.length, syncAll]);
+
+  // Sincronizar ao montar (ex: após login) se já estiver online e houver itens pendentes
+  useEffect(() => {
+    if (!hasTriedInitialSync.current && isOnline && cardsList.length > 0 && !isSyncing) {
+      hasTriedInitialSync.current = true;
+      console.log("🔄 Sincronização inicial: encontradas inspeções pendentes.");
+      syncAll();
+    }
+  }, [isOnline, cardsList.length, isSyncing, syncAll]);
 
   const providerValue = useMemo(
     () => ({
