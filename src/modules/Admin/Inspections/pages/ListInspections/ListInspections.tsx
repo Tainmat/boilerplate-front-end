@@ -4,6 +4,7 @@ import { Skeleton } from "@shared/components/Core/Skeleton";
 import { ItemsPerPage } from "@shared/components/Core/Table/ItemsPerPage";
 import { AnimatedPage } from "@shared/components/Layout/AnimatedPage";
 import { Col, Container, Row } from "react-bootstrap";
+import { createPortal } from "react-dom";
 
 import { Tab, Tabs } from "@/shared/components/Core/Tabs";
 
@@ -130,8 +131,11 @@ export function ListInspections() {
             </Row>
           )}
         </Container>
-        {inspectionToPrint && (
+      </Section>
+      {inspectionToPrint &&
+        createPortal(
           <div
+            className="pdf-print-area"
             style={{
               position: "fixed",
               top: 0,
@@ -144,9 +148,9 @@ export function ListInspections() {
             }}
           >
             <InspectionPDFReport ref={pdfRef} inspection={inspectionToPrint} />
-          </div>
+          </div>,
+          document.body,
         )}
-      </Section>
     </AnimatedPage>
   );
 }

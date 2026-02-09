@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
 
 import { ROUTE_HOME } from "@/modules/Home/routes/Home.paths";
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
@@ -52,7 +51,6 @@ export function useInspectionsRules() {
 
   // PDF
   const pdfRef = useRef<HTMLDivElement>(null);
-  const [printTitle, setPrintTitle] = useState("");
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
 
   useLayoutEffect(() => {
@@ -152,52 +150,44 @@ export function useInspectionsRules() {
     navigate(`${ROUTE_UPDATE_INSPECTION}/${uuid}/offline`);
   }
 
-  const onAfterPrint = useCallback(() => {
-    setInspectionToPrint(null);
-    setPrintTitle("");
-    document.title = TITLE_ADMIN_INSPECTIONS;
-  }, []);
-
-  const onPrintError = useCallback(() => {
-    addToast({
-      type: "warning",
-      title: "Erro ao gerar PDF",
-      description: "Não foi possível gerar o PDF. Tente novamente.",
-    });
-    setInspectionToPrint(null);
-    setPrintTitle("");
-    document.title = TITLE_ADMIN_INSPECTIONS;
-  }, [addToast]);
-
-  const handlePrint = useReactToPrint({
-    contentRef: pdfRef,
-    documentTitle: printTitle || undefined,
-    pageStyle: `
-      @page {
-        size: A4 portrait;
-        margin: 0;
-      }
+  const printPdf = useCallback((documentTitle: string) => {
+    // Inject print-only CSS dynamically
+    const style = document.createElement("style");
+    style.id = "pdf-print-styles";
+    style.textContent = `
       @media print {
-        html, body {
-          display: block !important;
-          height: auto !important;
+        @page { size: A4 portrait; margin: 0; }
+        body * { visibility: hidden !important; }
+        .pdf-print-area, .pdf-print-area * { visibility: visible !important; }
+        .pdf-print-area {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 210mm !important;
+          opacity: 1 !important;
+          z-index: 99999 !important;
           overflow: visible !important;
         }
-
-        body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       }
-    `,
-    onAfterPrint,
-    onPrintError,
-    preserveAfterPrint: true,
-  });
+    `;
+    document.head.appendChild(style);
+
+    const cleanup = () => {
+      style.remove();
+      document.title = TITLE_ADMIN_INSPECTIONS;
+      setInspectionToPrint(null);
+      window.removeEventListener("afterprint", cleanup);
+    };
+
+    window.addEventListener("afterprint", cleanup);
+
+    document.title = documentTitle;
+    window.print();
+  }, []);
 
   async function handleGeneratePdf(inspectionId: string, documentTitle: string) {
     try {
-      setPrintTitle(documentTitle);
       showLoader();
       const data = await fetchInspection(inspectionId);
 
@@ -214,9 +204,8 @@ export function useInspectionsRules() {
           cancelTxt: "Cancelar",
           confirmTxt: "Imprimir",
           onConfirm: async () => {
-            document.title = documentTitle;
             await document.fonts.ready;
-            setTimeout(handlePrint, 500);
+            setTimeout(() => printPdf(documentTitle), 500);
           },
           onCancel: () => {
             setInspectionToPrint(null);
