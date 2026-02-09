@@ -135,19 +135,21 @@ export function ListInspections() {
       {inspectionToPrint &&
         createPortal(
           <div
+            ref={pdfRef}
             className="pdf-print-area"
             style={{
-              position: "fixed",
+              position: "absolute",
               top: 0,
               left: 0,
               width: "210mm",
-              opacity: 0,
-              pointerEvents: "none",
-              zIndex: -9999,
-              overflow: "hidden",
+              minHeight: "297mm",
+              // padding: "2mm 0 2mm 0",
+              boxSizing: "border-box",
+              backgroundColor: "#fff",
+              // transform: "translateX(-10000px)",
             }}
           >
-            <InspectionPDFReport ref={pdfRef} inspection={inspectionToPrint} />
+            <InspectionPDFReport inspection={inspectionToPrint} />
           </div>,
           document.body,
         )}

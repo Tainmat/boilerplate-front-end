@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -150,41 +152,69 @@ export function useInspectionsRules() {
     navigate(`${ROUTE_UPDATE_INSPECTION}/${uuid}/offline`);
   }
 
-  const printPdf = useCallback((documentTitle: string) => {
-    // Inject print-only CSS dynamically
-    const style = document.createElement("style");
-    style.id = "pdf-print-styles";
-    style.textContent = `
-      @media print {
-        @page { size: A4 portrait; margin: 0; }
-        body * { visibility: hidden !important; }
-        .pdf-print-area, .pdf-print-area * { visibility: visible !important; }
-        .pdf-print-area {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          width: 210mm !important;
-          opacity: 1 !important;
-          z-index: 99999 !important;
-          overflow: visible !important;
-        }
-        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      }
-    `;
-    document.head.appendChild(style);
+  const generatePdfFile = useCallback(async (fileName: string) => {
+    if (!pdfRef.current) return;
 
-    const cleanup = () => {
-      style.remove();
-      document.title = TITLE_ADMIN_INSPECTIONS;
-      setInspectionToPrint(null);
-      window.removeEventListener("afterprint", cleanup);
-    };
+    // ⛔ ESSENCIAL: espera o DOM realmente pintar
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
 
-    window.addEventListener("afterprint", cleanup);
+    const canvas = await html2canvas(pdfRef.current, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
 
-    document.title = documentTitle;
-    window.print();
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`${fileName}.pdf`);
   }, []);
+
+  // const printPdf = useCallback((documentTitle: string) => {
+  //   // Inject print-only CSS dynamically
+  //   const style = document.createElement("style");
+  //   style.id = "pdf-print-styles";
+  //   style.textContent = `
+  //     @media print {
+  //       @page { size: A4 portrait; margin: 0; }
+  //       body * { visibility: hidden !important; }
+  //       .pdf-print-area, .pdf-print-area * { visibility: visible !important; }
+  //       .pdf-print-area {
+  //         position: fixed !important;
+  //         top: 0 !important;
+  //         left: 0 !important;
+  //         width: 210mm !important;
+  //         opacity: 1 !important;
+  //         z-index: 99999 !important;
+  //         overflow: visible !important;
+  //       }
+  //       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  //     }
+  //   `;
+  //   document.head.appendChild(style);
+
+  //   const cleanup = () => {
+  //     style.remove();
+  //     document.title = TITLE_ADMIN_INSPECTIONS;
+  //     setInspectionToPrint(null);
+  //     window.removeEventListener("afterprint", cleanup);
+  //   };
+
+  //   window.addEventListener("afterprint", cleanup);
+
+  //   document.title = documentTitle;
+  //   window.print();
+  // }, []);
 
   async function handleGeneratePdf(inspectionId: string, documentTitle: string) {
     try {
@@ -199,13 +229,13 @@ export function useInspectionsRules() {
           iconModal: "success",
           iconType: "success",
           buttonType: "success",
-          title: "PDF pronto para impressão",
-          description: `Deseja imprimir o relatório ${data.reportNumber}?`,
+          title: "Download PDF",
+          description: `Deseja fazer o download do relatório ${data.reportNumber}?`,
           cancelTxt: "Cancelar",
-          confirmTxt: "Imprimir",
+          confirmTxt: "Download",
           onConfirm: async () => {
-            await document.fonts.ready;
-            setTimeout(() => printPdf(documentTitle), 500);
+            await generatePdfFile(documentTitle);
+            setInspectionToPrint(null);
           },
           onCancel: () => {
             setInspectionToPrint(null);
