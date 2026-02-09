@@ -39,7 +39,7 @@ export function RecoverPassword() {
         email: formValues.emailUsuario,
       };
 
-      const response = await post<any>("/auth/forgot-password", payload);
+      const response = await post("/auth/forgot-password", payload);
 
       if (response.data) {
         addToast({
@@ -56,7 +56,7 @@ export function RecoverPassword() {
           description: response.message || "Erro ao enviar e-mail de recuperação.",
         });
       }
-    } catch (err) {
+    } catch {
       handleApiRejection();
     } finally {
       hideLoader();
@@ -75,7 +75,7 @@ export function RecoverPassword() {
 
           <Row className="mb-3">
             <Col>
-              <p className="text-muted text-center mb-0" style={{ fontSize: '0.9rem' }}>
+              <p className="text-muted text-center mb-0" style={{ fontSize: "0.9rem" }}>
                 Digite seu e-mail abaixo e enviaremos instruções para redefinir sua senha.
               </p>
             </Col>

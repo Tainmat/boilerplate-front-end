@@ -42,7 +42,7 @@ export const Button = styled.button<Props>`
         background-color: #ff0000 !important;
       }
     `}
-    
+
     /* Mobile pequeno (menor que 480px) */
     @media (max-width: 480px) {
       height: 2.75rem;
@@ -51,7 +51,7 @@ export const Button = styled.button<Props>`
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
     }
-    
+
     /* Mobile médio (481px até 768px) */
     @media (min-width: 481px) and (max-width: 768px) {
       height: 2.875rem;
@@ -60,15 +60,15 @@ export const Button = styled.button<Props>`
       margin-bottom: 0.875rem;
     }
 
-     /* Mobile pequeno (menor que 480px) */
-     @media (max-width: 480px) {
-       height: 2.75rem;
-       font-size: ${props.theme.font.size.xxs};
-     }
+    /* Mobile pequeno (menor que 480px) */
+    @media (max-width: 480px) {
+      height: 2.75rem;
+      font-size: ${props.theme.font.size.xxs};
+    }
 
-     /* Mobile médio (481px até 768px) */
-     @media (min-width: 481px) and (max-width: 768px) {
-       height: 2.875rem;
-     }
+    /* Mobile médio (481px até 768px) */
+    @media (min-width: 481px) and (max-width: 768px) {
+      height: 2.875rem;
+    }
   `}
 `;

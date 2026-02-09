@@ -97,7 +97,7 @@ export function InputText({
 
     setInputValue(e.target.value);
 
-    onChange && onChange(e);
+    onChange?.(e);
   }
 
   function handlePasswordIcon() {
@@ -184,7 +184,7 @@ export function InputText({
         )}
       </div>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

@@ -27,8 +27,8 @@ import {
   ROUTE_SAVE_EQUIPMENT,
   ROUTE_UPDATE_EQUIPMENT,
 } from "@/modules/Admin/Equipments/routes/Equipment.paths";
-
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+
 import { EquipmentsTable } from "./components/EquipmentsTable";
 
 export function ListEquipments() {

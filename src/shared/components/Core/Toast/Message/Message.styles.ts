@@ -1,6 +1,6 @@
+import { animated } from "@react-spring/web";
 import { IToastType } from "@shared/contexts/Toast/Toast.interface";
 import { rgba } from "polished";
-import { animated } from "@react-spring/web";
 import styled, { css } from "styled-components";
 
 interface Props {
@@ -23,6 +23,11 @@ export const Container = styled(animated.div)<Props>`
     padding: ${props.theme.spacing.xxxs};
 
     width: 420px;
+
+    @media (max-width: 480px) and (orientation: portrait) {
+      width: calc(100vw - 2rem);
+      margin: 0 auto;
+    }
 
     & + div {
       margin-top: ${props.theme.spacing.nano};
@@ -67,15 +72,32 @@ export const Container = styled(animated.div)<Props>`
           color: ${props.theme.colors.feedback.warning.medium};
         }
       `}
+
+      ${props.type === "info" &&
+      css`
+        background-color: ${props.theme.colors.feedback.neutral.pure};
+
+        > span {
+          color: ${props.theme.colors.feedback.neutral.medium};
+        }
+      `}
     }
 
     .text {
       flex: 1;
+      min-width: 0;
 
       .heading {
         display: flex;
         align-items: center;
         height: 2.5rem;
+      }
+
+      .toast-description {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        word-break: break-word;
       }
     }
 

@@ -1,5 +1,7 @@
 import "./ContactCard.style.css";
 
+import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
+import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 import { ButtonIcon } from "@/shared/components/Core/Buttons/ButtonIcon";
@@ -12,8 +14,6 @@ import { Heading } from "@/shared/components/Core/Typography/Heading";
 import { Paragraph } from "@/shared/components/Core/Typography/Paragraph";
 import { ICustomerContacts } from "@/shared/hooks/services/Admin/useCustomerContacts";
 import { put } from "@/shared/services/api/api.service";
-import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
-import { useState } from "react";
 import { phoneNumberMask } from "@/shared/utils/masks";
 
 interface Props {
@@ -28,24 +28,24 @@ export function ContactCard({ item, onRefetch, onEdit }: Props) {
 
   async function handleOnActive(id: string) {
     try {
-      await put<ICustomerContacts>(`${"parametrizations/customers/contacts"}/${id}`, {
+      await put(`${"parametrizations/customers/contacts"}/${id}`, {
         ...item,
         isActive: true,
       });
-      onRefetch && onRefetch();
-    } catch (error) {
+      onRefetch?.();
+    } catch {
       // Error handling
     }
   }
 
   async function handleOnInactive(id: string) {
     try {
-      await put<ICustomerContacts>(`${"parametrizations/customers/contacts"}/${id}`, {
+      await put(`${"parametrizations/customers/contacts"}/${id}`, {
         ...item,
         isActive: false,
       });
-      onRefetch && onRefetch();
-    } catch (error) {
+      onRefetch?.();
+    } catch {
       // Error handling
     }
   }
@@ -93,7 +93,11 @@ export function ContactCard({ item, onRefetch, onEdit }: Props) {
                   size="sm"
                   checked={item.isActive}
                   onChange={() => {
-                    item.isActive ? handleOnInactive(item.id) : handleOnActive(item.id);
+                    if (item.isActive) {
+                      handleOnInactive(item.id);
+                    } else {
+                      handleOnActive(item.id);
+                    }
                   }}
                 />
               </Tooltip>

@@ -90,13 +90,11 @@ export function InputTimePicker({
 
       <div
         className="icon"
-        onClick={() => {
-          !readOnly && setOpen((open) => !open);
-        }}
+        onClick={() => !readOnly && setOpen((open) => !open)}
         aria-hidden="true"
       ></div>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

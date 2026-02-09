@@ -1,23 +1,22 @@
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
+import { ROUTE_LOGIN } from "@modules/Auth/routes/Login.paths";
+import { login } from "@shared/services/api/api.service";
 import {
   clearLocalStorage,
   getLocalStorageItem,
   removeLocalStorageItem,
   setLocalStorageItem,
 } from "@shared/utils/storage/local";
-
-import { ROUTE_LOGIN } from "@modules/Auth/routes/Login.paths";
-import { login } from "@shared/services/api/api.service";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useLoaderContext } from "../Loader";
 
 interface Auth {
@@ -52,6 +51,7 @@ interface UserCredentials {
 interface authResponse {
   authenticated: boolean;
   firstLogin?: boolean;
+  workOffline?: boolean;
 }
 
 interface AuthContextData {
@@ -82,7 +82,9 @@ function AuthContext({ children }: Props) {
   useEffect(() => {
     const ususarioLocalStorage = getLocalStorageItem("Usincheck@JOmetto:user");
 
-    ususarioLocalStorage && setUser(ususarioLocalStorage);
+    if (ususarioLocalStorage) {
+      setUser(ususarioLocalStorage);
+    }
   }, []);
 
   const signIn = useCallback(
@@ -118,6 +120,9 @@ function AuthContext({ children }: Props) {
           return {
             authenticated: true,
             firstLogin: user.isFirstAccess,
+            workOffline:
+              user.roles.includes(String(import.meta.env.VITE_APP_ROLE_SYSTEM_ADMIN)) ||
+              user.roles.includes(String(import.meta.env.VITE_APP_ROLE_INSPECTOR)),
           };
         }
         return { authenticated: false };

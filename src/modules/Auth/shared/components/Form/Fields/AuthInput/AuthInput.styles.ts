@@ -16,7 +16,7 @@ export const Container = styled.div<Props>`
       position: absolute;
       left: 0.25rem;
       top: 0.5rem;
-      
+
       /* Mobile pequeno (menor que 480px) */
       @media (max-width: 480px) {
         top: 0.375rem;
@@ -62,7 +62,7 @@ export const Container = styled.div<Props>`
         &::placeholder {
           color: ${props.theme.colors.neutral.low.light};
         }
-        
+
         /* Mobile pequeno (menor que 480px) */
         @media (max-width: 480px) {
           height: 2.75rem;
@@ -70,7 +70,7 @@ export const Container = styled.div<Props>`
           padding-top: 0.625rem;
           padding-bottom: 0.625rem;
         }
-        
+
         /* Mobile médio (481px até 768px) */
         @media (min-width: 481px) and (max-width: 768px) {
           height: 2.875rem;
@@ -126,12 +126,12 @@ export const Container = styled.div<Props>`
         position: absolute;
         right: 0.5rem;
         top: 0.5rem;
-        
+
         /* Mobile pequeno (menor que 480px) */
         @media (max-width: 480px) {
           top: 0.375rem;
         }
-        
+
         /* Mobile médio (481px até 768px) */
         @media (min-width: 481px) and (max-width: 768px) {
           top: 0.4375rem;

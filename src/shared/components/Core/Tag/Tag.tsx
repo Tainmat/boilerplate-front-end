@@ -32,9 +32,7 @@ export function Tag({
       status={status}
       hover={hover}
       size={size}
-      onClick={() => {
-        !disabled && onClick && onClick();
-      }}
+      onClick={() => !disabled && onClick && onClick()}
       className={className}
     >
       {children}

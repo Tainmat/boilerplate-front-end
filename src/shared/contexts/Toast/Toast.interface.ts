@@ -1,4 +1,4 @@
-export type IToastType = "success" | "helper" | "warning";
+export type IToastType = "success" | "helper" | "warning" | "info";
 
 export interface IToastMessage {
   id: string;

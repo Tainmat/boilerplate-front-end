@@ -1,9 +1,11 @@
-import { IInspectionDetail } from "@/shared/hooks/services/Admin/useInspection";
-import { formatDateBR } from "@/shared/utils/date/dayjs";
-import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
 import AssinaturaLeandro from "@assets/images/assinatura_leandro.png";
 import Logo from "@assets/images/logo2.png";
 import { forwardRef } from "react";
+
+import { IInspectionDetail } from "@/shared/hooks/services/Admin/useInspection";
+import { formatDateBR } from "@/shared/utils/date/dayjs";
+import { formatBase64ForImage } from "@/shared/utils/fileToBase64";
+
 import * as S from "./InspectionPDFReport.styles";
 
 interface InspectionPDFReportProps {

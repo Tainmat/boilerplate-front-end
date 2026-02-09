@@ -38,6 +38,9 @@ export function Message({ message, style }: Props) {
       case "warning":
         return "error";
 
+      case "info":
+        return "info";
+
       default:
         return "";
     }
@@ -51,13 +54,13 @@ export function Message({ message, style }: Props) {
 
       <div className="text">
         <div className="heading">
-          <Heading size="sm" className="text-neutral-high-pure">
+          <Heading size="xs" className="text-neutral-high-pure">
             {message.title}
           </Heading>
         </div>
 
         {message.description && (
-          <Paragraph size="sm" className="text-neutral-high-medium">
+          <Paragraph size="sm" className="text-neutral-high-medium toast-description">
             {message.description}
           </Paragraph>
         )}

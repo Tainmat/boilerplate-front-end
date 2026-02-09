@@ -1,8 +1,7 @@
 /* import { URL_PROC_LIST_CLIE } from "@shared/constants/urls"; */
-import { get, fakeRequest } from "@shared/services/api/api.service";
+import { get } from "@shared/services/api/api.service";
 import { IApiResponse } from "@shared/services/api/api.service.interface";
 import { removeEmptyEntries } from "@shared/utils/generic";
-import { da } from "date-fns/locale";
 import { useCallback, useEffect, useState } from "react";
 
 export interface ICustomer {
@@ -42,7 +41,7 @@ export function useCustomers() {
         status: params?.status,
       });
 
-      const { data } = await get<ICustomer>("parametrizations/customers", queryParams);
+      const { data } = await get("parametrizations/customers", queryParams);
 
       if (data.data.length > 0) {
         setResult({
@@ -67,11 +66,15 @@ export function useCustomers() {
   }, []);
 
   function refetch() {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }
 
   useEffect(() => {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }, [params, fetchData]);
 
   return { result, params, refetch, setParams };

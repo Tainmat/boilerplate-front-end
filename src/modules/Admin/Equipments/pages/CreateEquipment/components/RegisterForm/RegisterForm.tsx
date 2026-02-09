@@ -1,16 +1,15 @@
 import { Button } from "@shared/components/Core/Buttons/Button";
-import { InputText } from "@shared/components/Core/Form/Fields/InputText";
 import { InputFile } from "@shared/components/Core/Form/Fields/InputFile";
-import { InputNumber } from "@/shared/components/Core/Form/Fields/InputNumber";
+import { InputText } from "@shared/components/Core/Form/Fields/InputText";
 import { Select } from "@shared/components/Core/Form/Fields/Select";
 import { IOption } from "@shared/components/Core/Form/Fields/Select/Select.interface";
 import { Skeleton } from "@shared/components/Core/Skeleton";
 import { useAlertContext } from "@shared/contexts/Alert";
+import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 import { Field, Form, Formik } from "formik";
 import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { comprimirImagem } from "@shared/utils/image-compress/imageCompression";
 
 import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
 
@@ -73,7 +72,7 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
         onSubmit(dataWithCroquisFlags);
       }}
     >
-      {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched, values }) => (
+      {({ touched, errors, dirty, isValid, setFieldValue, setFieldTouched }) => (
         <Form>
           <Row className="mb-4">
             <Col xl={4}>
@@ -186,7 +185,7 @@ export function EquipmentRegisterForm({ initialValues, onSubmit }: Props) {
                       });
 
                       setFieldValue("coverUrl", compressedBase64);
-                    } catch (error) {
+                    } catch {
                       // Em caso de erro, usar o método original
                       const reader = new FileReader();
                       reader.onload = (event) => {

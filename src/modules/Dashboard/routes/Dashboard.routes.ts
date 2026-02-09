@@ -6,6 +6,7 @@ import {
 } from "@shared/constants/user.roles";
 import { IRouteProps } from "@shared/routes/routes.interface";
 import { lazy } from "react";
+
 import { ROUTE_DASHBOARD } from "./Dashboard.paths";
 
 const Dashboard = lazy(() =>

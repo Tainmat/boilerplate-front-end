@@ -1,10 +1,13 @@
-import { useRef, useState, useCallback, useEffect } from "react";
-import { v4 } from "uuid";
-import { Container, DropZone, ImagePreview } from "@shared/components/Core/Form/Fields/InputFile/InputFile.styles";
+import {
+  Container,
+  DropZone,
+  ImagePreview,
+} from "@shared/components/Core/Form/Fields/InputFile/InputFile.styles";
 import { HelperText } from "@shared/components/Core/Form/HelperText";
 import { Label } from "@shared/components/Core/Form/Label";
 import { Icon } from "@shared/components/Core/Icons/Icon";
-import { ReactNode } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { v4 } from "uuid";
 
 interface Props {
   size?: "sm" | "lg";
@@ -53,19 +56,19 @@ export function InputFile({
 
   const buildImageUrl = (imagePath: string): string => {
     // Se já é uma URL completa ou base64, usar diretamente
-    if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
+    if (imagePath.startsWith("http") || imagePath.startsWith("data:")) {
       return imagePath;
     }
-    
+
     // Se contém o caminho completo do servidor, extrair apenas a parte relevante
-    if (imagePath.includes('/assets/public/')) {
-      const assetPath = imagePath.split('/assets/public/')[1];
+    if (imagePath.includes("/assets/public/")) {
+      const assetPath = imagePath.split("/assets/public/")[1];
       const url = `https://qas-usincheck.jometto.com.br/assets/public/${assetPath}`;
       return url;
     }
 
     // Fallback para outros casos
-    const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
     const url = `https://qas-usincheck.jometto.com.br${cleanPath}`;
     return url;
   };
@@ -83,39 +86,43 @@ export function InputFile({
     }
   }, [value, name]);
 
+  const handleFileSelect = useCallback(
+    (files: FileList | File) => {
+      if (multiple && files instanceof FileList) {
+        const fileArray = Array.from(files);
+        setFileCount(fileArray.length);
+        setFileName(
+          fileArray.length === 1 ? fileArray[0].name : `${fileArray.length} arquivos selecionados`,
+        );
 
-  const handleFileSelect = useCallback((files: FileList | File) => {
-    if (multiple && files instanceof FileList) {
-      const fileArray = Array.from(files);
-      setFileCount(fileArray.length);
-      setFileName(fileArray.length === 1 ? fileArray[0].name : `${fileArray.length} arquivos selecionados`);
-      
-      // Create preview for first image if multiple
-      if (fileArray[0] && fileArray[0].type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setImagePreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(fileArray[0]);
-      } else {
-        setImagePreview(null);
+        // Create preview for first image if multiple
+        if (fileArray[0] && fileArray[0].type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            setImagePreview(e.target?.result as string);
+          };
+          reader.readAsDataURL(fileArray[0]);
+        } else {
+          setImagePreview(null);
+        }
+      } else if (!multiple && files instanceof File) {
+        setFileName(files.name);
+        setFileCount(1);
+
+        // Create preview for images
+        if (files.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            setImagePreview(e.target?.result as string);
+          };
+          reader.readAsDataURL(files);
+        } else {
+          setImagePreview(null);
+        }
       }
-    } else if (!multiple && files instanceof File) {
-      setFileName(files.name);
-      setFileCount(1);
-      
-      // Create preview for images
-      if (files.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setImagePreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(files);
-      } else {
-        setImagePreview(null);
-      }
-    }
-  }, [multiple]);
+    },
+    [multiple],
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (multiple) {
@@ -140,36 +147,42 @@ export function InputFile({
     onChange?.(e);
   };
 
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (disabled || readOnly) return;
-    
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      if (inputRef.current) {
-        const dt = new DataTransfer();
-        if (multiple) {
-          Array.from(files).forEach(file => dt.items.add(file));
-        } else {
-          dt.items.add(files[0]);
-        }
-        inputRef.current.files = dt.files;
-        
-        const event = new Event('change', { bubbles: true });
-        inputRef.current.dispatchEvent(event);
-      }
-      handleFileSelect(multiple ? files : files[0]);
-    }
-  }, [disabled, readOnly, handleFileSelect, multiple]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
 
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (!disabled && !readOnly) {
-      setIsDragging(true);
-    }
-  }, [disabled, readOnly]);
+      if (disabled || readOnly) return;
+
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        if (inputRef.current) {
+          const dt = new DataTransfer();
+          if (multiple) {
+            Array.from(files).forEach((file) => dt.items.add(file));
+          } else {
+            dt.items.add(files[0]);
+          }
+          inputRef.current.files = dt.files;
+
+          const event = new Event("change", { bubbles: true });
+          inputRef.current.dispatchEvent(event);
+        }
+        handleFileSelect(multiple ? files : files[0]);
+      }
+    },
+    [disabled, readOnly, handleFileSelect, multiple],
+  );
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (!disabled && !readOnly) {
+        setIsDragging(true);
+      }
+    },
+    [disabled, readOnly],
+  );
 
   const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -188,7 +201,7 @@ export function InputFile({
     setFileCount(0);
     if (inputRef.current) {
       inputRef.current.value = "";
-      const event = new Event('change', { bubbles: true });
+      const event = new Event("change", { bubbles: true });
       inputRef.current.dispatchEvent(event);
     }
     onRemove?.();
@@ -231,15 +244,12 @@ export function InputFile({
           ref={inputRef}
           onChange={handleChange}
           onBlur={onBlur}
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
         />
 
         {imagePreview ? (
           <ImagePreview>
-            <img
-              src={imagePreview}
-              alt="Preview"
-            />
+            <img src={imagePreview} alt="Preview" />
             <div className="overlay">
               <div className="file-info">
                 <Icon icon="image" size="sm" />
@@ -259,21 +269,26 @@ export function InputFile({
           </ImagePreview>
         ) : (
           <div className="drop-content">
-            <Icon 
-              icon={isDragging ? "file_upload" : "cloud_upload"} 
-              size="lg" 
+            <Icon
+              icon={isDragging ? "file_upload" : "cloud_upload"}
+              size="lg"
               mode={isDragging ? "success" : "neutral"}
             />
             <div className="text">
               <span className="primary">
-                {isDragging ? (multiple ? "Solte as imagens aqui" : "Solte a imagem aqui") : placeholder}
+                {isDragging
+                  ? multiple
+                    ? "Solte as imagens aqui"
+                    : "Solte a imagem aqui"
+                  : placeholder}
               </span>
               <span className="secondary">
-                Formatos aceitos: JPG, PNG, GIF (máx. 5MB{multiple ? ' cada' : ''})
+                Formatos aceitos: JPG, PNG, GIF (máx. 5MB{multiple ? " cada" : ""})
               </span>
               {multiple && fileCount > 1 && (
                 <span className="secondary">
-                  {fileCount} {fileCount === 1 ? 'arquivo' : 'arquivos'} selecionado{fileCount === 1 ? '' : 's'}
+                  {fileCount} {fileCount === 1 ? "arquivo" : "arquivos"} selecionado
+                  {fileCount === 1 ? "" : "s"}
                 </span>
               )}
             </div>
@@ -287,7 +302,7 @@ export function InputFile({
         )}
       </DropZone>
 
-      {helperText && <HelperText text={helperText} />}
+      {helperText && <HelperText text={helperText} error={error} />}
     </Container>
   );
 }

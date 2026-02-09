@@ -40,19 +40,19 @@ export function Dropdown({ children, display, type, list, onOpen }: Props) {
   }, [wrapperRef]);
 
   useEffect(() => {
-    onOpen && onOpen(open);
+    onOpen?.(open);
   }, [onOpen, open]);
 
   function handleOnClick() {
-    type === "click" && setOpen((open) => !open);
+    if (type === "click") setOpen((open) => !open);
   }
 
   function handleOnMouseEnter() {
-    type === "hover" && setOpen(true);
+    if (type === "hover") setOpen(true);
   }
 
   function handleOnMouseLeave() {
-    type === "hover" && setOpen(false);
+    if (type === "hover") setOpen(false);
   }
 
   return (

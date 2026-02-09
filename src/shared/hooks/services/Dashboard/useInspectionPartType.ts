@@ -1,7 +1,8 @@
+import { useCallback, useEffect, useState } from "react";
+
 import { IDashboardParams } from "@/modules/Dashboard/pages/Dashboard/useDashboardRules";
 import { get } from "@/shared/services/api/api.service";
 import { removeEmptyEntries } from "@/shared/utils/generic";
-import { useCallback, useEffect, useState } from "react";
 
 export interface IInspectionPartType {
   amount: number;
@@ -19,7 +20,7 @@ export function useInspectionPartType() {
     setData(null);
     try {
       const payload = removeEmptyEntries(params);
-      const { data } = await get<IInspectionPartType[]>(
+      const { data } = await get(
         "/operational/parts-inspection/dashboard/inspection-part-types",
         payload,
       );
@@ -29,7 +30,7 @@ export function useInspectionPartType() {
       } else {
         setData([]);
       }
-    } catch (error) {
+    } catch {
       setData([]);
     } finally {
       setLoading(false);
@@ -44,7 +45,9 @@ export function useInspectionPartType() {
   );
 
   useEffect(() => {
-    params && fetchData(params);
+    if (params) {
+      fetchData(params);
+    }
   }, [fetchData, params]);
 
   return {

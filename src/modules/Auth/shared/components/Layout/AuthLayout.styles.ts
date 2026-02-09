@@ -17,7 +17,7 @@ export const MainContainer = styled.div`
   /* Mobile pequeno (menor que 480px) */
   @media (max-width: 480px) {
     background-image: none;
-    background-color: ${props => props.theme.colors.neutral.high.pure};
+    background-color: ${(props) => props.theme.colors.neutral.high.pure};
     padding: 0;
   }
 `;
@@ -82,7 +82,7 @@ export const LoginContent = styled.div`
     /* Mobile pequeno (menor que 480px) */
     @media (max-width: 480px) {
       padding: ${props.theme.spacing.xs} ${props.theme.spacing.nano};
-      
+
       .logo-usincheck {
         max-width: 10rem;
         margin-bottom: 1.5rem;

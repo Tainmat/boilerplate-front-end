@@ -20,9 +20,11 @@ function ModalContext({ children }: Props) {
 
       const openedModals = document.getElementsByClassName("custom-modal").length;
 
-      openedModals > 0
-        ? document.body.classList.add("no-overflow")
-        : document.body.classList.remove("no-overflow");
+      if (openedModals > 0) {
+        document.body.classList.add("no-overflow");
+      } else {
+        document.body.classList.remove("no-overflow");
+      }
 
       setAmount(openedModals);
     }

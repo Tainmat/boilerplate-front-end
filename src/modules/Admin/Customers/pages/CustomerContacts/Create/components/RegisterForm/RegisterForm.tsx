@@ -1,17 +1,16 @@
 import { Field, Form, Formik } from "formik";
 import { Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { phoneNumberMask } from "@/shared/utils/masks";
 
 import { Button } from "@/shared/components/Core/Buttons/Button";
 import { Checkbox } from "@/shared/components/Core/Form/Fields/Checkbox";
-import { InputText } from "@/shared/components/Core/Form/Fields/InputText";
 import { InputPhone } from "@/shared/components/Core/Form/Fields/InputPhone";
+import { InputText } from "@/shared/components/Core/Form/Fields/InputText";
 import { Select } from "@/shared/components/Core/Form/Fields/Select";
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
-import { TextArea } from "@/shared/components/Core/Form/Fields/TextArea";
 import { Skeleton } from "@/shared/components/Core/Skeleton";
 import { useAlertContext } from "@/shared/contexts/Alert";
+import { phoneNumberMask } from "@/shared/utils/masks";
 
 import { customerContactValidationSchema, ICustomerContatcRegisterForm } from "./RegisterForm.form";
 

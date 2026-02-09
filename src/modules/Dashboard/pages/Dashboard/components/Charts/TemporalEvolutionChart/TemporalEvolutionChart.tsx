@@ -15,6 +15,7 @@ import {
 } from "chart.js";
 import { Card } from "react-bootstrap";
 import { Line } from "react-chartjs-2";
+
 import { useTemporalEvolutionChartRules } from "./useTemporalEvolutionChartRules";
 
 // Registrar componentes necessários do Chart.js
@@ -52,7 +53,10 @@ export function TemporalEvolutionChart({ data, loading }: TemporalEvolutionChart
             <Line data={areaChartData} options={areaChartOptions} />
           </div>
         ) : (
-          <div className="d-flex justify-content-center align-items-center" style={{ height: "300px" }}>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "300px" }}
+          >
             <Paragraph size="sm">Sem dados disponíveis</Paragraph>
           </div>
         )}

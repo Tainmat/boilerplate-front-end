@@ -7,18 +7,20 @@ import { useHeaderContext } from "@shared/contexts/Layout/Header";
 import { useState } from "react";
 
 import { useAuthContext } from "@/shared/contexts/Auth";
+import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 
-import { ButtonIcon } from "../../Core/Buttons/ButtonIcon";
-import { Tooltip } from "../../Core/Tooltip";
-import { Paragraph } from "../../Core/Typography/Paragraph";
 import { Icon } from "../../Core/Icons/Icon";
+import { Tag } from "../../Core/Tag";
+import { Heading } from "../../Core/Typography/Heading";
+import { Paragraph } from "../../Core/Typography/Paragraph";
 import { UserDropdown } from "./Dropdown";
 
 export function Header() {
-  const { hover, toggleMenu, isSmartphone, isTablet } = useSideMenuOpenContext();
+  const { hover, toggleMenu, isSmartphone } = useSideMenuOpenContext();
   const { user } = useAuthContext();
   const { visible } = useHeaderContext();
   const { breadcrumb } = useBreadcrumbContext();
+  const { isSyncing, isOnline } = useOnlineStatus();
 
   const handleMenuClick = () => {
     toggleMenu();
@@ -54,7 +56,18 @@ export function Header() {
           </div>
         </div>
 
-        <div className="col2">
+        <div className="col2 gap-3">
+          <Tag status={isOnline ? "success" : "warning"} size="lg" className="gap-2">
+            <Icon
+              icon={isSyncing ? "cloud_sync" : isOnline ? "cloud_queue" : "cloud_off"}
+              mode={!isOnline ? "light" : undefined}
+              size="sm"
+            />
+            <Heading size="xs" className={isOnline ? "" : "text-neutral-high-pure"}>
+              {isSyncing ? "Sincronizando" : isOnline ? "Online" : "Offline"}
+            </Heading>
+          </Tag>
+
           <S.Avatar onClick={handleAvatarClick}>
             <img src={AvatarImage} alt="Username" />
             {menuIsOpen && <UserDropdown onClose={handleCloseDropdown} />}

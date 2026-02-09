@@ -185,9 +185,10 @@ export const Container = styled.table<Props>`
       &:last-child {
         padding-right: 1rem;
       }
-      
+
       /* For nested components that need to show text with ellipsis */
-      p, div:not(.d-flex) {
+      p,
+      div:not(.d-flex) {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -214,7 +215,9 @@ export const Container = styled.table<Props>`
 
         td {
           border: 1px solid transparent;
-          transition: border-color 250ms, background-color 250ms;
+          transition:
+            border-color 250ms,
+            background-color 250ms;
 
           > div.show-on-hover {
             opacity: 0;
@@ -436,7 +439,7 @@ export const Container = styled.table<Props>`
         &:last-child {
           padding-right: 0.75rem;
         }
-        
+
         /* Adjust max-width for mobile */
         max-width: 150px;
       }
@@ -488,7 +491,7 @@ export const Container = styled.table<Props>`
         &:last-child {
           padding-right: 0.875rem;
         }
-        
+
         /* Adjust max-width for tablet */
         max-width: 200px;
       }

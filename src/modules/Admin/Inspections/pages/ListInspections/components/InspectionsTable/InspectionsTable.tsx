@@ -1,17 +1,47 @@
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
-import { Td, Tr } from "@shared/components/Core/Table";
+import { Table, Tbody, Td, Th, Thead, Tr } from "@shared/components/Core/Table";
 import { Tag } from "@shared/components/Core/Tag";
 import { Tooltip } from "@shared/components/Core/Tooltip";
 import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
+import { Col, Row } from "react-bootstrap";
 
-import { IInspection } from "@/shared/hooks/services/Admin/useInspections";
+import { Icon } from "@/shared/components/Core/Icons/Icon";
+import { Empty } from "@/shared/components/Core/Table/Empty";
+import { LoadingLines } from "@/shared/components/Core/Table/LoadingLines";
+import { Heading } from "@/shared/components/Core/Typography/Heading";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
+import { IOfflineInspectionCard } from "@/shared/store/modules/OfflineInspection";
+
+import { useInspectionsRules } from "../../useInspectionsRules";
+import { StorageBar } from "../StorageBar";
+
+interface IInspectionTable
+  extends Omit<IOfflineInspectionCard, "isSyncing" | "syncAttempts" | "quantityPhotos"> {
+  isSyncing?: boolean;
+  erroSync?: string | undefined;
+  syncAttempts?: number;
+  quantityPhotos?: number;
+  partType?: { id: string; name: string };
+}
+
+interface StorageBarData {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  usedMB: number;
+  storageQuotaMB: number;
+  percentage: number;
+  formatSize: (mb: number) => string;
+}
 
 interface Props {
-  data: IInspection;
-  onEdit: () => void;
-  onGeneratePdf: () => void;
-  handleOnChangeStatusInspection: () => void;
+  data: IInspectionTable[] | null;
+  onEdit: (id: string) => void;
+  onGeneratePdf?: (id: string, documentTitle: string) => void;
+  handleOnChangeStatusInspection: (id: string, inStatus: boolean) => void;
+  handleDeleteInspection?: (id: string) => void;
+  onRetrySync?: (id: string) => void;
+  offline: boolean;
+  storageBarData?: StorageBarData;
 }
 
 function getStatusColor(
@@ -39,85 +69,228 @@ export function InspectionsTable({
   data,
   onEdit,
   handleOnChangeStatusInspection,
+  handleDeleteInspection,
   onGeneratePdf,
+  onRetrySync,
+  offline,
+  storageBarData,
 }: Props) {
   const { isSystemAdmin } = useAuthRoles();
   const { isInspectionChanger } = useAuthRoles();
+  const { isOnline } = useInspectionsRules();
+  const { isTablet } = useDeviceDetection();
 
   return (
-    <Tr>
-      <Td>
-        <div>
-          <Paragraph size="sm" title={data.reportNumber}>
-            {data.reportNumber}
-          </Paragraph>
-          <div className="d-sm-none">
-            <small className="text-muted d-block">
-              Rev: {data.revisionNumber} |{" "}
-              {data.customer.fantasyName || data.customer.corporateName}
-            </small>
-            <small className="text-muted">Inspetor: {data.inspectorUser.name}</small>
-          </div>
-        </div>
-      </Td>
+    <>
+      {offline && storageBarData && (
+        <Row>
+          <Col className="mb-4">
+            <StorageBar {...storageBarData} />
+          </Col>
+        </Row>
+      )}
+      <Table $bordered $isLoading={data === null} $hover={!!data?.length} $responsive>
+        <Thead>
+          <Tr>
+            <Th>
+              <Heading size="xs">Nº Relatório</Heading>
+            </Th>
 
-      <Td className="d-none d-md-table-cell">
-        <Paragraph size="sm" title={data.revisionNumber}>
-          {data.revisionNumber}
-        </Paragraph>
-      </Td>
+            <Th className="d-none d-md-table-cell">
+              <Heading size="xs">Revisão</Heading>
+            </Th>
 
-      <Td className="d-none d-sm-table-cell">
-        <Paragraph size="sm" title={data.customer.fantasyName || data.customer.corporateName}>
-          {data.customer.fantasyName || data.customer.corporateName}
-        </Paragraph>
-      </Td>
+            <Th className="d-none d-sm-table-cell">
+              <Heading size="xs">Cliente</Heading>
+            </Th>
 
-      <Td>
-        <div className="d-flex justify-content-center">
-          <Tag size="lg" status={getStatusColor(data.inspectionStatus.description)}>
-            {data.inspectionStatus.description}
-          </Tag>
-        </div>
-      </Td>
+            <Th>
+              <div className="d-flex justify-content-center">
+                <Heading size="xs">Status</Heading>
+              </div>
+            </Th>
 
-      <Td className="d-none d-lg-table-cell">
-        <Paragraph size="sm" title={data.inspectorUser.name}>
-          {data.inspectorUser.name}
-        </Paragraph>
-      </Td>
+            <Th className="d-none d-lg-table-cell">
+              <Heading size="xs">Inspetor</Heading>
+            </Th>
 
-      <Td>
-        <div className="d-flex justify-content-center gap-2">
-          <Tooltip title={isInspectionChanger() ? "Editar" : "Visualizar"} place="top-start">
-            <ButtonIcon
-              disabled={!data.isActive}
-              size="sm"
-              icon={isInspectionChanger() ? "edit" : "open_in_new"}
-              onClick={() => onEdit()}
-            />
-          </Tooltip>
+            <Th>
+              <div className="d-flex justify-content-center">
+                <Heading size="xs">Ações</Heading>
+              </div>
+            </Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {data ? (
+            data.length > 0 ? (
+              data.map((item) => (
+                <Tr key={item.id}>
+                  <Td>
+                    <div>
+                      <Paragraph size="sm" title={item.reportNumber}>
+                        {item.reportNumber}
+                      </Paragraph>
+                      <div className="d-sm-none">
+                        <small className="text-muted d-block">
+                          Rev: {item.revisionNumber} |{" "}
+                          {item.customer.fantasyName || item.customer.corporateName}
+                        </small>
+                        <small className="text-muted">Inspetor: {item.inspectorUser.name}</small>
+                      </div>
+                    </div>
+                  </Td>
 
-          <Tooltip title="Gerar PDF" place="top-start">
-            <ButtonIcon
-              disabled={!data.isActive}
-              size="sm"
-              icon="picture_as_pdf"
-              onClick={() => onGeneratePdf()}
-            />
-          </Tooltip>
+                  <Td className="d-none d-md-table-cell">
+                    <Paragraph size="sm" title={item.revisionNumber}>
+                      {item.revisionNumber}
+                    </Paragraph>
+                  </Td>
 
-          <Tooltip title={data.isActive ? "Desativar" : "Ativar"} place="top-start">
-            <ButtonIcon
-              disabled={!isSystemAdmin()}
-              size="sm"
-              icon={data.isActive ? "toggle_on" : "toggle_off"}
-              mode={data.isActive ? "success" : "warning"}
-              onClick={() => handleOnChangeStatusInspection()}
-            />
-          </Tooltip>
-        </div>
-      </Td>
-    </Tr>
+                  <Td className="d-none d-sm-table-cell">
+                    <Paragraph
+                      size="sm"
+                      title={item.customer.fantasyName || item.customer.corporateName}
+                    >
+                      {item.customer.fantasyName || item.customer.corporateName}
+                    </Paragraph>
+                  </Td>
+
+                  <Td>
+                    <div className="d-flex justify-content-center">
+                      <Tag size="lg" status={getStatusColor(item.inspectionStatus.description)}>
+                        {item.inspectionStatus.description}
+                      </Tag>
+                    </div>
+                  </Td>
+
+                  <Td className="d-none d-lg-table-cell">
+                    <Paragraph size="sm" title={item.inspectorUser.name}>
+                      {item.inspectorUser.name}
+                    </Paragraph>
+                  </Td>
+
+                  <Td>
+                    <div className="d-flex justify-content-center gap-2 align-items-center">
+                      {offline && item.erroSync && isOnline && (
+                        <Tooltip title="Tentar Sincronizar Novamente" place="top">
+                          <ButtonIcon
+                            size="sm"
+                            icon="sync"
+                            mode="warning"
+                            onClick={() => {
+                              if (onRetrySync) onRetrySync(item.id);
+                            }}
+                            disabled={item.isSyncing}
+                          />
+                        </Tooltip>
+                      )}
+
+                      <Tooltip
+                        title={isInspectionChanger() ? "Editar" : "Visualizar"}
+                        place="top-start"
+                      >
+                        <ButtonIcon
+                          disabled={!item.isActive}
+                          size="sm"
+                          icon={isInspectionChanger() ? "edit" : "open_in_new"}
+                          onClick={() => onEdit(item.id)}
+                        />
+                      </Tooltip>
+
+                      {!offline && (
+                        <>
+                          <Tooltip title="Gerar PDF" place="top-start">
+                            <ButtonIcon
+                              disabled={!item.isActive}
+                              size="sm"
+                              icon="picture_as_pdf"
+                              onClick={() => {
+                                if (onGeneratePdf)
+                                  onGeneratePdf(
+                                    item.id,
+                                    `${item.reportNumber} - ${item.partType?.name || ""}`,
+                                  );
+                              }}
+                            />
+                          </Tooltip>
+
+                          <Tooltip title={item.isActive ? "Desativar" : "Ativar"} place="top-start">
+                            <ButtonIcon
+                              disabled={!isSystemAdmin()}
+                              size="sm"
+                              icon={item.isActive ? "toggle_on" : "toggle_off"}
+                              mode={item.isActive ? "success" : "warning"}
+                              onClick={() =>
+                                handleOnChangeStatusInspection(item.id, !item.isActive)
+                              }
+                            />
+                          </Tooltip>
+                        </>
+                      )}
+
+                      {offline && (
+                        <>
+                          {handleDeleteInspection && (
+                            <Tooltip title="Remover Inspeção" place="top-start">
+                              <ButtonIcon
+                                disabled={!item.isActive}
+                                size="sm"
+                                icon="delete"
+                                onClick={() => handleDeleteInspection(item.id)}
+                                mode="warning"
+                              />
+                            </Tooltip>
+                          )}
+                          <div
+                            style={{
+                              display: "flex",
+                              width: "40px",
+                              height: "40px",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            {item.isSyncing ? (
+                              <Tooltip title="Sincronizando..." place="top">
+                                <div
+                                  className="spinner-border spinner-border-sm text-primary"
+                                  role="status"
+                                  style={{ width: "40px", height: "40px" }}
+                                >
+                                  <span className="visually-hidden">Sincronizando...</span>
+                                </div>
+                              </Tooltip>
+                            ) : item.erroSync ? (
+                              <Tooltip
+                                title={`Erro: ${item.erroSync} (${item.syncAttempts || 0} tentativas)`}
+                                place="top"
+                              >
+                                <Icon icon="error" size="sm" mode="warning" />
+                              </Tooltip>
+                            ) : (
+                              <Tooltip
+                                title={`Aguardando sincronização (${item.syncAttempts || 0} tentativas)`}
+                                place="top"
+                              >
+                                <Icon icon="schedule" size="sm" mode="helper" />
+                              </Tooltip>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </Td>
+                </Tr>
+              ))
+            ) : (
+              <Empty columns={isTablet ? 5 : 6} />
+            )
+          ) : (
+            <LoadingLines lines={10} columns={isTablet ? 5 : 6} />
+          )}
+        </Tbody>
+      </Table>
+    </>
   );
 }

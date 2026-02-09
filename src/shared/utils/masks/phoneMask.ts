@@ -1,5 +1,5 @@
-export type PhoneType = 'MOBILE' | 'LANDLINE' | 'UNKNOWN';
-export type CountryCode = 'BR' | 'US';
+export type PhoneType = "MOBILE" | "LANDLINE" | "UNKNOWN";
+export type CountryCode = "BR" | "US";
 
 export interface PhoneNumberConfig {
   country?: CountryCode;
@@ -34,48 +34,48 @@ const PHONE_PATTERNS = {
  * Removes all non-numeric characters from phone number
  */
 export function cleanPhoneNumber(value: string): string {
-  if (!value) return '';
-  return value.replace(/\D/g, '');
+  if (!value) return "";
+  return value.replace(/\D/g, "");
 }
 
 /**
  * Determines phone type based on number of digits and country
  */
-export function getPhoneType(cleanNumber: string, country: CountryCode = 'BR'): PhoneType {
-  if (!cleanNumber) return 'UNKNOWN';
+export function getPhoneType(cleanNumber: string, country: CountryCode = "BR"): PhoneType {
+  if (!cleanNumber) return "UNKNOWN";
 
   switch (country) {
-    case 'BR':
-      if (cleanNumber.length === 11 && cleanNumber[2] === '9') {
-        return 'MOBILE';
+    case "BR":
+      if (cleanNumber.length === 11 && cleanNumber[2] === "9") {
+        return "MOBILE";
       } else if (cleanNumber.length === 10) {
-        return 'LANDLINE';
+        return "LANDLINE";
       }
       break;
-    case 'US':
+    case "US":
       if (cleanNumber.length === 10) {
         // In US, both mobile and landline have 10 digits
         // We'll default to mobile for simplicity
-        return 'MOBILE';
+        return "MOBILE";
       }
       break;
   }
 
-  return 'UNKNOWN';
+  return "UNKNOWN";
 }
 
 /**
  * Validates phone number based on country and type
  */
-export function validatePhoneNumber(cleanNumber: string, country: CountryCode = 'BR'): boolean {
+export function validatePhoneNumber(cleanNumber: string, country: CountryCode = "BR"): boolean {
   if (!cleanNumber) return false;
 
   const patterns = PHONE_PATTERNS[country];
-  
+
   switch (country) {
-    case 'BR':
+    case "BR":
       // Brazilian mobile: 11 digits, 3rd digit must be 9
-      if (cleanNumber.length === 11 && cleanNumber[2] === '9') {
+      if (cleanNumber.length === 11 && cleanNumber[2] === "9") {
         return patterns.mobile.test(cleanNumber);
       }
       // Brazilian landline: 10 digits
@@ -83,7 +83,7 @@ export function validatePhoneNumber(cleanNumber: string, country: CountryCode = 
         return patterns.landline.test(cleanNumber);
       }
       break;
-    case 'US':
+    case "US":
       // US numbers: 10 digits
       if (cleanNumber.length === 10) {
         return patterns.mobile.test(cleanNumber);
@@ -97,23 +97,23 @@ export function validatePhoneNumber(cleanNumber: string, country: CountryCode = 
 /**
  * Formats phone number based on country and type
  */
-export function formatPhoneNumber(cleanNumber: string, country: CountryCode = 'BR'): string {
-  if (!cleanNumber) return '';
+export function formatPhoneNumber(cleanNumber: string, country: CountryCode = "BR"): string {
+  if (!cleanNumber) return "";
 
   const patterns = PHONE_PATTERNS[country];
   const type = getPhoneType(cleanNumber, country);
 
   switch (country) {
-    case 'BR':
-      if (type === 'MOBILE' && cleanNumber.length === 11) {
-        return cleanNumber.replace(patterns.mobile, '($1) $2-$3');
-      } else if (type === 'LANDLINE' && cleanNumber.length === 10) {
-        return cleanNumber.replace(patterns.landline, '($1) $2-$3');
+    case "BR":
+      if (type === "MOBILE" && cleanNumber.length === 11) {
+        return cleanNumber.replace(patterns.mobile, "($1) $2-$3");
+      } else if (type === "LANDLINE" && cleanNumber.length === 10) {
+        return cleanNumber.replace(patterns.landline, "($1) $2-$3");
       }
       break;
-    case 'US':
+    case "US":
       if (cleanNumber.length === 10) {
-        return cleanNumber.replace(patterns.mobile, '($1) $2-$3');
+        return cleanNumber.replace(patterns.mobile, "($1) $2-$3");
       }
       break;
   }
@@ -125,16 +125,15 @@ export function formatPhoneNumber(cleanNumber: string, country: CountryCode = 'B
  * Real-time input mask for phone numbers (as user types)
  */
 export function phoneInputMask(value: string, config: PhoneNumberConfig = {}): string {
-  const { country = 'BR' } = config;
+  const { country = "BR" } = config;
   const cleanNumber = cleanPhoneNumber(value);
 
-  if (!cleanNumber) return '';
+  if (!cleanNumber) return "";
 
   switch (country) {
-    case 'BR':
-      // Limit to 11 digits for Brazil
+    case "BR": {
       const limitedBR = cleanNumber.slice(0, 11);
-      
+
       if (limitedBR.length <= 2) {
         return `(${limitedBR}`;
       } else if (limitedBR.length <= 6) {
@@ -144,11 +143,11 @@ export function phoneInputMask(value: string, config: PhoneNumberConfig = {}): s
       } else {
         return `(${limitedBR.slice(0, 2)}) ${limitedBR.slice(2, 7)}-${limitedBR.slice(7)}`;
       }
+    }
 
-    case 'US':
-      // Limit to 10 digits for US
+    case "US": {
       const limitedUS = cleanNumber.slice(0, 10);
-      
+
       if (limitedUS.length <= 3) {
         return `(${limitedUS}`;
       } else if (limitedUS.length <= 6) {
@@ -156,6 +155,7 @@ export function phoneInputMask(value: string, config: PhoneNumberConfig = {}): s
       } else {
         return `(${limitedUS.slice(0, 3)}) ${limitedUS.slice(3, 6)}-${limitedUS.slice(6)}`;
       }
+    }
 
     default:
       return cleanNumber;
@@ -166,7 +166,7 @@ export function phoneInputMask(value: string, config: PhoneNumberConfig = {}): s
  * Complete phone number processing (validation + formatting)
  */
 export function phoneNumberMask(value: string, config: PhoneNumberConfig = {}): PhoneNumberResult {
-  const { country = 'BR' } = config;
+  const { country = "BR" } = config;
   const cleanNumber = cleanPhoneNumber(value);
   const type = getPhoneType(cleanNumber, country);
   const isValid = validatePhoneNumber(cleanNumber, country);
@@ -184,14 +184,14 @@ export function phoneNumberMask(value: string, config: PhoneNumberConfig = {}): 
 /**
  * Get phone type description for display
  */
-export function getPhoneTypeDescription(type: PhoneType, country: CountryCode = 'BR'): string {
+export function getPhoneTypeDescription(type: PhoneType, country: CountryCode = "BR"): string {
   switch (type) {
-    case 'MOBILE':
-      return country === 'BR' ? 'Celular' : 'Mobile';
-    case 'LANDLINE':
-      return country === 'BR' ? 'Fixo' : 'Landline';
+    case "MOBILE":
+      return country === "BR" ? "Celular" : "Mobile";
+    case "LANDLINE":
+      return country === "BR" ? "Fixo" : "Landline";
     default:
-      return '';
+      return "";
   }
 }
 

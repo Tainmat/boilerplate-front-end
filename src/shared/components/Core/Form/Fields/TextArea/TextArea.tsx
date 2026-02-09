@@ -40,11 +40,13 @@ export function TextArea({
   const [textAreaValue, setTextAreaValue] = useState(initialValue || "");
 
   useEffect(() => {
-    typeof value === "string" && setTextAreaValue(value);
+    if (typeof value === "string") {
+      setTextAreaValue(value);
+    }
   }, [value]);
 
   function handleOnChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    onChange && onChange(e);
+    onChange?.(e);
 
     setTextAreaValue(e.target.value);
   }
@@ -70,7 +72,7 @@ export function TextArea({
       </div>
 
       <S.Footer error={error} readOnly={readOnly} disabled={disabled}>
-        {helperText && <HelperText text={helperText} />}
+        {helperText && <HelperText text={helperText} error={error} />}
         <Caption size="sm" className={textAreaValue.length === maxlength ? "text-area-size" : ""}>
           {textAreaValue.length}/{maxlength}
         </Caption>

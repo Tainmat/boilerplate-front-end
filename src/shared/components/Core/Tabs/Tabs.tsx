@@ -14,7 +14,7 @@ export function Tabs({ defaultActiveKey, children, onChange }: TabsProps) {
   function handleOnSelect(eventKey: any) {
     setKey(eventKey);
 
-    onChange && onChange(eventKey);
+    onChange?.(eventKey);
   }
 
   return (
@@ -32,7 +32,7 @@ Tabs.defaultProps = {
 
 interface TabProps {
   eventKey: string;
-  title: string;
+  title: ReactNode;
   disabled?: boolean;
   children: ReactNode;
 }

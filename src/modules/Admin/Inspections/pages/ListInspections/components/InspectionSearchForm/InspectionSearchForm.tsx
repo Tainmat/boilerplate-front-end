@@ -1,4 +1,3 @@
-import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { InputSearch } from "@shared/components/Core/Form/Fields/Search/Input";
 import { SelectSearch } from "@shared/components/Core/Form/Fields/Search/Select";
@@ -9,25 +8,37 @@ import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
+
+import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
+
 import { IInspectionSearchForm, initialInspectionSearchValues } from "./InspectionSearchForm.form";
 
 interface Props {
   searchOptions: IOption[];
-  statusOptions?: IOption[];
   defaultValues?: IInspectionSearchForm | null;
   onSubmit?: (data: IInspectionSearchForm) => void;
   onAdd?: () => void;
+  offline?: boolean;
 }
 
 export function InspectionSearchForm({
   searchOptions,
-  statusOptions = [],
   defaultValues,
   onSubmit,
   onAdd,
+  offline,
 }: Props) {
-  const { isDesktop, isSmartphone, isTablet, isNotebook } = useDeviceDetection();
+  useDeviceDetection();
   const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
+  const { inspectionStatusDropdown } = useDropdownsRedux();
+
+  const inspectionStatusOptions: IOption[] = inspectionStatusDropdown.map((item) => {
+    return {
+      label: item.description,
+      value: item.id,
+    };
+  });
 
   useEffect(() => {
     if (initialValues === null) {
@@ -51,8 +62,8 @@ export function InspectionSearchForm({
           <Formik initialValues={initialValues} onSubmit={(values) => onSubmit && onSubmit(values)}>
             {({ values, setFieldValue, submitForm }) => (
               <Form>
-                <Row className="align-items-end mb-3">
-                  <Col xs={12} md={3}>
+                <Row className="align-items-end">
+                  <Col xs={12} md={3} className="mb-3">
                     <Field
                       as={SelectSearch}
                       placeholder="Pesquisar por"
@@ -60,6 +71,7 @@ export function InspectionSearchForm({
                       value={values.searchingBy}
                       options={searchOptions}
                       readOnly={searchOptions.length === 1}
+                      disabled={offline}
                       onChange={(option: IOption) => {
                         setFieldValue("searchingBy", option.value);
                         setFieldValue("search", "");
@@ -71,14 +83,14 @@ export function InspectionSearchForm({
                     />
                   </Col>
 
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={4} className="mb-3">
                     <Field
                       as={InputSearch}
                       placeholder="Pesquisar"
                       name="search"
                       type="text"
                       submitForm
-                      disabled={!values.searchingBy}
+                      disabled={!values.searchingBy || offline}
                       onReset={() => {
                         setFieldValue("search", "");
                         submitForm();
@@ -86,29 +98,38 @@ export function InspectionSearchForm({
                     />
                   </Col>
 
-                  {statusOptions.length > 0 && (
-                    <Col xs={12} md={3}>
-                      <Field
-                        as={SelectSearch}
-                        name="inspectionStatusId"
-                        placeholder="Status da Inspeção"
-                        value={values.inspectionStatusId}
-                        options={statusOptions}
-                        onChange={({ value }: IOption) => {
-                          setFieldValue("inspectionStatusId", value);
-                          submitForm();
-                        }}
-                        onReset={() => {
-                          setFieldValue("inspectionStatusId", "");
-                        }}
-                      />
-                    </Col>
-                  )}
+                  <Col xs={12} md={3} className="mb-3">
+                    <Field
+                      as={SelectSearch}
+                      name="inspectionStatusId"
+                      placeholder="Status da Inspeção"
+                      value={values.inspectionStatusId}
+                      options={[{ label: "Todos", value: "" }, ...inspectionStatusOptions]}
+                      disabled={offline}
+                      onChange={({ value }: IOption) => {
+                        setFieldValue("inspectionStatusId", value);
+                        submitForm();
+                      }}
+                      onReset={() => {
+                        setFieldValue("inspectionStatusId", "");
+                      }}
+                    />
+                  </Col>
 
-                  <Col xs={12} md={2} className="d-flex align-items-center justify-content-end ">
+                  <Col
+                    xs={12}
+                    md={2}
+                    className="d-flex align-items-center justify-content-end mb-3"
+                  >
                     <div className="d-flex gap-2">
                       <Tooltip title="Buscar" place="top-start">
-                        <ButtonIcon type="submit" size="lg" icon="search" mode="helper" />
+                        <ButtonIcon
+                          type="submit"
+                          size="lg"
+                          icon="search"
+                          mode="helper"
+                          disabled={offline}
+                        />
                       </Tooltip>
                       {onAdd && (
                         <Tooltip title="Adicionar" place="top-start">

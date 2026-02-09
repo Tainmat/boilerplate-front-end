@@ -1,4 +1,3 @@
-import { cnpjMask, phoneNumberMask } from "@/shared/utils/masks";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { Td, Tr } from "@shared/components/Core/Table";
 import { Tag } from "@shared/components/Core/Tag";
@@ -8,11 +7,11 @@ import { Paragraph } from "@shared/components/Core/Typography/Paragraph";
 import { Col, Row } from "react-bootstrap";
 
 import { ICustomer } from "@/shared/hooks/services/Admin/useCustomers";
+import { cnpjMask, phoneNumberMask } from "@/shared/utils/masks";
 
 interface Props {
   data: ICustomer;
   onEdit: () => void;
-  onOpenContacts: () => void;
   expanded?: boolean;
   onToggleExpand?: () => void;
   isSmartphone?: boolean;
@@ -22,7 +21,6 @@ interface Props {
 export function CustomersTable({
   data,
   onEdit,
-  onOpenContacts,
   expanded,
   onToggleExpand,
   isSmartphone,
@@ -41,23 +39,11 @@ export function CustomersTable({
           </Paragraph>
         </Td>
 
-        {/* <Td>
-          <Paragraph size="sm" title={data.fantasyName}>
-            {data.corporateName}
-          </Paragraph>
-        </Td> */}
-
         <Td hideOnMobile={isSmartphone}>
           <Paragraph size="sm" title={data.city}>
             {data.city}
           </Paragraph>
         </Td>
-
-        {/* <Td hideOnMobile={true}>
-          <Paragraph size="sm" title={data.state}>
-            {data.state}
-          </Paragraph>
-        </Td> */}
 
         <Td hideOnMobile={isSmartphone}>
           <Paragraph size="sm" title={data.phone}>
@@ -92,17 +78,6 @@ export function CustomersTable({
                   }}
                 />
               </Tooltip>
-
-              {/* <Tooltip title="Contatos" place="top-start">
-                <ButtonIcon
-                  size="sm"
-                  icon="contacts"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenContacts();
-                  }}
-                />
-              </Tooltip> */}
             </div>
           </Td>
         )}
