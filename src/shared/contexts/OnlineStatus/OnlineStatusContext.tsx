@@ -186,10 +186,10 @@ function OnlineStatusContext({ children }: Props) {
 
       onlineStableTimeRef.current = setTimeout(() => {
         if (navigator.onLine && cardsList.length > 0) {
-          console.log("🔄 Conexão estável há 30s. Iniciando sincronização...");
+          console.log("🔄 Conexão estável há 15s. Iniciando sincronização...");
           syncAll();
         }
-      }, 30000);
+      }, 15000);
     };
 
     const handleOffline = () => {

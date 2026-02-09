@@ -10,15 +10,14 @@ import { Empty } from "@/shared/components/Core/Table/Empty";
 import { LoadingLines } from "@/shared/components/Core/Table/LoadingLines";
 import { Heading } from "@/shared/components/Core/Typography/Heading";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+import { useDeviceDetection } from "@/shared/hooks/useDeviceDetection";
 import { IOfflineInspectionCard } from "@/shared/store/modules/OfflineInspection";
 
 import { useInspectionsRules } from "../../useInspectionsRules";
 import { StorageBar } from "../StorageBar";
 
-interface IInspectionTable extends Omit<
-  IOfflineInspectionCard,
-  "isSyncing" | "syncAttempts" | "quantityPhotos"
-> {
+interface IInspectionTable
+  extends Omit<IOfflineInspectionCard, "isSyncing" | "syncAttempts" | "quantityPhotos"> {
   isSyncing?: boolean;
   erroSync?: string | undefined;
   syncAttempts?: number;
@@ -79,6 +78,7 @@ export function InspectionsTable({
   const { isSystemAdmin } = useAuthRoles();
   const { isInspectionChanger } = useAuthRoles();
   const { isOnline } = useInspectionsRules();
+  const { isTablet } = useDeviceDetection();
 
   return (
     <>
@@ -284,10 +284,10 @@ export function InspectionsTable({
                 </Tr>
               ))
             ) : (
-              <Empty columns={6} />
+              <Empty columns={isTablet ? 5 : 6} />
             )
           ) : (
-            <LoadingLines lines={10} columns={6} />
+            <LoadingLines lines={10} columns={isTablet ? 5 : 6} />
           )}
         </Tbody>
       </Table>

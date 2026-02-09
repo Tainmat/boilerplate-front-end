@@ -307,9 +307,6 @@ export function CreateInspection() {
             id: user?.id || "",
             name: user?.socialName || "",
           },
-          isSyncing: false,
-          erroSync: undefined,
-          syncAttempts: 0,
         });
 
         addToast({

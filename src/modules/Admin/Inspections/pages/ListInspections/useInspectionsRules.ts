@@ -175,6 +175,12 @@ export function useInspectionsRules() {
         margin: 0;
       }
       @media print {
+        html, body {
+          display: block !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+
         body {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
@@ -183,6 +189,7 @@ export function useInspectionsRules() {
     `,
     onAfterPrint,
     onPrintError,
+    preserveAfterPrint: true,
   });
 
   async function handleGeneratePdf(inspectionId: string, documentTitle: string) {
@@ -203,9 +210,10 @@ export function useInspectionsRules() {
           description: `Deseja imprimir o relatório ${data.reportNumber}?`,
           cancelTxt: "Cancelar",
           confirmTxt: "Imprimir",
-          onConfirm: () => {
+          onConfirm: async () => {
             document.title = printTitleRef.current;
-            handlePrint();
+            await document.fonts.ready;
+            setTimeout(handlePrint, 200);
           },
           onCancel: () => {
             setInspectionToPrint(null);
