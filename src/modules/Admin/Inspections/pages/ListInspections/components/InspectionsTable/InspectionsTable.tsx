@@ -15,8 +15,10 @@ import { IOfflineInspectionCard } from "@/shared/store/modules/OfflineInspection
 import { useInspectionsRules } from "../../useInspectionsRules";
 import { StorageBar } from "../StorageBar";
 
-interface IInspectionTable
-  extends Omit<IOfflineInspectionCard, "isSyncing" | "syncAttempts" | "quantityPhotos"> {
+interface IInspectionTable extends Omit<
+  IOfflineInspectionCard,
+  "isSyncing" | "syncAttempts" | "quantityPhotos"
+> {
   isSyncing?: boolean;
   erroSync?: string | undefined;
   syncAttempts?: number;
@@ -219,7 +221,9 @@ export function InspectionsTable({
                               size="sm"
                               icon={item.isActive ? "toggle_on" : "toggle_off"}
                               mode={item.isActive ? "success" : "warning"}
-                              onClick={() => handleOnChangeStatusInspection(item.id, item.isActive)}
+                              onClick={() =>
+                                handleOnChangeStatusInspection(item.id, !item.isActive)
+                              }
                             />
                           </Tooltip>
                         </>
