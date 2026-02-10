@@ -30,6 +30,8 @@ export function useLoadAllDropdowns() {
         get("parametrizations/customers/dropdown", queryParams),
         get("parametrizations/part-types", {
           status: "active",
+          page: 1,
+          records: 9999,
         }),
         get("parametrizations/profile-management/users/dropdown", {
           onlyInspectionPermitions: true,
