@@ -22,7 +22,6 @@ interface IInspectionTable
   erroSync?: string | undefined;
   syncAttempts?: number;
   quantityPhotos?: number;
-  partType?: { id: string; name: string };
 }
 
 interface StorageBarData {
@@ -96,8 +95,12 @@ export function InspectionsTable({
               <Heading size="xs">Nº Relatório</Heading>
             </Th>
 
-            <Th className="d-none d-md-table-cell">
+            <Th className="d-none d-md-table-cell" style={{ width: "10%" }}>
               <Heading size="xs">Revisão</Heading>
+            </Th>
+
+            <Th className="d-none d-md-table-cell">
+              <Heading size="xs">Tipo Peça</Heading>
             </Th>
 
             <Th className="d-none d-sm-table-cell">
@@ -144,6 +147,12 @@ export function InspectionsTable({
                   <Td className="d-none d-md-table-cell">
                     <Paragraph size="sm" title={item.revisionNumber}>
                       {item.revisionNumber}
+                    </Paragraph>
+                  </Td>
+
+                  <Td className="d-none d-md-table-cell">
+                    <Paragraph size="sm" title={item.partType?.name}>
+                      {item.partType?.name}
                     </Paragraph>
                   </Td>
 
@@ -284,10 +293,10 @@ export function InspectionsTable({
                 </Tr>
               ))
             ) : (
-              <Empty columns={isTablet ? 5 : 6} />
+              <Empty columns={isTablet ? 6 : 7} />
             )
           ) : (
-            <LoadingLines lines={10} columns={isTablet ? 5 : 6} />
+            <LoadingLines lines={10} columns={isTablet ? 6 : 7} />
           )}
         </Tbody>
       </Table>
