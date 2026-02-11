@@ -3,6 +3,10 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IInspectionRegisterForm } from "@/modules/Admin/Inspections/pages/CreateInspection/components/RegisterForm/RegisterForm.form";
 
 interface IOfflineInspectionAdditionalData {
+  partType: {
+    id: string;
+    name: string;
+  };
   customer: {
     id: string;
     fantasyName: string;

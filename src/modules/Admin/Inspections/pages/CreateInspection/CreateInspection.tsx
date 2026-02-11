@@ -349,6 +349,7 @@ export function CreateInspection() {
 
           await addNewInspection({
             ...formValues,
+            partType: equipmentsDropdown.find((i) => i.id === formValues.partTypeId)!,
             customer: customersDropdown.find((c) => c.id === formValues.customerId)!,
             inspectionStatus: inspectionStatusDropdown.find(
               (i) => i.id === formValues.inspectionStatusId,
