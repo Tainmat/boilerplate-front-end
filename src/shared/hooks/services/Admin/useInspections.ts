@@ -10,6 +10,7 @@ export interface IInspection {
   reportStartDate: string;
   reportEndDate: string;
   isActive: boolean;
+  componentId: string;
   customer: {
     id: string;
     corporateName: string;

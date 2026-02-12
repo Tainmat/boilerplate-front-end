@@ -57,6 +57,9 @@ export function LatestInspections({ params, onRefetchReady }: Props) {
                   <Heading size="xs">Tipo Peça</Heading>
                 </Th>
                 <Th>
+                  <Heading size="xs">Componente</Heading>
+                </Th>
+                <Th>
                   <div className="d-flex justify-content-center">
                     <Heading size="xs">Status</Heading>
                   </div>
@@ -72,7 +75,7 @@ export function LatestInspections({ params, onRefetchReady }: Props) {
                   .fill(0)
                   .map((_, index) => (
                     <Tr key={index}>
-                      <Td colSpan={6}>
+                      <Td colSpan={7}>
                         <Skeleton />
                       </Td>
                     </Tr>
@@ -94,6 +97,9 @@ export function LatestInspections({ params, onRefetchReady }: Props) {
                       </Td>
                       <Td>
                         <Paragraph size="sm">{inspecao.partType.name}</Paragraph>
+                      </Td>
+                      <Td>
+                        <Paragraph size="sm">{inspecao.componentId}</Paragraph>
                       </Td>
                       <Td>
                         <div className="d-flex justify-content-center">

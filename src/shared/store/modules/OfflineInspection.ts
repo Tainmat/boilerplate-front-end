@@ -30,6 +30,7 @@ export interface IOfflineInspectionCard extends IOfflineInspectionAdditionalData
   createdAt: string;
   updatedAt: string;
   isSyncing: boolean;
+  componentId: string;
   erroSync?: string;
   syncAttempts: number;
   quantityPhotos: number;
