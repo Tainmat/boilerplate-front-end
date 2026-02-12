@@ -56,7 +56,7 @@ export function LatestInspections({ params, onRefetchReady }: Props) {
                 <Th>
                   <Heading size="xs">Tipo Peça</Heading>
                 </Th>
-                <Th>
+                <Th style={{ width: "25%" }}>
                   <Heading size="xs">Componente</Heading>
                 </Th>
                 <Th>
