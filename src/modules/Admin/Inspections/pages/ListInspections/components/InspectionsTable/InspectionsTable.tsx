@@ -99,7 +99,7 @@ export function InspectionsTable({
               <Heading size="xs">Revisão</Heading>
             </Th>
 
-            <Th className="d-none d-md-table-cell">
+            <Th className="d-none d-md-table-cell" style={{ width: "25%" }}>
               <Heading size="xs">Componente</Heading>
             </Th>
 
@@ -150,7 +150,7 @@ export function InspectionsTable({
                     </Paragraph>
                   </Td>
 
-                  <Td className="d-none d-md-table-cell">
+                  <Td className="d-none d-md-table-cell" style={{ whiteSpace: "nowrap" }}>
                     <Paragraph size="sm" title={item.componentId}>
                       {item.componentId}
                     </Paragraph>
