@@ -100,7 +100,7 @@ export function InspectionsTable({
             </Th>
 
             <Th className="d-none d-md-table-cell">
-              <Heading size="xs">Tipo Peça</Heading>
+              <Heading size="xs">Componente</Heading>
             </Th>
 
             <Th className="d-none d-sm-table-cell">
@@ -151,8 +151,8 @@ export function InspectionsTable({
                   </Td>
 
                   <Td className="d-none d-md-table-cell">
-                    <Paragraph size="sm" title={item.partType?.name}>
-                      {item.partType?.name}
+                    <Paragraph size="sm" title={item.componentId}>
+                      {item.componentId}
                     </Paragraph>
                   </Td>
 
