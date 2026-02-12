@@ -91,11 +91,11 @@ export function InspectionsTable({
       <Table $bordered $isLoading={data === null} $hover={!!data?.length} $responsive>
         <Thead>
           <Tr>
-            <Th>
+            <Th style={{ width: "10%" }}>
               <Heading size="xs">Nº Relatório</Heading>
             </Th>
 
-            <Th className="d-none d-md-table-cell" style={{ width: "10%" }}>
+            <Th className="d-none d-md-table-cell" style={{ width: "5%" }}>
               <Heading size="xs">Revisão</Heading>
             </Th>
 
@@ -167,7 +167,7 @@ export function InspectionsTable({
 
                   <Td>
                     <div className="d-flex justify-content-center">
-                      <Tag size="lg" status={getStatusColor(item.inspectionStatus.description)}>
+                      <Tag size="sm" status={getStatusColor(item.inspectionStatus.description)}>
                         {item.inspectionStatus.description}
                       </Tag>
                     </div>

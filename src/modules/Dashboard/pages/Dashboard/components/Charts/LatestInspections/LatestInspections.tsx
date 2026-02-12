@@ -44,10 +44,10 @@ export function LatestInspections({ params, onRefetchReady }: Props) {
           <Table $responsive $hover $bordered>
             <Thead>
               <Tr>
-                <Th>
+                <Th style={{ width: "10%" }}>
                   <Heading size="xs">Nº Relatório</Heading>
                 </Th>
-                <Th hideOnMobile={isSmartphone}>
+                <Th style={{ width: "10%" }} hideOnMobile={isSmartphone}>
                   <Heading size="xs">Data</Heading>
                 </Th>
                 <Th hideOnMobile={isSmartphone}>
@@ -104,7 +104,7 @@ export function LatestInspections({ params, onRefetchReady }: Props) {
                       <Td>
                         <div className="d-flex justify-content-center">
                           <Tag
-                            size="lg"
+                            size="sm"
                             status={getStatusColor(inspecao.inspectionStatus.description)}
                           >
                             {inspecao.inspectionStatus.description}
