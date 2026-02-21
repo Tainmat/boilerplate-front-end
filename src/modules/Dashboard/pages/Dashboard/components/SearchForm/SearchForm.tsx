@@ -1,6 +1,7 @@
 import { parseISO } from "date-fns";
 import { Col, Row } from "react-bootstrap";
 
+import { Button } from "@/shared/components/Core/Buttons/Button";
 import { InputDatePicker } from "@/shared/components/Core/Form/Fields/InputDatePicker";
 import { Select } from "@/shared/components/Core/Form/Fields/Select";
 import { IOption } from "@/shared/components/Core/Form/Fields/Select/Select.interface";
@@ -16,6 +17,7 @@ export interface Props {
   autoRefreshEnabled: boolean;
   handleAutoRefreshToggle: (enabled: boolean) => void;
   lastUpdated: Date;
+  onGeneratePDF: () => void;
 }
 
 export function DashboardSearchForm({
@@ -24,6 +26,7 @@ export function DashboardSearchForm({
   autoRefreshEnabled,
   handleAutoRefreshToggle,
   lastUpdated,
+  onGeneratePDF,
 }: Props) {
   const { result: CUSTOMER_OPTIONS } = useCustomersDropdown({ onlyActive: false });
 
@@ -36,7 +39,7 @@ export function DashboardSearchForm({
 
   return (
     <>
-      <Row className="mb-4">
+      <Row className="mb-4 align-items-end">
         {/* Filtro de período */}
         <Col lg={2} md={3} sm={12} className="mb-3 mb-md-0">
           <InputDatePicker
@@ -95,6 +98,12 @@ export function DashboardSearchForm({
               });
             }}
           />
+        </Col>
+
+        <Col className="d-flex justify-content-end mb-3 mb-md-0">
+          <Button onClick={onGeneratePDF} styles="primary" mode="success">
+            Gerar PDF
+          </Button>
         </Col>
       </Row>
 

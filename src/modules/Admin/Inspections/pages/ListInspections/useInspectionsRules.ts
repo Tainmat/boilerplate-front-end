@@ -1,5 +1,3 @@
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -17,6 +15,7 @@ import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/
 import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { put } from "@/shared/services/api/api.service";
+import { generatePdfFile } from "@/shared/utils/pdf";
 
 import { ROUTE_SAVE_INSPECTION, ROUTE_UPDATE_INSPECTION } from "../../routes/Inspection.paths";
 import {
@@ -152,70 +151,6 @@ export function useInspectionsRules() {
     navigate(`${ROUTE_UPDATE_INSPECTION}/${uuid}/offline`);
   }
 
-  const generatePdfFile = useCallback(async (fileName: string) => {
-    if (!pdfRef.current) return;
-
-    // ⛔ ESSENCIAL: espera o DOM realmente pintar
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-
-    const canvas = await html2canvas(pdfRef.current, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-    });
-
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`${fileName}.pdf`);
-  }, []);
-
-  // const printPdf = useCallback((documentTitle: string) => {
-  //   // Inject print-only CSS dynamically
-  //   const style = document.createElement("style");
-  //   style.id = "pdf-print-styles";
-  //   style.textContent = `
-  //     @media print {
-  //       @page { size: A4 portrait; margin: 0; }
-  //       body * { visibility: hidden !important; }
-  //       .pdf-print-area, .pdf-print-area * { visibility: visible !important; }
-  //       .pdf-print-area {
-  //         position: fixed !important;
-  //         top: 0 !important;
-  //         left: 0 !important;
-  //         width: 210mm !important;
-  //         opacity: 1 !important;
-  //         z-index: 99999 !important;
-  //         overflow: visible !important;
-  //       }
-  //       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  //     }
-  //   `;
-  //   document.head.appendChild(style);
-
-  //   const cleanup = () => {
-  //     style.remove();
-  //     document.title = TITLE_ADMIN_INSPECTIONS;
-  //     setInspectionToPrint(null);
-  //     window.removeEventListener("afterprint", cleanup);
-  //   };
-
-  //   window.addEventListener("afterprint", cleanup);
-
-  //   document.title = documentTitle;
-  //   window.print();
-  // }, []);
-
   async function handleGeneratePdf(inspectionId: string, documentTitle: string) {
     try {
       showLoader();
@@ -234,7 +169,7 @@ export function useInspectionsRules() {
           cancelTxt: "Cancelar",
           confirmTxt: "Download",
           onConfirm: async () => {
-            await generatePdfFile(documentTitle);
+            await generatePdfFile(documentTitle, pdfRef);
             setInspectionToPrint(null);
           },
           onCancel: () => {

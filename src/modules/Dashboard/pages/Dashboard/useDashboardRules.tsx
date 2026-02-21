@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
+import { useAlertContext } from "@/shared/contexts/Alert";
 import { useBreadcrumbContext } from "@/shared/contexts/Layout/Breadcrumb";
 import { useInspectionPartType } from "@/shared/hooks/services/Dashboard/useInspectionPartType";
 import { useTemporalEvolution } from "@/shared/hooks/services/Dashboard/useTemporalEvolution";
 import { useTotalizingCards } from "@/shared/hooks/services/Dashboard/useTotalizingCards";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
+import { formatDateWithUnderline } from "@/shared/utils/date";
 import { firstDayOfMonth, lastDayOfMonth } from "@/shared/utils/date/dayjs";
+import { generatePdfFile } from "@/shared/utils/pdf";
 
 export interface IDashboardParams {
   initialReportStartDate: string;
@@ -15,12 +18,14 @@ export interface IDashboardParams {
 }
 
 export function useDashboardRules() {
+  const { addAlert } = useAlertContext();
   const { setPageBreadcrumb } = useBreadcrumbContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(true);
   const latestInspectionsRefetchRef = useRef<(() => void) | null>(null);
   const { isCustomer } = useAuthRoles();
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   // Hooks dos componentes individuais
   const {
@@ -112,11 +117,35 @@ export function useDashboardRules() {
     refetchTemporalEvolution,
   ]);
 
+  const handleGeneratePDF = useCallback(() => {
+    const formattedDate = formatDateWithUnderline(new Date());
+
+    addAlert({
+      iconModal: "success",
+      iconType: "success",
+      buttonType: "success",
+      title: "Download PDF",
+      description: `Deseja fazer o download do relatório?`,
+      cancelTxt: "Cancelar",
+      confirmTxt: "Download",
+      onConfirm: async () => {
+        await generatePdfFile(`Relatório_${formattedDate}`, pdfRef, {
+          orientation: "landscape",
+          format: "a4",
+          scale: 2,
+          pageScale: 1,
+        });
+      },
+      onCancel: () => {},
+    });
+  }, [addAlert]);
+
   return {
     // Estados
     lastUpdated,
     params,
     autoRefreshEnabled,
+    pdfRef,
 
     // Dados dos componentes (dados brutos)
     totalizingCards: {
@@ -137,5 +166,6 @@ export function useDashboardRules() {
     setAutoRefreshEnabled,
     handleLatestInspectionsRefetchReady,
     isCustomer,
+    handleGeneratePDF,
   };
 }
