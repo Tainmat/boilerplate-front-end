@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { useAlertContext } from "@/shared/contexts/Alert";
 import { useBreadcrumbContext } from "@/shared/contexts/Layout/Breadcrumb";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { useInspectionPartType } from "@/shared/hooks/services/Dashboard/useInspectionPartType";
 import { useTemporalEvolution } from "@/shared/hooks/services/Dashboard/useTemporalEvolution";
 import { useTotalizingCards } from "@/shared/hooks/services/Dashboard/useTotalizingCards";
@@ -26,6 +27,7 @@ export function useDashboardRules() {
   const latestInspectionsRefetchRef = useRef<(() => void) | null>(null);
   const { isCustomer } = useAuthRoles();
   const pdfRef = useRef<HTMLDivElement>(null);
+  const { customersDropdown } = useDropdownsRedux();
 
   // Hooks dos componentes individuais
   const {
@@ -120,6 +122,15 @@ export function useDashboardRules() {
   const handleGeneratePDF = useCallback(() => {
     const formattedDate = formatDateWithUnderline(new Date());
 
+    let customerName = "Todos";
+    if (params?.customerId) {
+      const selectedCustomer = customersDropdown.find((c) => c.id === params.customerId);
+      if (selectedCustomer) {
+        // Usa o nome fantasia
+        customerName = selectedCustomer.fantasyName.replace(/\s+/g, "_");
+      }
+    }
+
     addAlert({
       iconModal: "success",
       iconType: "success",
@@ -129,7 +140,7 @@ export function useDashboardRules() {
       cancelTxt: "Cancelar",
       confirmTxt: "Download",
       onConfirm: async () => {
-        await generatePdfFile(`Relatório_${formattedDate}`, pdfRef, {
+        await generatePdfFile(`Relatório_${customerName}_${formattedDate}`, pdfRef, {
           orientation: "landscape",
           format: "a4",
           scale: 2,
@@ -138,7 +149,7 @@ export function useDashboardRules() {
       },
       onCancel: () => {},
     });
-  }, [addAlert]);
+  }, [addAlert, params?.customerId, customersDropdown]);
 
   return {
     // Estados
