@@ -15,11 +15,12 @@ import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
-import { getBlob, put } from "@/shared/services/api/api.service";
+import { get, getBlob, put } from "@/shared/services/api/api.service";
 import { formatDateWithUnderline } from "@/shared/utils/date";
-import { generatePdfFile } from "@/shared/utils/pdf";
+import { generateMultiPagePdfFile, generatePdfFile } from "@/shared/utils/pdf";
 
 import { ROUTE_SAVE_INSPECTION, ROUTE_UPDATE_INSPECTION } from "../../routes/Inspection.paths";
+import { transformInspectionDataForPdf } from "./components/InspectionListPDFReport/inspectionPdfFields";
 import {
   IInspectionSearchForm,
   initialInspectionSearchValues,
@@ -53,10 +54,19 @@ export function useInspectionsRules() {
   const [loaded, setLoaded] = useState(false);
   const [tableMode, setTableMode] = useState<"online" | "offline">(isOnline ? "online" : "offline");
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showExportPDFModal, setShowExportPDFModal] = useState(false);
 
-  // PDF
+  // PDF individual
   const pdfRef = useRef<HTMLDivElement>(null);
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
+
+  // PDF listagem
+  const pdfListRef = useRef<HTMLDivElement>(null);
+  const [pdfListData, setPdfListData] = useState<{
+    data: Record<string, string>[];
+    fields: string[];
+    generatedAt: Date;
+  } | null>(null);
 
   useLayoutEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -74,6 +84,37 @@ export function useInspectionsRules() {
   const errorsCount = useMemo(() => {
     return offlineInspections?.filter((i) => i.erroSync).length || 0;
   }, [offlineInspections]);
+
+  // Dispara geração do PDF após o componente InspectionListPDFReport renderizar no DOM
+  useEffect(() => {
+    if (!pdfListData) return;
+
+    const generate = async () => {
+      try {
+        await generateMultiPagePdfFile(
+          `Relatório_Inspeções_${formatDateWithUnderline(pdfListData.generatedAt)}`,
+          pdfListRef,
+        );
+        addToast({
+          type: "success",
+          title: "Exportação concluída",
+          description: "O relatório PDF foi gerado com sucesso.",
+        });
+      } catch {
+        addToast({
+          type: "warning",
+          title: "Erro ao gerar PDF",
+          description: "Não foi possível gerar o relatório PDF.",
+        });
+      } finally {
+        setPdfListData(null);
+        hideLoader();
+      }
+    };
+
+    generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdfListData]);
 
   const handleSearchParams = useCallback(
     (params: Record<string, any>) => {
@@ -259,6 +300,44 @@ export function useInspectionsRules() {
     setShowExportModal(true);
   }
 
+  function handleExportPDF() {
+    setShowExportPDFModal(true);
+  }
+
+  const handleConfirmExportPDF = async (startDate: string, endDate: string, fields: string[]) => {
+    setShowExportPDFModal(false);
+    showLoader();
+
+    try {
+      const { data: responseBody } = await get(
+        "/operational/parts-inspection/data/export-pdf-data",
+        { initialReportStartDate: startDate, finalReportStartDate: endDate, fields },
+      );
+
+      const items = responseBody?.data ?? responseBody ?? [];
+      const transformedData = transformInspectionDataForPdf(items, fields);
+
+      setPdfListData({ data: transformedData, fields, generatedAt: new Date() });
+    } catch (error: any) {
+      hideLoader();
+
+      if (error?.response?.status === 404) {
+        addToast({
+          type: "helper",
+          title: "Sem dados",
+          description:
+            error.response?.data?.message || "Nenhum dado encontrado para os filtros selecionados.",
+        });
+      } else {
+        addToast({
+          type: "warning",
+          title: "Erro ao exportar",
+          description: "Não foi possível exportar os dados para PDF.",
+        });
+      }
+    }
+  };
+
   const handleConfirmExport = async (initialDate: string, finalDate: string) => {
     setShowExportModal(false);
 
@@ -384,9 +463,19 @@ export function useInspectionsRules() {
     handleSyncInspection,
     handleExportExcel,
 
-    // Export modal
+    // Export Excel modal
     showExportModal,
     handleCloseExportModal: () => setShowExportModal(false),
     handleConfirmExport,
+
+    // Export PDF modal
+    showExportPDFModal,
+    handleCloseExportPDFModal: () => setShowExportPDFModal(false),
+    handleExportPDF,
+    handleConfirmExportPDF,
+
+    // PDF listagem
+    pdfListRef,
+    pdfListData,
   };
 }

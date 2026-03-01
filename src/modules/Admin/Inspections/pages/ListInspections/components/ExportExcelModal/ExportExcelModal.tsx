@@ -37,10 +37,7 @@ export function ExportExcelModal({ isOpen, onClose, onConfirm }: Props) {
 
   function handleConfirm() {
     if (!initialDate || !finalDate) return;
-    onConfirm(
-      formatDate(initialDate, "yyyy-MM-dd"),
-      formatDate(finalDate, "yyyy-MM-dd"),
-    );
+    onConfirm(formatDate(initialDate, "yyyy-MM-dd"), formatDate(finalDate, "yyyy-MM-dd"));
     setInitialDate(null);
     setFinalDate(null);
   }

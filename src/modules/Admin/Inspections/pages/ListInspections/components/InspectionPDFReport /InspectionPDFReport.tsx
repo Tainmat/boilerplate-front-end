@@ -180,7 +180,9 @@ export const InspectionPDFReport = forwardRef<HTMLDivElement, InspectionPDFRepor
           <S.SectionTitle>2. Considerações Gerais e Conclusões</S.SectionTitle>
           <S.ReportContent
             dangerouslySetInnerHTML={{
-              __html: inspection.finalConclusion || "<p>Sem conclusões registradas</p>",
+              __html:
+                inspection.finalConclusion ||
+                "<p style='color: blue;'>Sem conclusões registradas</p>",
             }}
           />
         </S.ReportSection>

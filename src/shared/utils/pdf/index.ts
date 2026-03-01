@@ -66,3 +66,35 @@ export const generatePdfFile = async (
   pdf.addImage(imgData, "PNG", x, y, finalWidth, finalHeight);
   pdf.save(`${fileName}.pdf`);
 };
+
+export const generateMultiPagePdfFile = async (
+  fileName: string,
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  options?: { scale?: number },
+) => {
+  if (!containerRef.current) return;
+
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+
+  const pages = containerRef.current.querySelectorAll<HTMLElement>(".pdf-page");
+  if (pages.length === 0) return;
+
+  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+
+  for (let i = 0; i < pages.length; i++) {
+    if (i > 0) pdf.addPage();
+
+    const canvas = await html2canvas(pages[i], {
+      scale: options?.scale ?? 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
+
+    pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pdfWidth, pdfHeight);
+  }
+
+  pdf.save(`${fileName}.pdf`);
+};

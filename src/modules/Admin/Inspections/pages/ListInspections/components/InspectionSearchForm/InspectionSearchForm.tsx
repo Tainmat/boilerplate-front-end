@@ -1,3 +1,4 @@
+import { Button } from "@shared/components/Core/Buttons/Button";
 import { ButtonIcon } from "@shared/components/Core/Buttons/ButtonIcon";
 import { InputSearch } from "@shared/components/Core/Form/Fields/Search/Input";
 import { SelectSearch } from "@shared/components/Core/Form/Fields/Search/Select";
@@ -11,6 +12,7 @@ import { Col, Row } from "react-bootstrap";
 
 import { Switch } from "@/shared/components/Core/Form/Fields/Switch";
 import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
+import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 
 import { IInspectionSearchForm, initialInspectionSearchValues } from "./InspectionSearchForm.form";
 
@@ -20,6 +22,7 @@ interface Props {
   onSubmit?: (data: IInspectionSearchForm) => void;
   onAdd?: () => void;
   onExport?: () => void;
+  onExportPDF?: () => void;
   offline?: boolean;
 }
 
@@ -29,11 +32,13 @@ export function InspectionSearchForm({
   onSubmit,
   onAdd,
   onExport,
+  onExportPDF,
   offline,
 }: Props) {
   useDeviceDetection();
   const [initialValues, setInitialValues] = useState<IInspectionSearchForm | null>(null);
   const { inspectionStatusDropdown } = useDropdownsRedux();
+  const { isSystemAdmin } = useAuthRoles();
 
   const inspectionStatusOptions: IOption[] = inspectionStatusDropdown.map((item) => {
     return {
@@ -133,18 +138,6 @@ export function InspectionSearchForm({
                           disabled={offline}
                         />
                       </Tooltip>
-                      {onExport && (
-                        <Tooltip title="Exportar Excel" place="top-start">
-                          <ButtonIcon
-                            type="button"
-                            size="lg"
-                            mode="primary"
-                            icon="table_view"
-                            disabled={offline}
-                            onClick={() => onExport()}
-                          />
-                        </Tooltip>
-                      )}
                       {onAdd && (
                         <Tooltip title="Adicionar" place="top-start">
                           <ButtonIcon
@@ -161,21 +154,46 @@ export function InspectionSearchForm({
                   </Col>
                 </Row>
 
-                <Row>
-                  <Col>
-                    <Tooltip title="Buscar" place="top-start">
-                      <Field
-                        as={Switch}
-                        name="status"
-                        checked={values.status === "all"}
-                        description="Mostrar inativos"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          setFieldValue("status", e.target.checked ? "all" : "active");
-                          submitForm();
-                        }}
-                      />
-                    </Tooltip>
+                <Row className="align-items-center justify-content-between">
+                  <Col xs="auto">
+                    <Field
+                      as={Switch}
+                      name="status"
+                      checked={values.status === "all"}
+                      description="Mostrar inativos"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        setFieldValue("status", e.target.checked ? "all" : "active");
+                        submitForm();
+                      }}
+                    />
                   </Col>
+                  {isSystemAdmin() && (onExport || onExportPDF) && (
+                    <Col xs="auto" className="d-flex gap-2">
+                      {onExport && (
+                        <Button
+                          type="button"
+                          styles="primary"
+                          icon="table_view"
+                          disabled={offline}
+                          onClick={onExport}
+                        >
+                          Exportar Excel
+                        </Button>
+                      )}
+                      {onExportPDF && (
+                        <Button
+                          type="button"
+                          styles="primary"
+                          mode="warning"
+                          icon="picture_as_pdf"
+                          disabled={offline}
+                          onClick={onExportPDF}
+                        >
+                          Exportar PDF
+                        </Button>
+                      )}
+                    </Col>
+                  )}
                 </Row>
               </Form>
             )}

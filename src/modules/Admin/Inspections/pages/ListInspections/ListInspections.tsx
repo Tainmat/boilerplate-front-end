@@ -8,7 +8,9 @@ import { createPortal } from "react-dom";
 
 import { Tab, Tabs } from "@/shared/components/Core/Tabs";
 
-import { ExportExcelModal } from "./components/ExportExcelModal/ExportExcelModal";
+import { ExportExcelModal } from "./components/ExportExcelModal";
+import { ExportPDFModal } from "./components/ExportPDFModal";
+import { InspectionListPDFReport } from "./components/InspectionListPDFReport/InspectionListPDFReport";
 import { InspectionPDFReport } from "./components/InspectionPDFReport ";
 import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
 import { InspectionsTable } from "./components/InspectionsTable";
@@ -41,6 +43,12 @@ export function ListInspections() {
     showExportModal,
     handleCloseExportModal,
     handleConfirmExport,
+    showExportPDFModal,
+    handleCloseExportPDFModal,
+    handleExportPDF,
+    handleConfirmExportPDF,
+    pdfListRef,
+    pdfListData,
   } = useInspectionsRules();
 
   return (
@@ -63,6 +71,7 @@ export function ListInspections() {
                 onSubmit={(search) => handleOnSearch(search)}
                 onAdd={isInspectionChanger() ? addNew : undefined}
                 onExport={handleExportExcel}
+                onExportPDF={handleExportPDF}
                 offline={tableMode === "offline"}
               />
             </Col>
@@ -138,10 +147,17 @@ export function ListInspections() {
           )}
         </Container>
       </Section>
+
       <ExportExcelModal
         isOpen={showExportModal}
         onClose={handleCloseExportModal}
         onConfirm={handleConfirmExport}
+      />
+
+      <ExportPDFModal
+        isOpen={showExportPDFModal}
+        onClose={handleCloseExportPDFModal}
+        onConfirm={handleConfirmExportPDF}
       />
 
       {inspectionToPrint &&
@@ -162,6 +178,25 @@ export function ListInspections() {
             }}
           >
             <InspectionPDFReport inspection={inspectionToPrint} />
+          </div>,
+          document.body,
+        )}
+
+      {pdfListData &&
+        createPortal(
+          <div
+            ref={pdfListRef}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
+          >
+            <InspectionListPDFReport
+              data={pdfListData.data}
+              fields={pdfListData.fields}
+              generatedAt={pdfListData.generatedAt}
+            />
           </div>,
           document.body,
         )}
