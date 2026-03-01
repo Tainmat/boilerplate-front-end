@@ -5,7 +5,7 @@ import { formatDateTimeBR } from "@/shared/utils/date/dayjs";
 
 import { PDF_FIELD_LABELS } from "./inspectionPdfFields";
 
-const ROWS_PER_PAGE = 18;
+const ROWS_PER_PAGE = 13;
 
 interface Props {
   data: Record<string, string>[];
