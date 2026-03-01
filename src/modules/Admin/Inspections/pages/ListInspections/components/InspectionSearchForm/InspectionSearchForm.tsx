@@ -19,6 +19,7 @@ interface Props {
   defaultValues?: IInspectionSearchForm | null;
   onSubmit?: (data: IInspectionSearchForm) => void;
   onAdd?: () => void;
+  onExport?: () => void;
   offline?: boolean;
 }
 
@@ -27,6 +28,7 @@ export function InspectionSearchForm({
   defaultValues,
   onSubmit,
   onAdd,
+  onExport,
   offline,
 }: Props) {
   useDeviceDetection();
@@ -131,6 +133,18 @@ export function InspectionSearchForm({
                           disabled={offline}
                         />
                       </Tooltip>
+                      {onExport && (
+                        <Tooltip title="Exportar Excel" place="top-start">
+                          <ButtonIcon
+                            type="button"
+                            size="lg"
+                            mode="primary"
+                            icon="table_view"
+                            disabled={offline}
+                            onClick={() => onExport()}
+                          />
+                        </Tooltip>
+                      )}
                       {onAdd && (
                         <Tooltip title="Adicionar" place="top-start">
                           <ButtonIcon
@@ -138,6 +152,7 @@ export function InspectionSearchForm({
                             size="lg"
                             mode="success"
                             icon="add"
+                            disabled={offline}
                             onClick={() => onAdd()}
                           />
                         </Tooltip>

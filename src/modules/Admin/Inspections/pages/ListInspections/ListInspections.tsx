@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 
 import { Tab, Tabs } from "@/shared/components/Core/Tabs";
 
+import { ExportExcelModal } from "./components/ExportExcelModal/ExportExcelModal";
 import { InspectionPDFReport } from "./components/InspectionPDFReport ";
 import { InspectionSearchForm } from "./components/InspectionSearchForm/InspectionSearchForm";
 import { InspectionsTable } from "./components/InspectionsTable";
@@ -31,11 +32,15 @@ export function ListInspections() {
     handleOnSearch,
     handleOnChangeItemsPerPage,
     handleOnChangePage,
+    handleOnChangeStatusInspection,
     handleDeleteInspection,
     addNew,
     updateOfflineInspection,
-    handleOnChangeStatusInspection,
     handleSyncInspection,
+    handleExportExcel,
+    showExportModal,
+    handleCloseExportModal,
+    handleConfirmExport,
   } = useInspectionsRules();
 
   return (
@@ -57,6 +62,7 @@ export function ListInspections() {
                 }
                 onSubmit={(search) => handleOnSearch(search)}
                 onAdd={isInspectionChanger() ? addNew : undefined}
+                onExport={handleExportExcel}
                 offline={tableMode === "offline"}
               />
             </Col>
@@ -132,6 +138,12 @@ export function ListInspections() {
           )}
         </Container>
       </Section>
+      <ExportExcelModal
+        isOpen={showExportModal}
+        onClose={handleCloseExportModal}
+        onConfirm={handleConfirmExport}
+      />
+
       {inspectionToPrint &&
         createPortal(
           <div

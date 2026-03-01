@@ -11,10 +11,12 @@ import { useLoaderContext } from "@/shared/contexts/Loader";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { useToastContext } from "@/shared/contexts/Toast";
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
-import { put } from "@/shared/services/api/api.service";
+import { getBlob, put } from "@/shared/services/api/api.service";
+import { formatDateWithUnderline } from "@/shared/utils/date";
 import { generatePdfFile } from "@/shared/utils/pdf";
 
 import { ROUTE_SAVE_INSPECTION, ROUTE_UPDATE_INSPECTION } from "../../routes/Inspection.paths";
@@ -45,10 +47,12 @@ export function useInspectionsRules() {
 
   // Permissões
   const { isInspectionChanger } = useAuthRoles();
+  const { customersDropdown } = useDropdownsRedux();
 
   // Estados locais
   const [loaded, setLoaded] = useState(false);
   const [tableMode, setTableMode] = useState<"online" | "offline">(isOnline ? "online" : "offline");
+  const [showExportModal, setShowExportModal] = useState(false);
 
   // PDF
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -251,6 +255,76 @@ export function useInspectionsRules() {
     [syncInspection, recalculate, addAlert, refetch],
   );
 
+  function handleExportExcel() {
+    setShowExportModal(true);
+  }
+
+  const handleConfirmExport = async (initialDate: string, finalDate: string) => {
+    setShowExportModal(false);
+
+    try {
+      showLoader();
+
+      let customerName = "Todos";
+      const customerId = params?.customerId;
+
+      if (customerId) {
+        const foundCustomer = customersDropdown.find((c) => c.id === customerId);
+        if (foundCustomer) {
+          customerName = foundCustomer.fantasyName.replace(/\s+/g, "_");
+        }
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { records, page, order, ...cleanExportParams } = params || ({} as any);
+
+      const blobData = await getBlob(`/operational/parts-inspection/data/export-excel`, {
+        ...cleanExportParams,
+        initialReportStartDate: initialDate,
+        finalReportStartDate: finalDate,
+      });
+
+      const url = window.URL.createObjectURL(blobData);
+      const link = document.createElement("a");
+      link.href = url;
+
+      link.setAttribute(
+        "download",
+        `Relatório_${customerName}_${formatDateWithUnderline(new Date())}.xlsx`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      addToast({
+        type: "success",
+        title: "Exportação concluída",
+        description: "O relatório Excel foi gerado com sucesso.",
+      });
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        const blob: Blob = error.response.data;
+        const text = await blob.text();
+        const parsed = JSON.parse(text);
+
+        addToast({
+          type: "helper",
+          title: "Sem dados",
+          description: parsed?.message || "Nenhum dado encontrado para os filtros selecionados.",
+        });
+      } else {
+        addToast({
+          type: "warning",
+          title: "Erro ao exportar",
+          description: "Não foi possível exportar os dados para o Excel.",
+        });
+      }
+    } finally {
+      hideLoader();
+    }
+  };
+
   const SEARCH_OPTIONS: IOption[] = [
     {
       value: "reportNumber",
@@ -308,5 +382,11 @@ export function useInspectionsRules() {
     handleOnChangeStatusInspection,
     handleDeleteInspection,
     handleSyncInspection,
+    handleExportExcel,
+
+    // Export modal
+    showExportModal,
+    handleCloseExportModal: () => setShowExportModal(false),
+    handleConfirmExport,
   };
 }
