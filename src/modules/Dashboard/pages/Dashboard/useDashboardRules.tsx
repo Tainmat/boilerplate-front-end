@@ -10,7 +10,7 @@ import { useTotalizingCards } from "@/shared/hooks/services/Dashboard/useTotaliz
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { formatDateWithUnderline } from "@/shared/utils/date";
 import { firstDayOfMonth, lastDayOfMonth } from "@/shared/utils/date/dayjs";
-import { generatePdfFile } from "@/shared/utils/pdf";
+import { generateDashboardPdfFile } from "@/shared/utils/pdf";
 
 export interface IDashboardParams {
   initialReportStartDate: string;
@@ -140,7 +140,7 @@ export function useDashboardRules() {
       cancelTxt: "Cancelar",
       confirmTxt: "Download",
       onConfirm: async () => {
-        await generatePdfFile(`Relatório_${customerName}_${formattedDate}`, pdfRef, {
+        await generateDashboardPdfFile(`Relatório_${customerName}_${formattedDate}`, pdfRef, {
           orientation: "landscape",
           format: "a4",
           scale: 2,
