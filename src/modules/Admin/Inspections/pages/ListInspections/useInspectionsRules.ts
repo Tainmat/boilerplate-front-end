@@ -17,6 +17,7 @@ import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
 import { get, getBlob, put } from "@/shared/services/api/api.service";
 import { formatDateWithUnderline } from "@/shared/utils/date";
+import { removeEmptyEntries } from "@/shared/utils/generic";
 import { generateMultiPagePdfFile, generatePdfFile } from "@/shared/utils/pdf";
 
 import { ROUTE_SAVE_INSPECTION, ROUTE_UPDATE_INSPECTION } from "../../routes/Inspection.paths";
@@ -309,9 +310,13 @@ export function useInspectionsRules() {
     showLoader();
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { records, page, order, ...cleanExportParams } = params || ({} as any);
+      const payload = removeEmptyEntries(cleanExportParams);
+
       const { data: responseBody } = await get(
         "/operational/parts-inspection/data/export-pdf-data",
-        { initialReportStartDate: startDate, finalReportStartDate: endDate, fields },
+        { ...payload, initialReportStartDate: startDate, finalReportStartDate: endDate },
       );
 
       const items = responseBody?.data ?? responseBody ?? [];
@@ -356,9 +361,10 @@ export function useInspectionsRules() {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { records, page, order, ...cleanExportParams } = params || ({} as any);
+      const payload = removeEmptyEntries(cleanExportParams);
 
       const blobData = await getBlob(`/operational/parts-inspection/data/export-excel`, {
-        ...cleanExportParams,
+        ...payload,
         initialReportStartDate: initialDate,
         finalReportStartDate: finalDate,
       });
