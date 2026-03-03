@@ -200,14 +200,12 @@ export const ReportSection = styled(Section)`
 export const ReportContent = styled.div`
   font-size: 11px;
   padding: 0.3rem 0.4rem;
-  color: blue;
   line-height: 1.3;
   flex: 1;
   overflow: hidden;
 
   * {
     font-size: 11px !important;
-    color: blue;
     line-height: 1.3;
   }
 

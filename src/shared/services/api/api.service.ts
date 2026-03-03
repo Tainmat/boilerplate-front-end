@@ -156,6 +156,26 @@ export async function get(
   return response;
 }
 
+export async function getBlob(
+  path: string,
+  params?: Record<string, any>,
+  controller?: AbortController,
+): Promise<Blob> {
+  const token = getAuthorizationToken();
+
+  const response = await api.get(path, {
+    params,
+    headers: {
+      Accept: "application/json",
+      Authorization: token,
+    },
+    responseType: "blob",
+    signal: controller?.signal,
+  });
+
+  return response.data;
+}
+
 export async function fakeRequest(
   time: number,
   values?: Record<string, any>,

@@ -1,5 +1,3 @@
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -13,12 +11,17 @@ import { useLoaderContext } from "@/shared/contexts/Loader";
 import { useOnlineStatus } from "@/shared/contexts/OnlineStatus";
 import { useToastContext } from "@/shared/contexts/Toast";
 import { useOfflineInspections } from "@/shared/hooks/offline/useOfflineInspections";
+import { useDropdownsRedux } from "@/shared/hooks/redux/useDropdownsRedux";
 import { IInspectionDetail, useInspection } from "@/shared/hooks/services/Admin/useInspection";
 import { useInspections } from "@/shared/hooks/services/Admin/useInspections";
 import { useAuthRoles } from "@/shared/hooks/services/Rules/Auth/useRoles";
-import { put } from "@/shared/services/api/api.service";
+import { get, getBlob, put } from "@/shared/services/api/api.service";
+import { formatDateWithUnderline } from "@/shared/utils/date";
+import { removeEmptyEntries } from "@/shared/utils/generic";
+import { generateMultiPagePdfFile, generatePdfFile } from "@/shared/utils/pdf";
 
 import { ROUTE_SAVE_INSPECTION, ROUTE_UPDATE_INSPECTION } from "../../routes/Inspection.paths";
+import { transformInspectionDataForPdf } from "./components/InspectionListPDFReport/inspectionPdfFields";
 import {
   IInspectionSearchForm,
   initialInspectionSearchValues,
@@ -46,14 +49,25 @@ export function useInspectionsRules() {
 
   // Permissões
   const { isInspectionChanger } = useAuthRoles();
+  const { customersDropdown } = useDropdownsRedux();
 
   // Estados locais
   const [loaded, setLoaded] = useState(false);
   const [tableMode, setTableMode] = useState<"online" | "offline">(isOnline ? "online" : "offline");
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showExportPDFModal, setShowExportPDFModal] = useState(false);
 
-  // PDF
+  // PDF individual
   const pdfRef = useRef<HTMLDivElement>(null);
   const [inspectionToPrint, setInspectionToPrint] = useState<IInspectionDetail | null>(null);
+
+  // PDF listagem
+  const pdfListRef = useRef<HTMLDivElement>(null);
+  const [pdfListData, setPdfListData] = useState<{
+    data: Record<string, string>[];
+    fields: string[];
+    generatedAt: Date;
+  } | null>(null);
 
   useLayoutEffect(() => {
     document.title = TITLE_ADMIN_INSPECTIONS;
@@ -71,6 +85,37 @@ export function useInspectionsRules() {
   const errorsCount = useMemo(() => {
     return offlineInspections?.filter((i) => i.erroSync).length || 0;
   }, [offlineInspections]);
+
+  // Dispara geração do PDF após o componente InspectionListPDFReport renderizar no DOM
+  useEffect(() => {
+    if (!pdfListData) return;
+
+    const generate = async () => {
+      try {
+        await generateMultiPagePdfFile(
+          `Relatório_Inspeções_${formatDateWithUnderline(pdfListData.generatedAt)}`,
+          pdfListRef,
+        );
+        addToast({
+          type: "success",
+          title: "Exportação concluída",
+          description: "O relatório PDF foi gerado com sucesso.",
+        });
+      } catch {
+        addToast({
+          type: "warning",
+          title: "Erro ao gerar PDF",
+          description: "Não foi possível gerar o relatório PDF.",
+        });
+      } finally {
+        setPdfListData(null);
+        hideLoader();
+      }
+    };
+
+    generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdfListData]);
 
   const handleSearchParams = useCallback(
     (params: Record<string, any>) => {
@@ -152,70 +197,6 @@ export function useInspectionsRules() {
     navigate(`${ROUTE_UPDATE_INSPECTION}/${uuid}/offline`);
   }
 
-  const generatePdfFile = useCallback(async (fileName: string) => {
-    if (!pdfRef.current) return;
-
-    // ⛔ ESSENCIAL: espera o DOM realmente pintar
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-
-    const canvas = await html2canvas(pdfRef.current, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-    });
-
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`${fileName}.pdf`);
-  }, []);
-
-  // const printPdf = useCallback((documentTitle: string) => {
-  //   // Inject print-only CSS dynamically
-  //   const style = document.createElement("style");
-  //   style.id = "pdf-print-styles";
-  //   style.textContent = `
-  //     @media print {
-  //       @page { size: A4 portrait; margin: 0; }
-  //       body * { visibility: hidden !important; }
-  //       .pdf-print-area, .pdf-print-area * { visibility: visible !important; }
-  //       .pdf-print-area {
-  //         position: fixed !important;
-  //         top: 0 !important;
-  //         left: 0 !important;
-  //         width: 210mm !important;
-  //         opacity: 1 !important;
-  //         z-index: 99999 !important;
-  //         overflow: visible !important;
-  //       }
-  //       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  //     }
-  //   `;
-  //   document.head.appendChild(style);
-
-  //   const cleanup = () => {
-  //     style.remove();
-  //     document.title = TITLE_ADMIN_INSPECTIONS;
-  //     setInspectionToPrint(null);
-  //     window.removeEventListener("afterprint", cleanup);
-  //   };
-
-  //   window.addEventListener("afterprint", cleanup);
-
-  //   document.title = documentTitle;
-  //   window.print();
-  // }, []);
-
   async function handleGeneratePdf(inspectionId: string, documentTitle: string) {
     try {
       showLoader();
@@ -234,7 +215,7 @@ export function useInspectionsRules() {
           cancelTxt: "Cancelar",
           confirmTxt: "Download",
           onConfirm: async () => {
-            await generatePdfFile(documentTitle);
+            await generatePdfFile(documentTitle, pdfRef);
             setInspectionToPrint(null);
           },
           onCancel: () => {
@@ -316,6 +297,119 @@ export function useInspectionsRules() {
     [syncInspection, recalculate, addAlert, refetch],
   );
 
+  function handleExportExcel() {
+    setShowExportModal(true);
+  }
+
+  function handleExportPDF() {
+    setShowExportPDFModal(true);
+  }
+
+  const handleConfirmExportPDF = async (startDate: string, endDate: string, fields: string[]) => {
+    setShowExportPDFModal(false);
+    showLoader();
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { records, page, order, ...cleanExportParams } = params || ({} as any);
+      const payload = removeEmptyEntries(cleanExportParams);
+
+      const { data: responseBody } = await get(
+        "/operational/parts-inspection/data/export-pdf-data",
+        { ...payload, initialReportStartDate: startDate, finalReportStartDate: endDate },
+      );
+
+      const items = responseBody?.data ?? responseBody ?? [];
+      const transformedData = transformInspectionDataForPdf(items, fields);
+
+      setPdfListData({ data: transformedData, fields, generatedAt: new Date() });
+    } catch (error: any) {
+      hideLoader();
+
+      if (error?.response?.status === 404) {
+        addToast({
+          type: "helper",
+          title: "Sem dados",
+          description:
+            error.response?.data?.message || "Nenhum dado encontrado para os filtros selecionados.",
+        });
+      } else {
+        addToast({
+          type: "warning",
+          title: "Erro ao exportar",
+          description: "Não foi possível exportar os dados para PDF.",
+        });
+      }
+    }
+  };
+
+  const handleConfirmExport = async (initialDate: string, finalDate: string) => {
+    setShowExportModal(false);
+
+    try {
+      showLoader();
+
+      let customerName = "Todos";
+      const customerId = params?.customerId;
+
+      if (customerId) {
+        const foundCustomer = customersDropdown.find((c) => c.id === customerId);
+        if (foundCustomer) {
+          customerName = foundCustomer.fantasyName.replace(/\s+/g, "_");
+        }
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { records, page, order, ...cleanExportParams } = params || ({} as any);
+      const payload = removeEmptyEntries(cleanExportParams);
+
+      const blobData = await getBlob(`/operational/parts-inspection/data/export-excel`, {
+        ...payload,
+        initialReportStartDate: initialDate,
+        finalReportStartDate: finalDate,
+      });
+
+      const url = window.URL.createObjectURL(blobData);
+      const link = document.createElement("a");
+      link.href = url;
+
+      link.setAttribute(
+        "download",
+        `Relatório_${customerName}_${formatDateWithUnderline(new Date())}.xlsx`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      addToast({
+        type: "success",
+        title: "Exportação concluída",
+        description: "O relatório Excel foi gerado com sucesso.",
+      });
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        const blob: Blob = error.response.data;
+        const text = await blob.text();
+        const parsed = JSON.parse(text);
+
+        addToast({
+          type: "helper",
+          title: "Sem dados",
+          description: parsed?.message || "Nenhum dado encontrado para os filtros selecionados.",
+        });
+      } else {
+        addToast({
+          type: "warning",
+          title: "Erro ao exportar",
+          description: "Não foi possível exportar os dados para o Excel.",
+        });
+      }
+    } finally {
+      hideLoader();
+    }
+  };
+
   const SEARCH_OPTIONS: IOption[] = [
     {
       value: "reportNumber",
@@ -373,5 +467,21 @@ export function useInspectionsRules() {
     handleOnChangeStatusInspection,
     handleDeleteInspection,
     handleSyncInspection,
+    handleExportExcel,
+
+    // Export Excel modal
+    showExportModal,
+    handleCloseExportModal: () => setShowExportModal(false),
+    handleConfirmExport,
+
+    // Export PDF modal
+    showExportPDFModal,
+    handleCloseExportPDFModal: () => setShowExportPDFModal(false),
+    handleExportPDF,
+    handleConfirmExportPDF,
+
+    // PDF listagem
+    pdfListRef,
+    pdfListData,
   };
 }
