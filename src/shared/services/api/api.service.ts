@@ -48,6 +48,11 @@ api.interceptors.response.use(
   },
 );
 
+api.interceptors.request.use(async (config) => {
+  await new Promise(resolve => setTimeout(resolve, 120000));
+  return config;
+});
+
 /* export interface IData<T> {
   current_page: number;
   returned_items: number;
