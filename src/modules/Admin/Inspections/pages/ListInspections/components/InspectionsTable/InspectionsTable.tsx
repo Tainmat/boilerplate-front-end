@@ -218,7 +218,7 @@ export function InspectionsTable({
                                 if (onGeneratePdf)
                                   onGeneratePdf(
                                     item.id,
-                                    `${item.reportNumber} - ${item.partType?.name || ""}`,
+                                    `${item.reportNumber} - ${item.componentId || item.partType?.name || ""}`,
                                   );
                               }}
                             />
