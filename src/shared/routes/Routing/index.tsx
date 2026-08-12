@@ -1,10 +1,10 @@
-import { ROUTE_HOME } from "@modules/Home/routes/Home.paths";
+import { NotFound } from "@modules/Errors/NotFound";
 import { Loader } from "@shared/components/Core/Loader";
 import { routes } from "@shared/routes/Pages/Pages.routes";
 import { RequireAuth } from "@shared/routes/Routing/RequireAuth";
 import { AnimatePresence } from "framer-motion";
 import { Suspense } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 export function Routing() {
   const location = useLocation();
@@ -31,7 +31,7 @@ export function Routing() {
             ))}
           </Route>
 
-          <Route path="*" element={<Navigate to={ROUTE_HOME} replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </AnimatePresence>
