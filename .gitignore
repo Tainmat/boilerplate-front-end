@@ -25,3 +25,9 @@ dev-dist
 *.sln
 *.sw?
 .env
+.orchestrator/
+
+.gitignore
+CLAUDE.md
+.claude/
+.omc/
