@@ -1,1 +1,0 @@
-export { CreateCustomer } from "./CreateCustomer";

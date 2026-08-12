@@ -1,1 +1,0 @@
-export { StorageBar } from "./StorageBar";

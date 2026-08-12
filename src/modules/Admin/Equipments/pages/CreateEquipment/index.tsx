@@ -1,1 +1,0 @@
-export { CreateEquipment } from "./CreateEquipment";

@@ -1,1 +1,0 @@
-export { CustomerContactRegisterForm } from "./RegisterForm";

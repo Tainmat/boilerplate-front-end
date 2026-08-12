@@ -20,10 +20,7 @@ import { useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { useLoadAllDropdowns } from "@/shared/hooks/services/Admin/Dropdown/useLoadAllDropdowns";
-
 export function Login() {
-  const { loadDropdowns } = useLoadAllDropdowns();
   const { deviceDetection, isSmartphone } = useDeviceDetection();
 
   const [searchParams] = useSearchParams();
@@ -45,9 +42,6 @@ export function Login() {
     });
 
     if (user?.authenticated === true) {
-      if (user.workOffline) {
-        await loadDropdowns();
-      }
       navigate(searchParams.get("redirect") ? String(searchParams.get("redirect")) : ROUTE_HOME);
     } else if (user?.authenticated === false) {
       formikHelpers.setFieldError("emailUsuario", "E-mail incorreto");
