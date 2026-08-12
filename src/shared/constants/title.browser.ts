@@ -1,4 +1,4 @@
-const brand = "USINCHECK -";
+const brand = "App -";
 
 export const TITLE_LOGIN = `${brand} Login`;
 export const TITLE_FIRST_LOGIN = `${brand} Primeiro acesso`;

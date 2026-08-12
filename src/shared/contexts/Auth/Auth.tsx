@@ -67,6 +67,8 @@ interface Props {
   children: ReactNode;
 }
 
+const userStorageKey = `${import.meta.env.VITE_KEY_CRIPTOGRAFIA}:user`;
+
 function AuthContext({ children }: Props) {
   const navigate = useNavigate();
 
@@ -80,7 +82,7 @@ function AuthContext({ children }: Props) {
   }, []);
 
   useEffect(() => {
-    const ususarioLocalStorage = getLocalStorageItem("Usincheck@JOmetto:user");
+    const ususarioLocalStorage = getLocalStorageItem(userStorageKey);
 
     if (ususarioLocalStorage) {
       setUser(ususarioLocalStorage);
@@ -93,7 +95,7 @@ function AuthContext({ children }: Props) {
         showLoader();
 
         setUser(null);
-        removeLocalStorageItem("Usincheck@JOmetto:user");
+        removeLocalStorageItem(userStorageKey);
 
         const { data } = await login("auth/login", credentials);
 
@@ -115,7 +117,7 @@ function AuthContext({ children }: Props) {
           };
 
           setUser(user);
-          setLocalStorageItem("Usincheck@JOmetto:user", user);
+          setLocalStorageItem(userStorageKey, user);
 
           return {
             authenticated: true,

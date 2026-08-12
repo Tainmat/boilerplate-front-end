@@ -29,6 +29,8 @@ interface Props {
   value?: string;
 }
 
+const apiOrigin = new URL(import.meta.env.VITE_API_URL).origin;
+
 export function InputFile({
   size,
   label,
@@ -63,13 +65,13 @@ export function InputFile({
     // Se contém o caminho completo do servidor, extrair apenas a parte relevante
     if (imagePath.includes("/assets/public/")) {
       const assetPath = imagePath.split("/assets/public/")[1];
-      const url = `https://qas-usincheck.jometto.com.br/assets/public/${assetPath}`;
+      const url = `${apiOrigin}/assets/public/${assetPath}`;
       return url;
     }
 
     // Fallback para outros casos
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
-    const url = `https://qas-usincheck.jometto.com.br${cleanPath}`;
+    const url = `${apiOrigin}${cleanPath}`;
     return url;
   };
 
