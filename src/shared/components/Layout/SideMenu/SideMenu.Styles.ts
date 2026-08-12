@@ -1,5 +1,5 @@
-import LatiniLogoOpen from "@assets/images/logo.png";
-import LatiniLogoClose from "@assets/images/logo-usincheck.png";
+import LatiniLogoOpen from "@assets/images/logo-blue-vertical.svg";
+import LatiniLogoClose from "@assets/images/logo-blue-vertical.svg";
 import styled, { css } from "styled-components";
 
 interface ContainerProps {

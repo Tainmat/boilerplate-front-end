@@ -1,4 +1,4 @@
-import LogoLatini from "@assets/images/logo.png";
+import LogoLatini from "@assets/images/logo-blue-vertical.svg";
 import * as S from "@modules/Auth/shared/components/Layout/AuthLayout.styles";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { ReactNode } from "react";
