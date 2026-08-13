@@ -23,6 +23,5 @@ export const ValidationsSchema = Yup.object().shape({
       },
     }),
   passwordUsuario: Yup.string()
-    .max(10, "O campo deve conter no máximo 10 caracteres!")
     .required("O campo é obrigatório!"),
 });

@@ -1,3 +1,4 @@
+import { rgba } from "polished";
 import styled, { css } from "styled-components";
 
 interface Props {
@@ -5,7 +6,11 @@ interface Props {
 }
 
 export const MainContainer = styled.div`
-  background-image: linear-gradient(321.77deg, rgba(181, 219, 156, 0.85) 5.96%, #f5f5f5 114.96%);
+  background-image: ${(props) => `linear-gradient(
+    321.77deg,
+    ${rgba(props.theme.colors.brand.primary.pure, 0.85)} 5.96%,
+    ${props.theme.colors.brand.primary.dark} 114.96%
+  )`};
   background-size: cover;
   width: 100vw;
   height: 100vh;
@@ -72,7 +77,7 @@ export const LoginContent = styled.div`
     padding: ${props.theme.spacing.xs};
     overflow: hidden !important;
 
-    .logo-usincheck {
+    .logo-app {
       margin: 0 auto;
       max-width: 12rem;
       height: auto;
@@ -83,7 +88,7 @@ export const LoginContent = styled.div`
     @media (max-width: 480px) {
       padding: ${props.theme.spacing.xs} ${props.theme.spacing.nano};
 
-      .logo-usincheck {
+      .logo-app {
         max-width: 10rem;
         margin-bottom: 1.5rem;
       }
@@ -93,7 +98,7 @@ export const LoginContent = styled.div`
     @media (min-width: 481px) and (max-width: 768px) {
       padding: ${props.theme.spacing.xs} ${props.theme.spacing.nano};
 
-      .logo-usincheck {
+      .logo-app {
         max-width: 11rem;
         margin-bottom: 1.75rem;
       }

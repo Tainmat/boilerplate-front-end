@@ -1,5 +1,5 @@
 import { ROUTE_LOGIN } from "@modules/Auth/routes/Login.paths";
-import { login } from "@shared/services/api/api.service";
+// import { login } from "@shared/services/api/api.service";
 import {
   clearLocalStorage,
   getLocalStorageItem,
@@ -97,6 +97,7 @@ function AuthContext({ children }: Props) {
         setUser(null);
         removeLocalStorageItem(userStorageKey);
 
+        /*
         const { data } = await login("auth/login", credentials);
 
         if (data) {
@@ -128,7 +129,37 @@ function AuthContext({ children }: Props) {
           };
         }
         return { authenticated: false };
-        /* return { authenticated: false }; */
+        */
+
+        const user: UserAuth = {
+          auth: {
+            expiresIn: 86400,
+            token: "login-disabled",
+          },
+          id: "login-disabled",
+          userName: credentials.username,
+          socialName: credentials.username,
+          email: credentials.username,
+          isFirstAccess: false,
+          photoUrl: null,
+          birthDate: null,
+          roles: [
+            String(import.meta.env.VITE_APP_ROLE_SYSTEM_ADMIN),
+            String(import.meta.env.VITE_APP_ROLE_ADMINISTRATOR),
+            String(import.meta.env.VITE_APP_ROLE_INSPECTOR),
+            String(import.meta.env.VITE_APP_ROLE_CUSTOMER),
+          ],
+          customers: [],
+        };
+
+        setUser(user);
+        setLocalStorageItem(userStorageKey, user);
+
+        return {
+          authenticated: true,
+          firstLogin: false,
+          workOffline: true,
+        };
       } catch {
         return undefined;
       } finally {

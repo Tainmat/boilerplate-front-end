@@ -7,7 +7,7 @@ interface Props {
 
 export const Button = styled.button<Props>`
   ${(props) => css`
-    background-color: ${props.theme.colors.feedback.success.pure};
+    background-color: ${props.theme.colors.brand.primary.pure};
     border: unset;
     border-radius: 500px;
     color: ${props.theme.colors.neutral.high.pure};
@@ -23,7 +23,7 @@ export const Button = styled.button<Props>`
     margin-bottom: 0.75rem;
 
     &:disabled {
-      border: 2px solid ${rgba(props.theme.colors.feedback.success.pure, 0.32)};
+      border: 2px solid ${rgba(props.theme.colors.brand.primary.pure, 0.32)};
       background-color: ${rgba(props.theme.colors.neutral.low.pure, 0.32)};
       color: ${rgba(props.theme.colors.neutral.high.pure, 0.64)};
 
