@@ -1,4 +1,4 @@
-import LogoLatini from "@assets/images/logo-blue-vertical.svg";
+import Logo from "@assets/images/logo-blue-vertical.svg";
 import * as S from "@modules/Auth/shared/components/Layout/AuthLayout.styles";
 import { useDeviceDetection } from "@shared/hooks/useDeviceDetection";
 import { ReactNode } from "react";
@@ -19,7 +19,7 @@ export function AuthLayout({ children, deviceType }: Props) {
       <S.MainContainer>
         <S.LoginContainer $isSmartphone={isSmartphone}>
           <S.LoginContent>
-            <img src={LogoLatini} className="logo-usincheck" alt="Logo UsinCheck" />
+            <img src={Logo} className="logo-app" alt="Logo App" />
             {children}
           </S.LoginContent>
         </S.LoginContainer>
